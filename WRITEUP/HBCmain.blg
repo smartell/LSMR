@@ -1,0 +1,50 @@
+This is BibTeX, Version 0.99d (TeX Live 2011)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: HBCmain.aux
+The style file: apalike.bst
+A level-1 auxiliary file: ./Appendix1/WorkPlan.aux
+A level-1 auxiliary file: ./Appendix2/SimulationModel.aux
+Database file #1: $HOME/Documents/ARTICLES/Articles-1.bib
+Warning--empty journal in fournier2011ad
+You've used 4 entries,
+            1935 wiz_defined-function locations,
+            502 strings with 4651 characters,
+and the built_in function-call counts, 1622 in all, are:
+= -- 153
+> -- 81
+< -- 2
++ -- 28
+- -- 28
+* -- 146
+:= -- 294
+add.period$ -- 11
+call.type$ -- 4
+change.case$ -- 33
+chr.to.int$ -- 4
+cite$ -- 5
+duplicate$ -- 54
+empty$ -- 103
+format.name$ -- 34
+if$ -- 302
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 3
+newline$ -- 22
+num.names$ -- 12
+pop$ -- 30
+preamble$ -- 1
+purify$ -- 34
+quote$ -- 0
+skip$ -- 41
+stack$ -- 0
+substring$ -- 104
+swap$ -- 4
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 24
+warning$ -- 1
+while$ -- 12
+width$ -- 0
+write$ -- 51
+(There was 1 warning)

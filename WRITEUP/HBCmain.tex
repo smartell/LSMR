@@ -1,0 +1,109 @@
+
+
+%
+%  HBCmain
+%
+%  Created by Steven James Dean Martell on 2011-09-27.
+%  Copyright (c) 2011 UBC Fisheries Centre. All rights reserved.
+%
+\documentclass[]{article}
+
+% Use utf-8 encoding for foreign characters
+\usepackage[utf8]{inputenc}
+
+% Setup for fullpage use
+\usepackage{fullpage}
+
+% Uncomment some of the following if you use the features
+%
+% Running Headers and footers
+%\usepackage{fancyhdr}
+% Multipart figures
+%\usepackage{subfigure}
+% Natbib package for bibliography
+\usepackage[round]{natbib}
+
+% More symbols
+\usepackage{amsmath} 
+\usepackage{amssymb} 
+\usepackage{latexsym}
+
+% Surround parts of graphics with box
+\usepackage{boxedminipage}
+
+% Package for including code in the document
+\usepackage{listings}
+
+% If you want to generate a toc for each chapter (use with book)
+\usepackage{minitoc}
+
+% This is now the recommended way for checking for PDFLaTeX:
+\usepackage{ifpdf}
+
+%% The following is used for tables of equations.
+\newcounter{saveEq} 
+\def\putEq{\setcounter{saveEq}{\value{equation}}} 
+\def\getEq{\setcounter{equation}{\value{saveEq}}} 
+\def 
+\tableEq{ 
+
+% equations in tables
+\putEq \setcounter{equation}{0} 
+\renewcommand{\theequation}{T\arabic{table}.\arabic{equation}} \vspace{-5mm} } 
+\def\normalEq{ 
+
+% renew normal equations
+\getEq 
+\renewcommand{\theequation}{\arabic{section}.\arabic{equation}}}
+
+\def\puthrule{ 
+
+%thick rule lines for equation tables
+\hrule \hrule \hrule \hrule \hrule} 
+\usepackage{multicol}
+
+%\newif\ifpdf
+%\ifx\pdfoutput\undefined
+%\pdffalse % we are not running PDFLaTeX
+%\else
+%\pdfoutput=1 % we are running PDFLaTeX
+%\pdftrue
+%\fi
+\ifpdf 
+\usepackage[pdftex]{graphicx} \else 
+\usepackage{graphicx} \fi 
+\title{Estimates of population status of humpback chub (\textit{Gila cypha}) in the Grand Canyon based on a length-based mark-recapture assessment model.} 
+\author{ Steven J. D. Martell\\
+UBC Fisheries Centre,\\
+2202 Main Mall,\\
+Vancouver, BC\\
+V6T 1Z4,\\
+CANADA }
+
+\date{2011-09-27}
+
+\begin{document}
+
+\ifpdf \DeclareGraphicsExtensions{.pdf, .jpg, .tif} \else \DeclareGraphicsExtensions{.eps, .jpg} \fi
+
+\maketitle 
+\begin{abstract}
+	A length-structured population model that incorporates mark-recapture data was developed to estimate abundance of humpback chub (\textit{Gila cypha}) in the Grand Canyon between 1989 and 2011. The model was fit to observations on catch-at-length and capture-recapture data from sampling programs that employed a variety of gear types including electrofishing, tramel netting, and hoop nets. Previous assessment models were age-based and have been shown to produce biased estimates of recent recruitment estimates. The age-structured model was also limited to data on fish that were greater than 150mm total length; the minimum size required for tagging. The length-structured model developed here makes no assumptions about age of individual fish and is also fit to catch-at-length data for fish that are too small to tag. Model outputs are based the number of fish greater than a specified size, or in a fixed size interval, there are no age-based results. 
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}\label{sec:Intro}
+
+In this report, I develop a length-structured mark-recapture model (hereafter, LSMR) where the accounting system for population numbers is based purely on length. The model is a statistical catch-at-length model, where the initial length distribution and recruitment each year are treated as latent variables to be estimated by fitting the model to a series of catch-at-length observations take over a period of time. A separable function is developed to estimate the year and size effect in observed catch-at-length data. The statistical nature of the model is very similar to that of \cite{fournier1982general}, but is based on catch-at-length rather than catch-age data. The model is also fit to length-based capture-recapture data, where the growth and survival of tagged animals is updated at each time step and the predicted ratio of marked and unmarked fish-at-length is used to estimate the length-based recapture rates.
+
+\input{./Methods/LSMRmethods}
+
+\bibliographystyle{apalike} 
+\bibliography{$HOME/Documents/ARTICLES/Articles-1}
+
+\appendix 
+\include{./Appendix1/WorkPlan} 
+\include{./Appendix2/SimulationModel}
+
+\end{document} 

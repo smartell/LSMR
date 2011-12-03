@@ -1,0 +1,13 @@
+## Data file for a length-based simulation model.
+## Model dimensions
+## syr, nyr
+1990	2010
+## lb ub bw
+5.0	40.0 1.0
+
+
+## Growth parameters
+## linf, k, beta
+40.0	0.25 1.2
+
+

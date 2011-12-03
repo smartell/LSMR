@@ -1,0 +1,10 @@
+%!TEX root = /Users/stevenmartell/Documents/CONSULTING/HumpbackChub/HBC_2011_Assessment/WRITEUP/HBCmain.tex
+\section{Individual based model for simulating the dynamics and sampling of humpback chub in the Grand Canyon}
+
+\subsection{Introduction}
+The following is a detailed description of the simulation model that was used for simulating the population dynamics and data collection programs for humpback chub in the Grand canyon. We first describe in detail the life-history trajectory of an individual fish: the survival probability, growth, and capture history and provide the documented code to implement this process. I then describe the data structures that resemble a databased of individual capture histories for both tagged and untagged fish.   The individual based model (IBM) is then used to estimate the fate and capture histories of a known number of recruits starting life at a 40mm length interval.
+
+The simulation model was constructed using R \citep{R-Development-Core-Team:2009fk}.  The algorithm populates three matrixes that contain the total number of fish captured in year $t$ at length interval $x$, the total number of newly marked fish, and a matrix of the total number of recaptured individuals.  At each time step the fish is alive, information on length and age is stored along with information on capture history, the tag number if the fish was large enough to tag.
+
+\subsection{R-code}
+\lstinputlisting[language=R]{../R/HBCsim.R}

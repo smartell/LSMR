@@ -1,0 +1,60 @@
+%!TEX root = /Users/stevenmartell/Documents/CONSULTING/HumpbackChub/HBC_2011_Assessment/WRITEUP/HBCmain.tex
+
+\section{Methods}\label{sec:Methods}
+\subsection{Estimation of growth from mark-recapture data}
+I first examined the mark-recapture data to estimate parameters for the von Bertalanffy growth model based on the methods described by \cite{zhang2009use}.  
+
+
+\subsection{Length-structured mark-recapture model (LSMR)}
+The following is a description of the analytical model for the length-structured mark-recapture model (hereafter, LSMR) used in this assessment.  I present the analytical model in the form of a table where the order in which model equations are presented also represent the order in which the calculations proceed in the computer code. The LSMR model was implemented in AD Model Builder \citep{fournier2011ad}, and the template code is available in the appendix of this document.
+
+
+
+\begin{table}
+  \centering
+\caption{Data, parameters, and analytical procedures for the length-based mark-recapture model.}\label{Table:LSMRmodel} 
+\tableEq
+    \begin{align}
+        \hline
+		&\mbox{INDEXES, DATA \& CONSTANTS} &\nonumber\\
+		&\mbox{index for time, index for length interval} 
+		&i,j \\
+		&\mbox{time step}  & \tau\\
+		&\mbox{set of midpoints of length intervals}
+		&\Lambda = \{x_1, \ldots,x_J\}\\
+		&\mbox{catch, new marks, recaptures} 
+		&C_{i,j}, M_{i,j}, R_{i,j}\\[1ex]
+		%%
+		%%
+		&\mbox{PARAMETERS \& DERIVED VARIABLES} &\nonumber\\
+		&\mbox{estimated parameters} 
+		&\theta=\{\dot{N},\bar{R},M_\infty,l_\infty,k,\beta,l_x,g_x,
+			\vec{\eta},\vec{\nu} \}\\
+		&\mbox{mortality-at-length} 
+		& \vec{m} = \frac{M_\infty l_\infty}{\Lambda}\\
+		&\mbox{selectivity-at-length} 
+		& \vec{s} = \frac{1}{1+\exp(-(\Lambda-l_x)/g_x)}\\
+		&\mbox{growth increment} 
+		& \vec{\Delta} = (l_\infty-\Lambda)(1-\exp(-k \tau))  \\
+		&\mbox{length transition probability}
+		& P_{j,j'} =\int_{x_j-x^*}^{x_j+x^*} \frac{x_{j'}^{(\Delta_{j}/\beta-1)}
+		e^{x_{j'}/\beta}}{\beta^{\Delta_{j}/\beta} \Gamma(\Delta_{j}/\beta)}dx, 
+		\quad \sum_{j'=1}^J P_{j,j'}= 1 \\
+		&\mbox{total numbers, marked numbers} 
+		& \mathbf{N}, \mathbf{T}\\[1ex]
+		%%
+		%%
+		&\mbox{INITIAL STATES ($i=1$)}  \nonumber\\
+		&\mbox{initial numbers-at-length}\quad
+		&N_{i,j} = \dot{N}\exp(\eta_j)\\
+		%%
+		%%
+		&\mbox{DYNAMIC STATES ($i>1$)} \nonumber\\
+		&\mbox{capture probability} 
+		& f_i\\
+		\hline \nonumber
+    \end{align}
+    \normalEq
+\end{table}
+
+
