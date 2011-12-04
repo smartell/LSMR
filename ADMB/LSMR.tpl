@@ -1,19 +1,19 @@
-// **************************************************************** //
-// LSMR: Length Structured Mark-Recapture model.                    //
-//                                                                  //
-// Created by Steven James Dean Martell on 2011-10-26.              //
-// Copyright (c) 2011. All rights reserved.                         //
-//                                                                  //
-// PROJECT LOG:  DATE       HOURS  COMMENTS                         //
-//               Sep 23/11	  4    Simulation model in R			//
-//               Sep 26/11    8    Set up HBC project & Rcode       //
-//               Sep 27/11	  8    Simulation model in R            //
-//               Oct 27/11    8    Simulation model in R & ADMB code//
-//               Oct 31/11    4    LSMR.tpl code                    //
-//                                                                  //
-//                                                                  //
-//                                                                  //
-// **************************************************************** //
+// ************************************************************************* //
+// LSMR: Length Structured Mark-Recapture model.                             //
+//                                                                           //
+// Created by Steven James Dean Martell on 2011-10-26.                       //
+// Copyright (c) 2011. All rights reserved.                                  //
+//                                                                           //
+// PROJECT LOG:  DATE       HOURS  COMMENTS                                  //
+//               Sep 23/11	  4    Simulation model in R			         //
+//               Sep 26/11    8    Set up HBC project & Rcode                //
+//               Sep 27/11	  8    Simulation model in R                     //
+//               Oct 27/11    8    Simulation model in R & ADMB code         //
+//               Oct 31/11    4    LSMR.tpl code                             //
+//                                                                           //
+//                                                                           //
+//                                                                           //
+// ************************************************************************* //
 
 
 DATA_SECTION
