@@ -1,0 +1,31 @@
+_______________________________________________________________________________
+               Integrated Length Structured Mark Recapture Model
+                                  Version 1.0
+                                
+               Created by Steven James Dean Martell on 2011-10-26.
+               Copyright (c) 2011. All rights reserved.           
+
+_______________________________________________________________________________
+_______________________________________________________________________________
+
+This software is maintained using a Distributed Version Control System (DVCS)
+called Git.  The Git repository can be cloned from GitHub at the following URL
+
+https://github.com/smartell/HBC-LSMR
+
+Read only url:
+git://github.com/smartell/HBC-LSMR.git
+
+SSH Read-Write:
+git@github.com:smartell/HBC-LSMR.git
+
+To gain write access to the repository contact martell.steve@gmail.com
+
+THE FOLLOWING IS A LIST OF USEFUL GIT COMMANDS TO USE AT THE COMMAND LINE$:
+  git help                      <list git commands>
+  git clone url ILSMR/          <clone repository>
+  git add filename              <add new file>
+  git commit -m"message"        <commit with message>
+  git log                       <view commit log>
+  git status                    <view changes & staging>
+  git branch                    <list, create or delete branches>
