@@ -8,16 +8,17 @@ _______________________________________________________________________________
 _______________________________________________________________________________
 _______________________________________________________________________________
 
+Obtaining a copy of ILSMR:
+==========================
+
 This software is maintained using a Distributed Version Control System (DVCS)
-called Git.  The Git repository can be cloned from GitHub at the following URL
+called Git.  The Git repository can be cloned from google at the following URL
 
-https://github.com/smartell/HBC-LSMR
+https://code.google.com/p/lsmr-project/
+# Deprecated https://github.com/smartell/HBC-LSMR
 
-Read only url:
-git://github.com/smartell/HBC-LSMR.git
-
-SSH Read-Write:
-git@github.com:smartell/HBC-LSMR.git
+To obtain a clone of the repository use:
+git clone https://code.google.com/p/lsmr-project/
 
 To gain write access to the repository contact martell.steve@gmail.com
 
@@ -29,3 +30,4 @@ THE FOLLOWING IS A LIST OF USEFUL GIT COMMANDS TO USE AT THE COMMAND LINE$:
   git log                       <view commit log>
   git status                    <view changes & staging>
   git branch                    <list, create or delete branches>
+_______________________________________________________________________________
