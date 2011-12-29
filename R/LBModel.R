@@ -47,3 +47,30 @@ for(i in 2:4)
 }
 legend("top",c("Age 0", "Age 0.5", "Age 1.0", "Age 1.5"), lty=1, col=1:4, ncol=4, lwd=2, bty="n")
 dev.copy2pdf(file="../FIGS/fig:lengthTransition.pdf")
+
+
+#Population model with constant recruitment.
+N = rep(0, length=n)
+R = rep(0, length=n)
+
+# Initialize the numbers at length
+r <- dgamma(xp, 200, scale = 0.5/10)/sum(dgamma(xp, 200, scale=0.5/10))
+R  <- 100 * r
+plot(xp,R, type="l")
+for(i in 1:50)
+{
+	N = as.vector((N*exp(-0.5))%*%P) +R*exp(rnorm(1, 0, 0.5))
+	lines(xp, N, type="l")
+}
+
+# Dynamic states
+par(mfcol=c(5, 2), las=1, mar=c(1, 3, 1, 1))
+for(i in 1:10)
+{
+	N = as.vector((N*exp(-0.5-0.4*runif(1)))%*%P) + R*exp(rnorm(1, 0, .5))
+	plot(xp, N, type="h")
+	print(sum(N))
+}
+
+
+

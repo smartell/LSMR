@@ -17,7 +17,7 @@ lvbinc <- function(lrel,tau,k,Linf) {
 # define the length bins
 
 lbins <- c(30,35,40,45,50,55,60,65,70,75,80)
-lbins <- seq(30, 80, by=2)
+lbins <- seq(30, 80, by=5)
 # define the Monte Carlo transition matrices
 
 nits <- dim(pars)[1]

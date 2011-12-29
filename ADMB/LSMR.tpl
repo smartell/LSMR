@@ -286,6 +286,7 @@ FUNCTION calc_objective_function;
   }
 
 
+
 FUNCTION dvar_vector dgamma(dvector& x, dvariable& a, dvariable& b)
   {
 	//returns the gamma density with a & b as parameters
