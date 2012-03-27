@@ -1,0 +1,7 @@
+#This is the default control file for ASMR.
+FULL_HBC2009.dat		## -Data file name
+NULL					## -Optional scenario file (use 'NULL' to ignore this feature)
+## Scenario1.dat			## -Optional scenario file (use 'NULL' to ignore this feature)
+0						## -If by cohort flag (1) otherwise (0)
+1						## -Model (ASMR1, ASMR2, ASMR3)
+2						## -Likelihood (poisson, negative binomial)

@@ -243,7 +243,7 @@ FUNCTION calc_catch_at_length
 		
 		//New Marks based on proportion of Chat that is unmarked (1-T/N)
 		dvar_vector markRate = 1. - vposfun(1. - elem_div(T(ir),N(ir)),0.01,fpen);
-		cout<<min(N(ir))<<endl;
+		//cout<<min(N(ir))<<endl;
 		Mhat(i)(13,nx) = elem_prod( Chat(i)(13,nx), 1.-markRate(13,nx) );
 		
 		
@@ -281,8 +281,8 @@ FUNCTION calc_objective_function;
 	fvec(2) = norm2(M-Mhat);
 	fvec(3) = norm2(R-Rhat);
 	
-	//if(fpen > 0 ) cout<<"Fpen = "<<fpen<<endl;
-	f = sum(fvec) + sum(pvec) + 1.e6*fpen;
+	if(fpen > 0 ) cout<<"Fpen = "<<fpen<<endl;
+	f = sum(fvec) + sum(pvec);//	 + 1.e6*fpen;
   }
 
 
