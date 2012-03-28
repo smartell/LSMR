@@ -1,0 +1,2 @@
+TH_ENCOUNTER_RANKING  = FISHNO
+TRIP_ID = Note that the PA200.....  are from the counter on the LRC.
