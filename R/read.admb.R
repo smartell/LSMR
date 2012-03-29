@@ -1,3 +1,5 @@
+
+
 read.admb <-
 function(ifile)
 {	
@@ -91,10 +93,13 @@ function(fn, nsamples=10000)
 	#This function reads the binary output from ADMB
 	#-mcsave command line option.
 	#fn = paste(ifile,'.psv',sep='')
+	require(MCMCpack)
 	filen <- file(fn, "rb")
 	nopar <- readBin(filen, what = integer(), n = 1)
 	mcmc <- readBin(filen, what = numeric(), n = nopar * nsamples)
 	mcmc <- matrix(mcmc, byrow = TRUE, ncol = nopar)
+	mcmc <- as.mcmc(mcmc)
 	close(filen)
+
 	return(mcmc)
 }
