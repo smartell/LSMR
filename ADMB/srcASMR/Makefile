@@ -15,7 +15,7 @@ $(EXEC).rep: $(TPL) $(DAT)
 mcmc: runmc evalmc dust
 
 runmc: $(EXEC) $(EXEC).rep
-	./$(EXEC) -ind $(DAT) -mcmc 10000 -mcsave 10 -nosdmcmc
+	./$(EXEC) -ind $(DAT) -mcmc 500000 -mcsave 200 -nosdmcmc
 
 evalmc: $(EXEC).psv
 	./$(EXEC) -ind $(DAT) -mceval

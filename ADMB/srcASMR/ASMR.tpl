@@ -186,7 +186,7 @@ PARAMETER_SECTION
 	init_bounded_number m(0,1.0,-2);
 	!! if(model==1) pterm_phz=1; else pterm_phz=-1;
 	init_bounded_number pterm(0,1,pterm_phz);
-	!! if(likelihood==2) tau_phz=2; else tau_phz=-1;
+	!! if(likelihood==2) tau_phz=3; else tau_phz=-1;
 	init_bounded_number tau(0,500,tau_phz);
 	!! if(model==3) ahat_phz=-1; else ahat_phz=1;
 	init_bounded_vector ahat(1,nva,0,nage,ahat_phz);
@@ -464,7 +464,7 @@ FUNCTION calc_negloglike
 		}
 	} 
 	
-	//if(active(m)) lvec(3) = dlnorm(m,log(0.13-0.0005),0.1); 	//prior for adult m.
+	if(active(m)) lvec(3) = dlnorm(m,log(0.13-0.0005),0.1); 	//prior for adult m.
 	//lvec(4) = 0.1*square(log_UT(sage)-log(mta(nyr,sage)/pt(nyr)));	//use termial capture prob for age2 in terminal year
 	//cout<<"Likelihood\t"<<lvec<<endl;
 	
@@ -541,7 +541,10 @@ REPORT_SECTION
 	report<<"rt\n"<<get_rt()<<endl<<endl;
 	report<<"Q\n"<<Q<<endl;
 	
-	if(model==3) report<<"cdelta\n"<<Cdelta<<endl;
+	if(model==3){
+		REPORT(rcta);
+		report<<"cdelta\n"<<Cdelta<<endl;
+	} 
 
 FUNCTION dvar_vector get_drt()
 	//back-calculated-recruitment
