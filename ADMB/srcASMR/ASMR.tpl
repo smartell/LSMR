@@ -183,7 +183,7 @@ DATA_SECTION
 	END_CALCS 
 	
 PARAMETER_SECTION
-	init_bounded_number m(0,1.0,-2);
+	init_bounded_number m(0,1.0,2);
 	!! if(model==1) pterm_phz=1; else pterm_phz=-1;
 	init_bounded_number pterm(0,1,pterm_phz);
 	!! if(likelihood==2) tau_phz=3; else tau_phz=-1;

@@ -31,6 +31,8 @@ class(obj$delta)	<- c("matrix", "marks")
 obj$cmr <- list(mta=obj$mta, rcta=obj$rcta)
 class(obj$cmr)		<- c("cmr", "list")
 
+load("EstM_obj.RData")
+load("FixM_obj.RData")
 
 # --------------------------------------------------------------------------- #
 # S3 method for class 'asmr'                                                  #
@@ -138,6 +140,7 @@ plot.retro <- function(obj, ...)
 		lines(yr, nt4/1000,col=i)
 		points(yr[ii], nt4[ii]/1000, col=i, pch=20)
 	}
+	grid()
 	if(.SAVEFIGS) dev.copy2pdf(file=paste(.FIGDIR, "fig:retro_nt4.pdf", sep=""))
 	
 	# plotr rt estimates
@@ -154,6 +157,7 @@ plot.retro <- function(obj, ...)
 		lines(yr, rt/1000,col=i)
 		points(yr[ii], rt[ii]/1000, col=i, pch=20)
 	}
+	grid()
 	if(.SAVEFIGS) dev.copy2pdf(file=paste(.FIGDIR, "fig:retro_rt.pdf", sep=""))
 	
 }
@@ -217,6 +221,7 @@ hist(obj$mc_nt4[,23], prob=TRUE, yaxt="n", ylab="Posterior density", xlab="Age-4
 
 hist(objM$mc_nt4[,23], prob=TRUE, yaxt="n", ylab="Posterior density", xlab="Age-4+ abundance in 2011", main="", col="light blue", add=TRUE)
 legend("top", c("M=0.130", "M=0.094"), pch=15, col=c("tan", "lightblue"), bty="n")
+text("Truth lies somewhere in\nbetween these distributions", x=10500, y=0.002, cex=1.65)
 if(.SAVEFIGS) dev.copy2pdf(file=paste(.FIGDIR, "fig:marg_Nt4_estM.pdf", sep=""))
 
 
