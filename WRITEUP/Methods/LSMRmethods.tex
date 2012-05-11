@@ -1,12 +1,44 @@
 %!TEX root = /Users/stevenmartell/Documents/CONSULTING/HumpbackChub/HBC_2011_Assessment/WRITEUP/HBCmain.tex
+\section{Methods} % (fold)
+\label{sec:methods}
 
-\section{Methods}\label{sec:Methods}
-\subsection{Estimation of growth from mark-recapture data}
-I first examined the mark-recapture data to estimate parameters for the von Bertalanffy growth model based on the methods described by \cite{zhang2009use}.  
+There are two major methodological components in this length-based model: (1) the development of an individual based model (IBM) for simulating a capture recapture program, and (2) a statistical catch-at-length mark-recapture model to estimate the number of individual fish in each length-class in each sampling year.  A detailed description of the IBM simulation model is provided in the appendix; in short, this simulation model generates a matrix of the number of fish captured-at-length, a matrix of the number of newly marked fish released-at-length, and a matrix of marked fish recaptured-at-length.  The remained of this section is a detailed analytical description of the statistical catch-at-length model used to estimate the abundance-at-length of humpback chub in the Grand Canyon.
 
+The following is a description of the analytical model for the length-structured mark-recapture model (hereafter, LSMR) used in this assessment.  I present the analytical model in the form of a table where the order in which model equations are presented also represent the order in which the calculations proceed in the computer code. The LSMR model was implemented in AD Model Builder \citep{fournier2011ad}, and the template code is available in the appendix of this document as well as a Git code repository (\url{https://code.google.com/p/lsmr-project/}).  The description of the Length-Structured Mark-Recapture (LSMR) model is broken down into: input data, estimated parameters, dynamics of numbers-at-length, capture probability, and negative log-likelihoods and prior densities.
+
+
+\subsection{Input data} % (fold)
+\label{sub:input_data}
+
+The model dimensions consists of time intervals (year indexed by $i$) and length intervals (index by $j$).  Capture-recapture data for the humpback chub have been collected on an annual basis since May 1, 1989,  and the latest capture record in this analysis is February 27, 2012.
+
+
+% subsection input_data (end)
+
+\subsection{Estimated parameters} % (fold)
+\label{sub:estimated_parameters}
+
+% subsection estimated_parameters (end)
+
+\subsection{Dynamics of numbers-at-length} % (fold)
+\label{sub:dynamics_of_numbers_at_length}
+
+% subsection dynamics_of_numbers_at_length (end)
+
+\subsection{Length-based capture probability} % (fold)
+\label{sub:length_based_capture_probability}
+
+% subsection length_based_capture_probability (end)
+
+\subsection{Negative log-likelihoods and prior densities} % (fold)
+\label{sub:negative_log_likelihoods_and_prior_densities}
+
+% subsection negative_log_likelihoods_and_prior_densities (end)
 
 \subsection{Length-structured mark-recapture model (LSMR)}
-The following is a description of the analytical model for the length-structured mark-recapture model (hereafter, LSMR) used in this assessment.  I present the analytical model in the form of a table where the order in which model equations are presented also represent the order in which the calculations proceed in the computer code. The LSMR model was implemented in AD Model Builder \citep{fournier2011ad}, and the template code is available in the appendix of this document.
+
+
+
 
 
 
@@ -57,4 +89,4 @@ The following is a description of the analytical model for the length-structured
     \normalEq
 \end{table}
 
-
+% section methods (end)

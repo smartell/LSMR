@@ -59,7 +59,13 @@ THETA <- list( lmin=lmin,
 set.seed(991)
 iclr <- rev(topo.colors(length(syr:nyr),0.5))
 Rt<-floor(rlnorm(length(syr:nyr), log(300), 0.9))
-Et<-runif(length(sample.yrs), 0.05, 0.2)  #Effort
+h1 <- 0.04
+h2 <- 0.20
+t  <- min(sample.yrs)
+T  <- max(sample.yrs)
+pr <- 1
+Et <- h1+(h2-h1)*cos(0.5+(sample.yrs-t)/(T-t)*pr*pi)^2
+#Et<-runif(length(sample.yrs), 0.05, 0.2)  #Effort
 
 #  Global objects for storing data
 fish.id     <- 0    #Unique id for individual fish
@@ -250,6 +256,7 @@ R   <- matrix(0,nrow=length(sample.yrs), ncol=length(xbin))
 	write("#End of file", fn, append=T)
 	write(999, fn, append=T)
 	
+	file.copy(fn, "../ADMB/srcLSMR/simLSMR.dat", overwrite=TRUE)
 }
 
 ## ___________________________________________________________ ##
@@ -271,7 +278,7 @@ for(i in seq(1,length(sample.yrs)-1/dt,by=1/dt))
 	tmp <- rbind(ut, mt, rt)
 	
     barplot(tmp,names.arg=xbin,xlab=""
-    ,ylab="", main=sample.yrs[i])
+    ,ylab="", main=sample.yrs[i], col=1:3)
 }
 mtext(c("Length (cm)","Frequency"), 
     c(1, 2), outer=T, las=0, line=1)

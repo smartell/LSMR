@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=pdflatex 2011.7.3)  30 DEC 2011 09:57
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=pdflatex 2011.7.3)  26 APR 2012 14:05
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -255,6 +255,10 @@ Now handling font encoding U ...
 Package: fullpage 1999/02/23 1.1 (PWD)
 \FP@margin=\skip43
 )
+(/usr/local/texlive/2011/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip10
+Package: url 2006/04/12  ver 3.3  Verb mode for urls, etc.
+)
 (/usr/local/texlive/2011/texmf-dist/tex/latex/natbib/natbib.sty
 Package: natbib 2010/09/13 8.31b (PWD, AO)
 \bibhang=\skip44
@@ -299,7 +303,7 @@ LaTeX Font Info:    Redeclaring font encoding OML on input line 567.
 LaTeX Font Info:    Redeclaring font encoding OMS on input line 568.
 \macc@depth=\count93
 \c@MaxMatrixCols=\count94
-\dotsspace@=\muskip10
+\dotsspace@=\muskip11
 \c@parentequation=\count95
 \dspbrk@lvl=\count96
 \tag@help=\toks17
@@ -505,18 +509,18 @@ Package: ltxcmds 2011/04/18 v1.20 LaTeX kernel commands for general use (HO)
 (./HBCmain.aux (./Appendix1/WorkPlan.aux) (./Appendix2/SimulationModel.aux))
 \openout1 = `HBCmain.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 85.
-LaTeX Font Info:    ... okay on input line 85.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 85.
-LaTeX Font Info:    ... okay on input line 85.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 85.
-LaTeX Font Info:    ... okay on input line 85.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 85.
-LaTeX Font Info:    ... okay on input line 85.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 85.
-LaTeX Font Info:    ... okay on input line 85.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 85.
-LaTeX Font Info:    ... okay on input line 85.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 86.
+LaTeX Font Info:    ... okay on input line 86.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 86.
+LaTeX Font Info:    ... okay on input line 86.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 86.
+LaTeX Font Info:    ... okay on input line 86.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 86.
+LaTeX Font Info:    ... okay on input line 86.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 86.
+LaTeX Font Info:    ... okay on input line 86.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 86.
+LaTeX Font Info:    ... okay on input line 86.
 \c@lstlisting=\count122
 Package minitoc(hints) Info: I0049
 (minitoc(hints))             ==> You requested the hints option. 
@@ -578,17 +582,17 @@ G,.JBIG2,.JB2,.eps]
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-LaTeX Font Info:    Try loading font information for U+msa on input line 89.
+LaTeX Font Info:    Try loading font information for U+msa on input line 90.
 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2009/06/22 v3.00 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 89.
+LaTeX Font Info:    Try loading font information for U+msb on input line 90.
 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2009/06/22 v3.00 AMS symbols B
 )
-LaTeX Font Info:    Try loading font information for U+lasy on input line 89.
+LaTeX Font Info:    Try loading font information for U+lasy on input line 90.
 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/ulasy.fd
 File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
@@ -600,11 +604,11 @@ File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 [1
 
 {/usr/local/texlive/2011/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-(./Methods/LSMRmethods.tex) (./HBCmain.bbl) [2] [3]
+(./Methods/LSMRmethods.tex) (./HBCmain.bbl [2] [3]) [4]
 \openout2 = `./Appendix1/WorkPlan.aux'.
 
- (./Appendix1/WorkPlan.tex
-[4
+
+(./Appendix1/WorkPlan.tex [5
 
 ]
 Overfull \hbox (311.23842pt too wide) in paragraph at lines 54--54
@@ -613,15 +617,15 @@ Overfull \hbox (311.23842pt too wide) in paragraph at lines 54--54
  tagno[] 
  []
 
-[5] <../FIGS/fig:lengthTransition.pdf, id=37, 556.0775pt x 459.7175pt>
+[6] <../FIGS/fig:lengthTransition.pdf, id=40, 556.0775pt x 459.7175pt>
 File: ../FIGS/fig:lengthTransition.pdf Graphic file (type pdf)
 
 <use ../FIGS/fig:lengthTransition.pdf>
 Package pdftex.def Info: ../FIGS/fig:lengthTransition.pdf used on input line 80
 .
 (pdftex.def)             Requested size: 361.44609pt x 298.81282pt.
- [6 <../FIGS/fig:lengthTransition.pdf>])
-[7]
+ [7 <../FIGS/fig:lengthTransition.pdf>])
+[8]
 \openout2 = `./Appendix2/SimulationModel.aux'.
 
  (./Appendix2/SimulationModel.tex
@@ -644,28 +648,29 @@ LaTeX Font Info:    Font shape `OML/cmr/m/it' in size <10> not available
 LaTeX Font Info:    Font shape `OML/cmr/bx/n' in size <10> not available
 (Font)              Font shape `OML/cmm/b/it' tried instead on input line 28.
 
-[8
+[9
 
 
-] [9]
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 84.
+]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 67.
  (/usr/local/texlive/2011/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 84.
 LaTeX Font Info:    Font shape `OMS/cmr/bx/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/b/n' tried instead on input line 98.
+(Font)              Font shape `OMS/cmsy/b/n' tried instead on input line 67.
  [10]
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 90.
+ [11]
 LaTeX Font Info:    Font shape `OML/cmr/m/n' in size <10> not available
-(Font)              Font shape `OML/cmm/m/it' tried instead on input line 168.
+(Font)              Font shape `OML/cmm/m/it' tried instead on input line 174.
 
-[11] [12]
-Overfull \hbox (4.2498pt too wide) in paragraph at lines 238--240
+[12] [13]
+Overfull \hbox (4.2498pt too wide) in paragraph at lines 244--246
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
-)) [13]
+)) [14]
 Package minitoc Info: I0009
 (minitoc)             Listing minitoc auxiliary files. 
 (minitoc)             Creating the HBCmain.maf file.
@@ -677,10 +682,10 @@ Package minitoc(hints) Info: I0019
  (./HBCmain.aux (./Appendix1/WorkPlan.aux)
 (./Appendix2/SimulationModel.aux)) ) 
 Here is how much of TeX's memory you used:
- 7274 strings out of 493633
- 94182 string characters out of 3143378
- 234906 words of memory out of 3000000
- 10207 multiletter control sequences out of 15000+200000
+ 7360 strings out of 493633
+ 95314 string characters out of 3143378
+ 240033 words of memory out of 3000000
+ 10289 multiletter control sequences out of 15000+200000
  15184 words of font info for 61 fonts, out of 3000000 for 9000
  831 hyphenation exceptions out of 8191
  37i,12n,46p,987b,2279s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -706,10 +711,10 @@ i10.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmti
 12.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmti9
 .pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.
 pfb>
-Output written on HBCmain.pdf (13 pages, 324489 bytes).
+Output written on HBCmain.pdf (14 pages, 305127 bytes).
 PDF statistics:
- 137 PDF objects out of 1000 (max. 8388607)
- 98 compressed objects within 1 object stream
+ 144 PDF objects out of 1000 (max. 8388607)
+ 103 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
  6 words of extra memory for PDF output out of 10000 (max. 10000000)
 

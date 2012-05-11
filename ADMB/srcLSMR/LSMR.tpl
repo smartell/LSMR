@@ -9,8 +9,8 @@
 //               Sep 26/11    8    Set up HBC project & Rcode                //
 //               Sep 27/11	  8    Simulation model in R                     //
 //               Oct 27/11    8    Simulation model in R & ADMB code         //
-//               Oct 31/11    4    LSMR.tpl code                             //
-//                                                                           //
+//               Oct 31/11    4    LSMR.tpl code  (PAID $11,000)             //
+//               Apr 26/12    4    LSMR code development.                    //
 //                                                                           //
 //                                                                           //
 // ************************************************************************* //
@@ -401,6 +401,9 @@ REPORT_SECTION
 	REPORT(f);
 	REPORT(N);
 	REPORT(T);
+	REPORT(i_C);
+	REPORT(i_M);
+	REPORT(i_R);
 	REPORT(Chat);
 	REPORT(Mhat);
 	REPORT(Rhat);

@@ -16,7 +16,7 @@ get.df=function(fn="~/Documents/CONSULTING/HBC ASMR Performance/HBC Data/GCMRC_A
 	#Fix the Date column to proper m/d/Y format
 	x=as.character(df$START_DATETIME)
 	x=as.POSIXct(strptime(x,"%m/%d/%Y"))
-	df$DATES=x
+	df$DATES = x
 	df$TAGNO = df$TH_ENCOUNTER_RANKING
 	df$TL    = df$TOTAL_LENGTH
 	
