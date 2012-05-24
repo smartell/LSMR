@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=pdflatex 2011.7.3)  26 APR 2012 14:05
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=pdflatex 2011.7.3)  12 MAY 2012 17:32
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -19,8 +19,8 @@ ian, spanish, swedish, turkish, turkmen, ukrainian, uppersorbian, welsh, loaded
 .
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2007/10/19 v1.4h Standard LaTeX document class
-(/usr/local/texlive/2011/texmf-dist/tex/latex/base/size10.clo
-File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/size12.clo
+File: size12.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 )
 \c@part=\count79
 \c@section=\count80
@@ -596,36 +596,35 @@ LaTeX Font Info:    Try loading font information for U+lasy on input line 90.
 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/ulasy.fd
 File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
-) (./HBCmain.toc)
+) (./HBCmain.toc
+[1
+
+{/usr/local/texlive/2011/texmf-var/fonts/map/pdftex/updmap/pdftex.map}])
 \tf@toc=\write4
 \openout4 = `HBCmain.toc'.
 
 
-[1
-
-{/usr/local/texlive/2011/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-(./Methods/LSMRmethods.tex) (./HBCmain.bbl [2] [3]) [4]
+(./Methods/LSMRmethods.tex [2] [3]) (./HBCmain.bbl) [4] [5]
 \openout2 = `./Appendix1/WorkPlan.aux'.
 
 
-(./Appendix1/WorkPlan.tex [5
+(./Appendix1/WorkPlan.tex [6
 
 ]
-Overfull \hbox (311.23842pt too wide) in paragraph at lines 54--54
- []\OT1/cmtt/m/n/10 SELECT "CAPTURE_ID" fishno, "TRIP_ID" trip_id, "START_DATE"
+Overfull \hbox (448.82011pt too wide) in paragraph at lines 54--54
+ []\OT1/cmtt/m/n/12 SELECT "CAPTURE_ID" fishno, "TRIP_ID" trip_id, "START_DATE"
  dates,"START_RM" rm,"RIVER_CODE" riv, "TOTAL_LENGTH" tl,"TH_ENCOUNTER_RANKING"
  tagno[] 
  []
 
-[6] <../FIGS/fig:lengthTransition.pdf, id=40, 556.0775pt x 459.7175pt>
+[7] <../FIGS/fig:lengthTransition.pdf, id=42, 556.0775pt x 459.7175pt>
 File: ../FIGS/fig:lengthTransition.pdf Graphic file (type pdf)
 
 <use ../FIGS/fig:lengthTransition.pdf>
 Package pdftex.def Info: ../FIGS/fig:lengthTransition.pdf used on input line 80
 .
 (pdftex.def)             Requested size: 361.44609pt x 298.81282pt.
- [7 <../FIGS/fig:lengthTransition.pdf>])
-[8]
+ [8] [9 <../FIGS/fig:lengthTransition.pdf>]) [10]
 \openout2 = `./Appendix2/SimulationModel.aux'.
 
  (./Appendix2/SimulationModel.tex
@@ -643,34 +642,44 @@ LaTeX Font Info:    Try loading font information for OML+cmr on input line 8.
  (/usr/local/texlive/2011/texmf-dist/tex/latex/base/omlcmr.fd
 File: omlcmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    Font shape `OML/cmr/m/it' in size <10> not available
+LaTeX Font Info:    Font shape `OML/cmr/m/it' in size <12> not available
 (Font)              Font shape `OML/cmm/m/it' tried instead on input line 8.
-LaTeX Font Info:    Font shape `OML/cmr/bx/n' in size <10> not available
-(Font)              Font shape `OML/cmm/b/it' tried instead on input line 28.
 
-[9
+[11
 
 
 ]
+LaTeX Font Info:    Font shape `OML/cmr/bx/n' in size <12> not available
+(Font)              Font shape `OML/cmm/b/it' tried instead on input line 28.
+ [12]
 LaTeX Font Info:    Try loading font information for OMS+cmr on input line 67.
  (/usr/local/texlive/2011/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    Font shape `OMS/cmr/bx/n' in size <10> not available
+LaTeX Font Info:    Font shape `OMS/cmr/bx/n' in size <12> not available
 (Font)              Font shape `OMS/cmsy/b/n' tried instead on input line 67.
- [10]
-LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 90.
- [11]
-LaTeX Font Info:    Font shape `OML/cmr/m/n' in size <10> not available
-(Font)              Font shape `OML/cmm/m/it' tried instead on input line 174.
 
-[12] [13]
-Overfull \hbox (4.2498pt too wide) in paragraph at lines 244--246
+[13] [14]
+LaTeX Font Info:    Font shape `OML/cmr/m/n' in size <12> not available
+(Font)              Font shape `OML/cmm/m/it' tried instead on input line 174.
+ [15] [16]
+Overfull \hbox (87.19402pt too wide) in paragraph at lines 244--246
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
-)) [14]
+
+Overfull \hbox (16.69414pt too wide) in paragraph at lines 252--253
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (9.64415pt too wide) in paragraph at lines 259--260
+[][][][][][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+[17])) [18]
 Package minitoc Info: I0009
 (minitoc)             Listing minitoc auxiliary files. 
 (minitoc)             Creating the HBCmain.maf file.
@@ -682,39 +691,37 @@ Package minitoc(hints) Info: I0019
  (./HBCmain.aux (./Appendix1/WorkPlan.aux)
 (./Appendix2/SimulationModel.aux)) ) 
 Here is how much of TeX's memory you used:
- 7360 strings out of 493633
- 95314 string characters out of 3143378
- 240033 words of memory out of 3000000
- 10289 multiletter control sequences out of 15000+200000
- 15184 words of font info for 61 fonts, out of 3000000 for 9000
+ 7372 strings out of 493633
+ 95559 string characters out of 3143378
+ 238409 words of memory out of 3000000
+ 10307 multiletter control sequences out of 15000+200000
+ 17444 words of font info for 70 fonts, out of 3000000 for 9000
  831 hyphenation exceptions out of 8191
- 37i,12n,46p,987b,2279s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 37i,12n,46p,1041b,2279s stack positions out of 5000i,500n,10000p,200000b,50000s
 </usr/local/texlive/2011/texmf-dist/fonts/t
 ype1/public/amsfonts/cm/cmbsy10.pfb></usr/local/texlive/2011/texmf-dist/fonts/t
 ype1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2011/texmf-dist/fonts/ty
 pe1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2011/texmf-dist/fonts/typ
-e1/public/amsfonts/cm/cmbx9.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1
-/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/
-public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/p
-ublic/amsfonts/cm/cmmi5.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/pub
-lic/amsfonts/cm/cmmi7.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/publi
-c/amsfonts/cm/cmmib10.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/publi
-c/amsfonts/cm/cmr10.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/
-amsfonts/cm/cmr12.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/am
-sfonts/cm/cmr17.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsf
-onts/cm/cmr7.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfont
-s/cm/cmr9.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/c
-m/cmsy10.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm
-/cmsy5.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/c
-msy7.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmt
-i10.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmti
-12.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmti9
-.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.
-pfb>
-Output written on HBCmain.pdf (14 pages, 305127 bytes).
+e1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2011/texmf-dist/fonts/type
+1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1
+/public/amsfonts/cm/cmmi12.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmmi6.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/pu
+blic/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/publ
+ic/amsfonts/cm/cmmib10.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/publ
+ic/amsfonts/cm/cmr10.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public
+/amsfonts/cm/cmr12.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/a
+msfonts/cm/cmr17.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/ams
+fonts/cm/cmr8.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfon
+ts/cm/cmsy10.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfont
+s/cm/cmsy6.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/
+cm/cmsy8.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm
+/cmti10.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/
+cmti12.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/c
+mtt12.pfb>
+Output written on HBCmain.pdf (18 pages, 306027 bytes).
 PDF statistics:
- 144 PDF objects out of 1000 (max. 8388607)
- 103 compressed objects within 2 object streams
+ 145 PDF objects out of 1000 (max. 8388607)
+ 102 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
  6 words of extra memory for PDF output out of 10000 (max. 10000000)
 

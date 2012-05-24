@@ -18,11 +18,12 @@ n		<- 35	#number of intervals
 
 
 ## Bin intervals (mm)
-x	<- seq(5.0, 1.0*linf, length=n+1)
+x	<- seq(5.0, 1.2*linf, length=n+1)
 d	<- 0.5*(x[2]-x[1])
 xp	<- seq(x[1]+d, by=2*d, length=n)
 
 dl	<- (linf-xp)*(1-exp(-k))
+dl	<- log(exp((linf-xp)*(1-exp(-k)))+1)
 alpha <- dl/beta*6/12
 P	<- matrix(0, nrow=n, ncol=n)
 for(i in 1:n)

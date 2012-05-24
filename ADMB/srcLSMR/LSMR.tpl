@@ -312,6 +312,11 @@ FUNCTION dvar_matrix dLTM(dvector& x, const dvariable &linf, const dvariable &k,
 			(k)		- Brody growth coefficient over time interval dt.
 			(cv) 	- coefficient of variation in the size increment.
 			
+			Use the following for the mean growth increment to ensure
+			the function (dl) remains positive. Beyone Linf, growth 
+			increment decays exponentially.
+			dl	<- log(exp((linf-xp)*(1-exp(-k)))+1)  to ensure dl is positive
+			
 	*/
 	
 		RETURN_ARRAYS_INCREMENT();
@@ -327,8 +332,9 @@ FUNCTION dvar_matrix dLTM(dvector& x, const dvariable &linf, const dvariable &k,
 		cout<<"Ok"<<endl;
 		for(j=1;j<=n-1;j++)
 		{
-			dvariable t1 = posfun(linf-xm(j),1./n,pen);
-			beta(j) = t1 * (1.-mfexp(-k));
+			//dvariable t1 = posfun(linf-xm(j),1./n,pen);
+			//beta(j) = t1 * (1.-mfexp(-k));
+			beta(j) = log(mfexp( (linf-xm(j))*(1.-mfexp(-k)) )+1.0);
 		}
 		dl = alpha*beta;
 		
@@ -374,8 +380,9 @@ FUNCTION dvar_matrix dv_LTM(dvector& x, const dvariable &linf, const dvariable &
 	xm = x(1,n-1)+0.5*first_difference(x);
 	for(j=1;j<=n-1;j++)
 	{
-		dvariable t2=posfun(linf-xm(j),1./n,pen);
-		dl(j) = (t2)*(1.-exp(-k*dt));
+		//dvariable t2=posfun(linf-xm(j),1./n,pen);
+		//dl(j) = (t2)*(1.-exp(-k*dt));
+		dl(j) = log(mfexp( (linf-xm(j))*(1.-mfexp(-k*dt)) )+1.0);
 	}
 	alpha = dl/beta;
 	

@@ -1,12 +1,13 @@
 \contentsline {section}{\numberline {1}Introduction}{2}
 \contentsline {section}{\numberline {2}Methods}{2}
-\contentsline {subsection}{\numberline {2.1}Input data}{2}
-\contentsline {subsection}{\numberline {2.2}Estimated parameters}{2}
-\contentsline {subsection}{\numberline {2.3}Dynamics of numbers-at-length}{2}
-\contentsline {subsection}{\numberline {2.4}Length-based capture probability}{2}
-\contentsline {subsection}{\numberline {2.5}Negative log-likelihoods and prior densities}{2}
-\contentsline {subsection}{\numberline {2.6}Length-structured mark-recapture model (LSMR)}{2}
-\contentsline {section}{\numberline {A}Work plan}{5}
-\contentsline {section}{\numberline {B}Individual based model for simulating the dynamics and sampling of humpback chub in the Grand Canyon}{9}
-\contentsline {subsection}{\numberline {B.1}Introduction}{9}
-\contentsline {subsection}{\numberline {B.2}R-code}{9}
+\contentsline {subsection}{\numberline {2.1}Input data}{3}
+\contentsline {subsection}{\numberline {2.2}Estimated parameters \& parametric functions}{3}
+\contentsline {subsection}{\numberline {2.3}Growth transition}{4}
+\contentsline {subsection}{\numberline {2.4}Dynamics of numbers-at-length}{4}
+\contentsline {subsection}{\numberline {2.5}Length-based capture probability}{4}
+\contentsline {subsection}{\numberline {2.6}Negative log-likelihoods and prior densities}{4}
+\contentsline {subsection}{\numberline {2.7}Length-structured mark-recapture model (LSMR)}{4}
+\contentsline {section}{\numberline {A}Work plan}{6}
+\contentsline {section}{\numberline {B}Individual based model for simulating the dynamics and sampling of humpback chub in the Grand Canyon}{11}
+\contentsline {subsection}{\numberline {B.1}Introduction}{11}
+\contentsline {subsection}{\numberline {B.2}R-code}{11}

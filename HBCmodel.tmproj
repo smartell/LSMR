@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>WRITEUP/Methods/LSMRmethods.tex</string>
+	<string>ReadMe</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -18,7 +18,7 @@
 		</dict>
 	</array>
 	<key>fileHierarchyDrawerWidth</key>
-	<integer>350</integer>
+	<integer>164</integer>
 	<key>metaData</key>
 	<dict>
 		<key>ADMB/srcASMR/ASMR.tpl</key>
@@ -35,20 +35,6 @@
 			<key>firstVisibleLine</key>
 			<integer>171</integer>
 		</dict>
-		<key>ADMB/srcASMR/asmr.par</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>0</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
-		</dict>
 		<key>ADMB/srcLSMR/LSMR.tpl</key>
 		<dict>
 			<key>caret</key>
@@ -61,7 +47,37 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>108</integer>
+			<integer>70</integer>
+		</dict>
+		<key>ADMB/srcLSMR/Makefile</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>11</integer>
+				<key>line</key>
+				<integer>15</integer>
+			</dict>
+			<key>columnSelection</key>
+			<false/>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>61</integer>
+				<key>line</key>
+				<integer>15</integer>
+			</dict>
 		</dict>
 		<key>R/2012HBCData/ASMR_MARTELL_20120313.csv</key>
 		<dict>
@@ -191,51 +207,46 @@
 			<key>firstVisibleLine</key>
 			<integer>13</integer>
 		</dict>
-		<key>WRITEUP/HBCmain.tex</key>
+		<key>ReadMe</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>15</integer>
+				<integer>14</integer>
 				<key>line</key>
-				<integer>15</integer>
+				<integer>16</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>29</integer>
-		</dict>
-		<key>WRITEUP/Methods/LSMRmethods.tex</key>
-		<dict>
-			<key>caret</key>
+			<integer>3</integer>
+			<key>selectFrom</key>
 			<dict>
 				<key>column</key>
-				<integer>280</integer>
+				<integer>13</integer>
 				<key>line</key>
-				<integer>12</integer>
+				<integer>16</integer>
 			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>692</integer>
-			<key>firstVisibleLine</key>
-			<integer>4</integer>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>19</integer>
+				<key>line</key>
+				<integer>16</integer>
+			</dict>
 		</dict>
 	</dict>
 	<key>openDocuments</key>
 	<array>
-		<string>R/HBCsim.R</string>
-		<string>R/2012HBCData/HBCdata.R</string>
-		<string>R/2012HBCData/LSMR_dataScript.R</string>
-		<string>R/2012HBCData/Notes.txt</string>
-		<string>R/2012HBCData/raw2012data.csv</string>
-		<string>R/2012HBCData/raw2012data.dat</string>
-		<string>R/2012HBCData/ASMR_MARTELL_20120313.csv</string>
 		<string>ADMB/srcLSMR/LSMR.tpl</string>
-		<string>R/LBModel.R</string>
-		<string>WRITEUP/Methods/LSMRmethods.tex</string>
-		<string>WRITEUP/HBCmain.tex</string>
-		<string>ADMB/srcASMR/asmr.par</string>
+		<string>ADMB/srcLSMR/Makefile</string>
+		<string>ReadMe</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
+	<false/>
+	<key>showFileHierarchyPanel</key>
 	<true/>
 	<key>treeState</key>
 	<dict>
@@ -260,55 +271,10 @@
 						</dict>
 					</dict>
 				</dict>
-				<key>PRESENTATION</key>
-				<dict>
-					<key>isExpanded</key>
-					<true/>
-					<key>subItems</key>
-					<dict>
-						<key>ASMR</key>
-						<dict>
-							<key>isExpanded</key>
-							<true/>
-							<key>subItems</key>
-							<dict/>
-						</dict>
-					</dict>
-				</dict>
-				<key>R</key>
-				<dict>
-					<key>isExpanded</key>
-					<true/>
-					<key>subItems</key>
-					<dict>
-						<key>2012HBCData</key>
-						<dict>
-							<key>isExpanded</key>
-							<true/>
-							<key>subItems</key>
-							<dict/>
-						</dict>
-					</dict>
-				</dict>
-				<key>WRITEUP</key>
-				<dict>
-					<key>isExpanded</key>
-					<true/>
-					<key>subItems</key>
-					<dict>
-						<key>Methods</key>
-						<dict>
-							<key>isExpanded</key>
-							<true/>
-							<key>subItems</key>
-							<dict/>
-						</dict>
-					</dict>
-				</dict>
 			</dict>
 		</dict>
 	</dict>
 	<key>windowFrame</key>
-	<string>{{353, 4}, {1317, 1024}}</string>
+	<string>{{0, 4}, {1024, 742}}</string>
 </dict>
 </plist>
