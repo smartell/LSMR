@@ -7,7 +7,7 @@
 \contentsline {subsection}{\numberline {2.5}Length-based capture probability}{4}
 \contentsline {subsection}{\numberline {2.6}Negative log-likelihoods and prior densities}{4}
 \contentsline {subsection}{\numberline {2.7}Length-structured mark-recapture model (LSMR)}{4}
-\contentsline {section}{\numberline {A}Work plan}{6}
-\contentsline {section}{\numberline {B}Individual based model for simulating the dynamics and sampling of humpback chub in the Grand Canyon}{11}
-\contentsline {subsection}{\numberline {B.1}Introduction}{11}
-\contentsline {subsection}{\numberline {B.2}R-code}{11}
+\contentsline {section}{\numberline {A}Work plan}{7}
+\contentsline {section}{\numberline {B}Individual based model for simulating the dynamics and sampling of humpback chub in the Grand Canyon}{12}
+\contentsline {subsection}{\numberline {B.1}Introduction}{12}
+\contentsline {subsection}{\numberline {B.2}R-code}{12}
