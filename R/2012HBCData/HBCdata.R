@@ -47,7 +47,7 @@ fn<-function(tagno)
 	sdf$AGE=sdf$AGE[1]+iage
 	
 	#Recaptures & remove duplicates in same recapture YR
-	sdf$RECAP[-1]=T
+	sdf$RECAP[-1]=Tm
 	sdf=sdf[!duplicated(sdf$YR), ]
 	
 	#New marks released

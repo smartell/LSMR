@@ -156,9 +156,29 @@ plot.retro <- function(obj, ...)
 		ii <- length(yr)
 		lines(yr, rt/1000,col=i)
 		points(yr[ii], rt[ii]/1000, col=i, pch=20)
+		#points(yr[ii], obj[[i]]$M, pch=19, col=i)
 	}
 	grid()
 	if(.SAVEFIGS) dev.copy2pdf(file=paste(.FIGDIR, "fig:retro_rt.pdf", sep=""))
+	
+	# plotr rt estimates
+	yr <- obj[[1]]$byr
+	rt <- obj[[1]]$rt
+	plot(yr, rt/1000, type="n", xlab="Brood year", ylab="Natural mortality"
+		,ylim=c(0, 0.3,  ...))
+	
+	for(i in 2:nretro)
+	{
+		yr <- obj[[i]]$byr
+		rt <- obj[[i]]$rt
+		ii <- length(yr)
+		#lines(yr, rt/1000,col=i)
+		#points(yr[ii], rt[ii]/1000, col=i, pch=20)
+		points(yr[ii], obj[[i]]$M, pch=19, col=i)
+		
+	}
+	grid()
+	
 	
 }
 

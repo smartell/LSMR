@@ -30,4 +30,5 @@ THE FOLLOWING IS A LIST OF USEFUL GIT COMMANDS TO USE AT THE COMMAND LINE$:
   git log                       <view commit log>
   git status                    <view changes & staging>
   git branch                    <list, create or delete branches>
+  git checkout <branch>         <change branch>
 _______________________________________________________________________________
