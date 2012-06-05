@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=pdflatex 2011.7.3)  1 JUN 2012 10:06
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=pdflatex 2011.7.3)  4 JUN 2012 23:05
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -526,6 +526,9 @@ Package: multicol 2008/12/05 v1.6h multicolumn formatting (FMi)
 
 LaTeX Warning: Label `tx' multiply defined.
 
+
+LaTeX Warning: Label `LI' multiply defined.
+
 (./Appendix1/WorkPlan.aux) (./Appendix2/SimulationModel.aux))
 \openout1 = `HBCmain.aux'.
 
@@ -650,6 +653,22 @@ Package pdftex.def Info: ../FIGS/LSMR/fig:CaptureLFbubbles.pdf used on input li
 ne 127.
 (pdftex.def)             Requested size: 469.75499pt x 388.36269pt.
 
+<../FIGS/LSMR/fig:MarksAtLengthHOOP.pdf, id=27, 556.0775pt x 459.7175pt>
+File: ../FIGS/LSMR/fig:MarksAtLengthHOOP.pdf Graphic file (type pdf)
+
+<use ../FIGS/LSMR/fig:MarksAtLengthHOOP.pdf>
+Package pdftex.def Info: ../FIGS/LSMR/fig:MarksAtLengthHOOP.pdf used on input l
+ine 134.
+(pdftex.def)             Requested size: 469.75499pt x 388.36269pt.
+
+<../FIGS/LSMR/fig:MarksAtLengthGILL.pdf, id=28, 556.0775pt x 459.7175pt>
+File: ../FIGS/LSMR/fig:MarksAtLengthGILL.pdf Graphic file (type pdf)
+
+<use ../FIGS/LSMR/fig:MarksAtLengthGILL.pdf>
+Package pdftex.def Info: ../FIGS/LSMR/fig:MarksAtLengthGILL.pdf used on input l
+ine 141.
+(pdftex.def)             Requested size: 469.75499pt x 388.36269pt.
+
 (../TABLES/LSMR/tableCaptureNumbers.tex
 Overfull \hbox (9.41272pt too wide) in paragraph at lines 8--42
  [] 
@@ -660,13 +679,20 @@ Overfull \hbox (27.89803pt too wide) in paragraph at lines 8--64
  [] 
  []
 
+) (../TABLES/LSMR/table:Mark:GILL.tex) (../TABLES/LSMR/table:Mark:HOOP.tex
+Overfull \hbox (15.89803pt too wide) in paragraph at lines 7--60
+ [] 
+ []
+
 ))
 No file HBCmain.bbl.
 [4] [5] [6 <../FIGS/LSMR/fig:GrowthIncrements.pdf>] [7 <../FIGS/LSMR/fig:Captur
-eLFbubbles.pdf>] [8] [9] [10]
+eLFbubbles.pdf>] [8 <../FIGS/LSMR/fig:MarksAtLengthHOOP.pdf>] [9 <../FIGS/LSMR/
+fig:MarksAtLengthGILL.pdf>] [10] [11] [12] [13] [14]
 \openout2 = `./Appendix1/WorkPlan.aux'.
 
- (./Appendix1/WorkPlan.tex [11
+ (./Appendix1/WorkPlan.tex
+[15
 
 ]
 Overfull \hbox (448.82011pt too wide) in paragraph at lines 54--54
@@ -675,19 +701,19 @@ Overfull \hbox (448.82011pt too wide) in paragraph at lines 54--54
  tagno[] 
  []
 
-[12] <../FIGS/fig:lengthTransition.pdf, id=77, 556.0775pt x 459.7175pt>
+[16] <../FIGS/fig:lengthTransition.pdf, id=104, 556.0775pt x 459.7175pt>
 File: ../FIGS/fig:lengthTransition.pdf Graphic file (type pdf)
 
 <use ../FIGS/fig:lengthTransition.pdf>
 Package pdftex.def Info: ../FIGS/fig:lengthTransition.pdf used on input line 80
 .
 (pdftex.def)             Requested size: 361.44609pt x 298.81282pt.
- [13] [14 <../FIGS/fig:lengthTransition.pdf>]) [15]
+ [17] [18 <../FIGS/fig:lengthTransition.pdf>]) [19]
 \openout2 = `./Appendix2/SimulationModel.aux'.
 
  (./Appendix2/SimulationModel.tex
 
-Package natbib Warning: Citation `R-Development-Core-Team:2009fk' on page 16 un
+Package natbib Warning: Citation `R-Development-Core-Team:2009fk' on page 20 un
 defined on input line 7.
 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/listings/lstlang1.sty
@@ -707,13 +733,13 @@ File: omlcmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 LaTeX Font Info:    Font shape `OML/cmr/m/it' in size <12> not available
 (Font)              Font shape `OML/cmm/m/it' tried instead on input line 8.
 
-[16
+[20
 
 
 ]
 LaTeX Font Info:    Font shape `OML/cmr/bx/n' in size <12> not available
 (Font)              Font shape `OML/cmm/b/it' tried instead on input line 28.
- [17]
+ [21]
 LaTeX Font Info:    Try loading font information for OMS+cmr on input line 67.
  (/usr/local/texlive/2011/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
@@ -723,10 +749,10 @@ LaTeX Font Info:    Font shape `OMS/cmr/bx/n' in size <12> not available
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 90.
 
-[18] [19]
+[22] [23]
 LaTeX Font Info:    Font shape `OML/cmr/m/n' in size <12> not available
 (Font)              Font shape `OML/cmm/m/it' tried instead on input line 174.
- [20] [21]
+ [24] [25]
 Overfull \hbox (87.19402pt too wide) in paragraph at lines 244--246
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
@@ -741,7 +767,7 @@ Overfull \hbox (9.64415pt too wide) in paragraph at lines 259--260
 [][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
-[22])) [23]
+[26])) [27]
 
 Package natbib Warning: There were undefined citations.
 
@@ -759,10 +785,10 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 7523 strings out of 493633
- 97901 string characters out of 3143378
- 306468 words of memory out of 3000000
- 10434 multiletter control sequences out of 15000+200000
+ 7544 strings out of 493633
+ 98547 string characters out of 3143378
+ 410607 words of memory out of 3000000
+ 10447 multiletter control sequences out of 15000+200000
  19122 words of font info for 77 fonts, out of 3000000 for 9000
  831 hyphenation exceptions out of 8191
  38i,13n,46p,1041b,2284s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -787,10 +813,10 @@ e/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2
 exmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2011/te
 xmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2011/tex
 mf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on HBCmain.pdf (23 pages, 2043517 bytes).
+Output written on HBCmain.pdf (27 pages, 2318554 bytes).
 PDF statistics:
- 187 PDF objects out of 1000 (max. 8388607)
- 133 compressed objects within 2 object streams
+ 214 PDF objects out of 1000 (max. 8388607)
+ 152 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
- 16 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 26 words of extra memory for PDF output out of 10000 (max. 10000000)
 

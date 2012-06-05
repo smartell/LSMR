@@ -16,6 +16,7 @@ require(Hmisc)
 require(PBSmodelling)
 dfile    <- "raw2012data.csv"
 xbin     <- seq(50, 600, by=10)
+
 # ------------------------------------------------------------------------------- #
 # Read data file and create data.frame object for use. Returns (DF)
 # ------------------------------------------------------------------------------- #
@@ -34,6 +35,10 @@ get.DF   <- function(dfile)
 	gearType  <- read.table("gearCode.txt", header=T, sep="\t")
 	gid       <- pmatch(DF$GEAR_CODE,gearType[,1], duplicates.ok=TRUE)
 	DF$GROUP  <- gearType[gid, 2]
+	
+	# Sort data frame by date the tagno,  add recapture field
+	DF        <- DF[order(DF$DATE, DF$TAGNO), ]
+	DF$RECAP  <- duplicated(DF$TAGNO)
 	
 	
 	return (DF)
@@ -63,8 +68,8 @@ getGrowthIncrement <- function(DF)
 	TRdata   <- NULL
 	for(i in idNum) TRdata <- rbind(TRdata, fnGI(i))
 	colnames(TRdata) <- c("#YEAR","RIVER","L1","L2","DT","DL")
-	TR <- na.omit(TR)         #Remove missing recapture measurements
-	ii <- which(TR$DL <= -5)  #Remove records with growth increments < -5 mm
+	TRdata <- na.omit(TRdata)     #Remove missing recapture measurements
+	ii <- which(TRdata$DL <= -5)  #Remove records with growth increments < -5 mm
 	TR$RIVER[TR$RIVER==1] <- "COR"
 	TR$RIVER[TR$RIVER==2] <- "LCR"
 	return(as.data.frame(TRdata[-ii, ]))
@@ -138,26 +143,95 @@ tableGear <- function(DF)
 # ------------------------------------------------------------------------------- #
 # Table of annual captures by gear type
 # ------------------------------------------------------------------------------- #
-tabeLf <- function(DF)
+tableLf <- function(DF)
 {
 	names(DF) <- toupper(names(DF))
 	DFm       <- melt(DF, id=c("YEAR","XI"), na.rm=TRUE)
 	tx        <- cast(DFm,YEAR~XI,length, subset=variable=="TL")
 	
 	plotBubbles(t(tx[,c(-1,-48)]),xval=1989:2012,yval=sort(unique(DF$XI,na.rm=T))
-	            ,size=0.15,hide0=TRUE, frange=0.01, xlab="Year", ylab="Length (mm)")
+	            , size=0.15, hide0=TRUE, frange=0.01
+	            , xlab="Year", ylab="Length (mm)")
 	rect(1988,100,2013,150,col=colr(4,0.2),border=NA)
 	fig       <- "../../FIGS/LSMR/fig:CaptureLFbubbles.pdf"
 	dev.copy2pdf(file=fig)
 	
 	fn        <- "../../TABLES/LSMR/tableCaptureLF.tex"
-	cap       <- "Number of fish captured by length by all gear types listed in the GCMRC
-	              database for each year."
+	cap       <- "Number of fish captured by length by all gear types 
+	              listed in the GCMRC database for each year."
 	cgrp      <- c("", "YEAR")
 	ncgrp     <- c(1, 22)
 	
 	d1        <- latex(t(tx),file=fn, caption=cap
 		         , size="tiny",cgroup=cgrp, n.cgroup=ncgrp)
+	# use sed to make sideways table
+	sed.exp <- paste("sed -i~ 's/table/sidewaystable/g' ", fn)
+	system(sed.exp)
+
+}
+
+# ------------------------------------------------------------------------------- #
+# Table of new marks released each year (RECAP=FALSE)
+# ------------------------------------------------------------------------------- #
+tableNewMarks <- function(DF)
+{
+	names(DF) <- toupper(names(DF))
+	DFm       <- melt(DF, id=c("YEAR","MONTH","XI","RECAP","GROUP"), na.rm=TRUE)
+	tx        <- cast(DFm,YEAR~XI~RECAP|GROUP, length, subset=c(variable=="TL"))
+	gear      <- c("GILL", "HOOP") # Add gear group here to plot results
+	
+	# Barplots of marks released and recaptured.
+	fn.plot <- function(x)
+	{
+		par(mfcol=c(6, 4), mar=c(0.5, 1, 0.5, 1), oma=c(4, 4, 1, 1))
+		n   <- dim(x)[1]
+		for(i in 1:n)
+		{
+			if(!i%%6 || i==n)par(xaxt="s") else par(xaxt="n")
+			if(i==n)lgdtxt=c("Mark", "Recap") else lgdtxt=NULL
+			barplot(t(x[i, , ]), xlim=c(0, length(xbin))
+			        , legend.text=lgdtxt
+			        , args.legend=list(bty="n", cex=0.75))
+			title( main=rownames(x)[i],   font.main=2, cex.main=0.75, line=-1)
+		}
+		mtext(c("Length (mm)","Frequency"),side=c(1, 2), outer=T, line=2)
+		
+		fig=paste("../../FIGS/LSMR/fig:MarksAtLength",gear[jj],".pdf", sep="")
+		print(fig)
+		jj<<-jj+1
+		dev.copy2pdf(file=fig)
+	}
+	
+	event    <- c("Mark", "Recapture")
+	cap      <- c("Number of new marks released by year and size interval."
+	            , "Number of recaptured marks by year and size interval.")
+	fdir     <- "../../TABLES/LSMR/"
+	cgrp      <- c("YEAR")
+	
+
+	fn.write <- function(x)
+	{
+		for(i in 1:2)
+		{
+			ncgrp <- c(dim(x)[1])
+			fi    <- paste(fdir,"table:",event[i],":", gear[jj],".tex", sep="")
+			LI    <- t(x[, , i])
+			d1    <- latex(LI, file=fi, caption=cap[i]
+			               , size="tiny", cgroup=cgrp, n.cgroup=ncgrp)
+			
+			# use sed to replace table with sidewaystable
+			sed.exp <- paste('sed -i~ "s/table/sidewaystable/g" ', fi)
+			system(sed.exp)
+		}
+		jj <<- jj+1
+		print(jj)
+	}
+	
+	ii = names(tx) %in% gear
+	jj        <<-1
+	lapply(tx[ii], fn.plot)
+	jj       <<- 1
+	lapply(tx[ii], fn.write)
 }
 
 # ------------------------------------------------------------------------------- #
