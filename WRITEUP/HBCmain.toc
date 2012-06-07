@@ -7,7 +7,13 @@
 \contentsline {subsection}{\numberline {2.5}Length-based capture probability}{4}
 \contentsline {subsection}{\numberline {2.6}Negative log-likelihoods and prior densities}{4}
 \contentsline {subsection}{\numberline {2.7}Length-structured mark-recapture model (LSMR)}{4}
-\contentsline {section}{\numberline {A}Work plan}{15}
-\contentsline {section}{\numberline {B}Individual based model for simulating the dynamics and sampling of humpback chub in the Grand Canyon}{20}
-\contentsline {subsection}{\numberline {B.1}Introduction}{20}
-\contentsline {subsection}{\numberline {B.2}R-code}{20}
+\contentsline {subsection}{\numberline {2.8}Processing length frequency data}{4}
+\contentsline {section}{\numberline {3}Results}{7}
+\contentsline {subsection}{\numberline {3.1}Sampling effort}{7}
+\contentsline {subsection}{\numberline {3.2}Length composition}{7}
+\contentsline {section}{\numberline {A}Work plan}{14}
+\contentsline {section}{\numberline {B}Individual based model for simulating the dynamics and sampling of humpback chub in the Grand Canyon}{19}
+\contentsline {subsection}{\numberline {B.1}Introduction}{19}
+\contentsline {subsection}{\numberline {B.2}R-code}{19}
+\contentsline {section}{\numberline {C}Processing mark-recapture by length information}{26}
+\contentsline {subsection}{\numberline {C.1}R-Code for Database manipulation}{26}
