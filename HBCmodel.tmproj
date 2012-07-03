@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>R/2012HBCData/LSMR_dataScript.R</string>
+	<string>ReadMe</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -21,12 +21,40 @@
 	<integer>285</integer>
 	<key>metaData</key>
 	<dict>
+		<key>ADMB/srcASMR/ASMR.R</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>1</integer>
+				<key>line</key>
+				<integer>205</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>119</integer>
+		</dict>
+		<key>ADMB/srcASMR/ASMR.dat</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>1</integer>
+				<key>line</key>
+				<integer>6</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
 		<key>ADMB/srcASMR/ASMR.tpl</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>29</integer>
+				<integer>30</integer>
 				<key>line</key>
 				<integer>185</integer>
 			</dict>
@@ -34,6 +62,62 @@
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>171</integer>
+		</dict>
+		<key>ADMB/srcASMR/FULL_HBC2012.dat</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>ADMB/srcASMR/Makefile</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>ADMB/srcASMR/Trials.txt</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>ADMB/srcASMR/asmr.rep</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>8</integer>
+				<key>line</key>
+				<integer>163</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
 		</dict>
 		<key>ADMB/srcLSMR/LSMR.tpl</key>
 		<dict>
@@ -107,7 +191,7 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>8</integer>
 			<key>selectFrom</key>
 			<dict>
 				<key>column</key>
@@ -288,6 +372,13 @@
 		<string>TABLES/LSMR/tableCaptureLF.tex</string>
 		<string>TABLES/LSMR/tableCaptureNumbers.tex</string>
 		<string>R/2012HBCData/LSMR_dataScript.R</string>
+		<string>ADMB/srcASMR/asmr.rep</string>
+		<string>ADMB/srcASMR/Trials.txt</string>
+		<string>ADMB/srcASMR/ASMR.R</string>
+		<string>ADMB/srcASMR/ASMR.tpl</string>
+		<string>ADMB/srcASMR/Makefile</string>
+		<string>ADMB/srcASMR/FULL_HBC2012.dat</string>
+		<string>ADMB/srcASMR/ASMR.dat</string>
 		<string>ADMB/srcLSMR/LSMR.tpl</string>
 		<string>R/ASMR.R</string>
 		<string>R/HBCsim.R</string>
@@ -313,6 +404,13 @@
 					<true/>
 					<key>subItems</key>
 					<dict>
+						<key>srcASMR</key>
+						<dict>
+							<key>isExpanded</key>
+							<true/>
+							<key>subItems</key>
+							<dict/>
+						</dict>
 						<key>srcLSMR</key>
 						<dict>
 							<key>isExpanded</key>

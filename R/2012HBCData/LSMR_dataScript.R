@@ -23,7 +23,7 @@
 #   tableMarks: marks released and recaptured by GILL and HOOP nets
 # ------------------------------------------------------------------------------- #
 require(ggplot2)
-require(hacks)
+# require(hacks) #deprecated
 require(reshape)
 require(Hmisc)
 require(PBSmodelling)
@@ -69,7 +69,7 @@ getGrowthIncrement <- function(DF)
         sDF  <- sDF[order(sDF[,1]),]
         ni   <- dim(sDF)[1]
         dt   <- as.integer(sDF[ni, 1] - sDF[1, 1]) # days at large
-        if(dt<=365) return(NULL)                   # at least 1-year at liberty
+        if(dt<=365 || dt>730 ) return(NULL)        # at least 1-year at liberty
         l1   <- sDF[1 , 2]                         # length at tagging
         l2   <- sDF[ni, 2]                         # length at recapture
         yr   <- sDF[1 , 3]                         # release year
@@ -78,15 +78,52 @@ getGrowthIncrement <- function(DF)
         return (c(yr, tl, l1, l2, dt, round(dl, 2)))
     }
     idNum    <- unique(DF$TAGNO)
-    TRdata   <- NULL
+    TRdata   <- data.frame()
     for(i in idNum) TRdata <- rbind(TRdata, fnGI(i))
-    colnames(TRdata) <- c("#YEAR","RIVER","L1","L2","DT","DL")
-    TRdata <- na.omit(TRdata)     #Remove missing recapture measurements
-    ii <- which(TRdata$DL <= -5)  #Remove records with growth increments < -5 mm
-    TR$RIVER[TR$RIVER==1] <- "COR"
-    TR$RIVER[TR$RIVER==2] <- "LCR"
+    colnames(TRdata) <- c("YEAR","RIVER","L1","L2","DT","DL")
+    
+    TRdata <- na.omit(TRdata)      #Remove missing recapture measurements
+    ii <- which(TRdata$DL <= -10)  #Remove records with growth increments < -5 mm
+    #TRdata$RIVER[TRdata$RIVER==1] <- "COR"
+    #TRdata$RIVER[TRdata$RIVER==2] <- "LCR"
     return(as.data.frame(TRdata[-ii, ]))
 }
+
+# ------------------------------------------------------------------------------- #
+# Annual growth increment data based on captures and recaps in subsequent year.
+# ------------------------------------------------------------------------------- #
+annualGrowthIncrement <- function(DF)
+{
+	# Goal: for each year compute the length-at-capture & growth increment into
+	#       the following year.
+	# PSEUDOCODE:
+	# - get vector of unique years.
+	# - find unique individuals recaptured year i and year i+1
+	# - get TL from each capture event
+	
+	ATR    <- data.frame()
+	iyr    <- unique(DF$YEAR)
+	for(i in iyr)
+	{
+		iDF  <- rbind(subset(DF,DF$YEAR==i), subset(DF, DF$YEAR==i+1))
+		iDF  <- iDF[order(iDF$TAGNO, iDF$DATE), ]
+		irc  <- unique(iDF$TAGNO[duplicated(iDF$TAGNO)])
+		
+		for(j in irc)
+		{
+			ijDF <- subset(iDF, iDF$TAGNO==j)
+			nj   <- dim(ijDF)[1]
+			dt   <- as.integer(ijDF$DATE[nj] - ijDF$DATE[1])
+			l1   <- ijDF$TL[1]
+			l2   <- ijDF$TL[nj]
+			loc  <- ijDF$RIVER_CODE[1]
+			ATR  <- rbind(ATR, c(YEAR=i, RIVER=loc, TAGNO=j, l1=l1, l2=l2, dt=dt))
+		}
+	}
+	colnames(ATR)=c("YEAR","RIVER","TAGNO","l1","l2","dt")
+	return(ATR)
+}
+
 
 # ------------------------------------------------------------------------------- #
 # Get captures & recaptures by length interval
@@ -297,15 +334,31 @@ if(!exists("DF")) DF <- get.DF(dfile)
 if(!exists("TR"))
 {
     TR <- getGrowthIncrement(DF)
+    print(head(TR))
     TR <- TR[order(TR$YEAR,TR$RIVER),]
-    write(dim(TR)[1],file="HBC_Tag_Recapture.dat")
+    write(dim(TR)[1],file="HBC_Tag_RecaptureII.dat")
     write(c("#YEAR","RIVER","L1","L2","DT","DL"), ncol=6, 
-            file="HBC_Tag_Recapture.dat", append=TRUE)
-    write.table(TR,file="HBC_Tag_Recapture.dat",row.names=F, 
+            file="HBC_Tag_RecaptureII.dat", append=TRUE)
+    write.table(TR,file="HBC_Tag_RecaptureII.dat",row.names=F, 
             col.names=F, append=TRUE)
     
     fig="../../FIGS/LSMR/fig:GrowthIncrements.pdf"
     plot.gi(TR, file=fig)
+}
+if(!exists("ATR"))
+{
+	ATR  <- annualGrowthIncrement(DF)
+	O    <- na.omit(ATR[ATR$dt>365, -3])
+	O$dl <- round((O$l2-O$l1)/(O$dt/365.25), 2)
+	
+	print(head(O))
+	fn  <- "HBC_Annual_GI.dat"
+	write(dim(O)[1], file=fn)
+	write(c("#YEAR","RIVER","l1","l2","dt","dl"), ncol=6, file=fn, append=TRUE)
+	write.table(O, file=fn, row.names=FALSE, col.names=FALSE, append=TRUE)
+	
+	fig <-"../../FIGS/LSMR/fig:AnnualGrowthIncrements.pdf"
+	plot.atr(O, file=fig)
 }
 
 # ------------------------------------------------------------------------------- #
@@ -314,14 +367,28 @@ if(!exists("TR"))
 plot.gi <- function(TR, file=NULL,  ...)
 {
     p<-ggplot(TR,aes(L1,DL))
-    p<-p + geom_point(aes(colour=factor(-RIVER), levels=2),alpha=0.5)
+    p<-p + geom_point(aes(colour=factor(RIVER), levels=2),alpha=0.5)
     p<-p + stat_quantile(alpha=0.7, col="black")+facet_wrap(~YEAR) 
     p<-p + labs(x="Release Length (mm)", y="Annual growth increment (mm)")
     p<-p + labs(colour="River")+theme_grey(base_size =  12, base_family = "")
-
-    
     if(!is.null(file))
         dev.copy2pdf(file=file)
     
     return(p)
+}
+
+plot.atr <- function(ATR, file=NULL, ...)
+{
+	O    <- ATR[ATR$dt>365, ]
+	O$gi <- (O$l2-O$l1)/(O$dt/365.25)
+	p    <- ggplot(O, aes(l1, gi))
+	p    <- p + geom_point(aes(color=factor(RIVER), levels=2), alpha=0.5)
+	p    <- p + stat_quantile(alpha=0.7, col="black") + facet_wrap(~YEAR)
+	p    <- p + labs(colour="River")+theme_grey(base_size =  12, base_family = "")
+	p
+	if(!is.null(file))
+        dev.copy2pdf(file=file)
+    
+    return(p)
+    
 }

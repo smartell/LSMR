@@ -5,7 +5,7 @@
 
 # call in growth parameters for skipjack
 
-pars <- matrix(scan("params_t.dat"),ncol=3,byrow=T)
+pars <- matrix(scan("params_t.dat", skip=1),ncol=3,byrow=T)
 
 # define growth increment function
 
@@ -17,7 +17,7 @@ lvbinc <- function(lrel,tau,k,Linf) {
 # define the length bins
 
 lbins <- c(30,35,40,45,50,55,60,65,70,75,80)
-lbins <- seq(30, 80, by=5)
+lbins <- seq(30, 80, by=2)
 # define the Monte Carlo transition matrices
 
 nits <- dim(pars)[1]
@@ -31,14 +31,14 @@ tau <- 1
 
 for(k in 1:nits) {
 
-  phi <- pars[k,3]
+  phi <- pars[k,3]   #std in the process errors
 
   for(i in 1:dim(tmat)[1]) {
 
   lx <- lbins[i]
   ly <- lbins[i+1]
   df <- phi/mean(lbins[i]+lbins[i+1])
-  epsl <- rt(1,df)
+  epsl <- rt(1,df)   #random variable from t-distribution wiht df.
 
     for(j in 1:dim(tmat)[2]) {
 

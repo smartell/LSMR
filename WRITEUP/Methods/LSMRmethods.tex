@@ -24,8 +24,13 @@ Natural mortality is a function of length \eqref{eq:T1.6}, where the natural mor
 
 \subsection{Growth transition} % (fold)
 \label{sub:growth_transition}
-The asymptotic length $l_\infty$ is defined as the average asymptotic length for a population of fish.  It is assumed in \eqref{eq:T1.8} that individuals greater than $l_\infty$ continue to grow at a much reduced rate $k$; this is accomplished by exponentiating the growth increment equation ($(l_\infty-x_j)(1-exp(-k\tau))$), adding 1.0, and taking the natural logarithm ensuring that \eqref{eq:T1.8} remains positive for all positive values of $l_\infty$, $k$, and $\Lambda$.
+The asymptotic length $l_\infty$ is defined as the average asymptotic length for a population of fish.  It is assumed in \eqref{eq:T1.8} that individuals greater than $l_\infty$ continue to grow at a much reduced rate $k$; this is accomplished by exponentiating the growth increment equation ($(l_\infty-x_j)(1-\exp(-k\tau))$), adding 1.0, and taking the natural logarithm ensuring that \eqref{eq:T1.8} remains positive for all positive values of $l_\infty$, $k$, and $\Lambda$.
 The probability of transitioning from one length interval $x_j$ to length intervals greater than $x_{j}$ is based on a gamma density function \eqref{eq:T1.9}, where the mean is denoted by $\Delta_j$ and a variance equal to $\Delta_j \beta$.  Each row of $\mathbf{P}_{j,j'}$ is normalized to sum to 1.0, and $\mathbf{P}_{j,j'}=1.0$ when $j=j'=n$, where $n$ is the number of length intervals (i.e., individuals in the last length interval represent a plus group).
+
+% Alternative method for constructing the Length Transition Matrix. (Move to Appendix?)
+There is an alternative method for independently constructing annual length transition matrix based on individual capture-recapture information that incorporates both parametric uncertainty and measurement error.  This method was recently described by \cite{hillary2010new}. In short, the method first estimates von Bertalanffy growth parameters based on the length-at-release and growth increment information, growth parameters are then sampled from the joint posterior distribution, and for each posterior sample measurement error is then added to the predicted growth increment  from $x_j$ to $x_{j'}$ and the overlap between $(x_{j'}-x^*) \cap (x_{j'}+x^*)$ is calculated.  To numerically approximate the length transition matrix, 1,000 samples from the joint posterior distribution are used to construct 1,000 length-transition matrixes ($P_{j,j'}$) and the mean values from the 1000 matrixes are used as the length transition matrix.
+
+Growth parameters were estimated based on growth increment data from individual fish that were captured and recaptured in the subsequent year only.  Initially, growth increment data based on length-at-tagging and the most recent capture event was used (i.e., the longest time at liberty) were going to be used; but, upon further inspection of the raw data  there is evidence of changes in growth rates over time (see increasing negative slopes in Figure \ref{fig:FIGS_LSMR_fig:GrowthIncrements}).  To minimize the impact of changing growth rates, the growth increment data were based only on individuals that were captured and recaptured in the subsequent calendar year (Figure \ref{fig:FIGS_LSMR_fig:AnnualGrowthIncrements}), hereafter referred to as annual growth increment data.
 
 
 
@@ -87,8 +92,8 @@ The probability of transitioning from one length interval $x_j$ to length interv
 		& \vec{\Delta} = \ln( \exp[(l_\infty-\Lambda)(1-\exp(-k \tau))] +1)
 		\label{eq:T1.8}\\
 		&\mbox{length transition probability}
-		& \mathbf{P}_{j,j'} =\int_{x_j-x^*}^{x_j+x^*} \frac{x_{j'}^{(\Delta_{j}/\beta-1)}
-		e^{x_{j'}/\beta}}{\beta^{\Delta_{j}/\beta} \Gamma(\Delta_{j}/\beta)}dx, \nonumber\\
+		& \mathbf{P}_{j,j'} =\int_{x_{j'}-x^*}^{x_{j'}+x^*} \frac{x_{j'}^{(\Delta_{j}/\beta-1)}
+		e^{x_{j'}/\beta}}{\beta^{\Delta_{j}/\beta} \Gamma(\Delta_{j}/\beta)}dx_{j'}, \nonumber\\
 		& &\quad \sum_{j'=1}^J P_{j,j'}= 1 
 		\label{eq:T1.9}\\
 		&\mbox{total numbers, marked numbers} 
@@ -118,11 +123,24 @@ The probability of transitioning from one length interval $x_j$ to length interv
 \begin{figure}[htbp]
 	\centering
 		\includegraphics[width=6.5in]{../FIGS/LSMR/fig:GrowthIncrements.pdf}
-	\caption{Growth increments by tag year for individually tagged humpback chub that have been at large for at least 1 year. River 2 corresponds to fish tagged in the Little Colorado River, River 1 the Colorado River.  Recapture events could have occurred in either river. Fitted lines correspond to the 5, 50 and 95 percentiles of the data.}
+	\caption{Growth increments by tag year for individually tagged humpback chub that have been at large for at least 1 year.   Recapture events could have occurred in either river. Fitted lines correspond to the 5, 50 and 95 percentiles of the data.}
 	\label{fig:FIGS_LSMR_fig:GrowthIncrements}
 \end{figure}
 
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=6.5in]{../FIGS/LSMR/fig:AnnualGrowthIncrements.pdf}
+	\caption{Annual growth increments of humpback chub of all fish captured and recaptured in the following year. River 2 corresponds to fish tagged in the Little Colorado River, River 1 the Colorado River. Fitted lines correspond to the 5, 50 and 95 percentiles of the data.}
+	\label{fig:FIGS_LSMR_fig:AnnualGrowthIncrements}
+\end{figure}
 
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=6.5in]{../FIGS/LSMR/fig:LinfPosteriors.pdf}
+		\includegraphics[width=6.5in]{../FIGS/LSMR/fig:kPosteriors.pdf}
+	\caption{caption}
+	\label{fig:FIGS_LSMR_fig:LinfPosteriors}
+\end{figure}
 
 
 
