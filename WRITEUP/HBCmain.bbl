@@ -1,0 +1,25 @@
+\begin{thebibliography}{}
+
+\bibitem[Fournier and Archibald, 1982]{fournier1982general}
+Fournier, D. and Archibald, C. (1982).
+\newblock {A general theory for analyzing catch at age data}.
+\newblock {\em Canadian Journal of Fisheries and Aquatic Sciences},
+  39(8):1195--1207.
+
+\bibitem[Fournier et~al., 2011]{fournier2011ad}
+Fournier, D., Skaug, H., Ancheta, J., Ianelli, J., Magnusson, A., Maunder, M.,
+  Nielsen, A., and Sibert, J. (2011).
+\newblock Ad model builder: using automatic differentiation for statistical
+  inference of highly parameterized complex nonlinear models.
+
+\bibitem[Hillary, 2011]{hillary2010new}
+Hillary, R. (2011).
+\newblock A new method for estimating growth transition matrices.
+\newblock {\em Biometrics}, 67:76--85.
+
+\bibitem[{R Development Core Team}, 2009]{R-Development-Core-Team:2009fk}
+{R Development Core Team} (2009).
+\newblock {\em R: A Language and Environment for Statistical Computing}.
+\newblock R Foundation for Statistical Computing, Vienna, Austria.
+
+\end{thebibliography}
