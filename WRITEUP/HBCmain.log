@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=pdflatex 2011.7.3)  3 JUL 2012 13:03
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=pdflatex 2011.7.3)  6 JUL 2012 16:14
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -621,63 +621,31 @@ File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 \openout4 = `HBCmain.toc'.
 
 
-(./Methods/LSMRmethods.tex [2] [3] [4]
-<../FIGS/LSMR/fig:GrowthIncrements.pdf, id=29, 504.88625pt x 504.88625pt>
-File: ../FIGS/LSMR/fig:GrowthIncrements.pdf Graphic file (type pdf)
-
-<use ../FIGS/LSMR/fig:GrowthIncrements.pdf>
-Package pdftex.def Info: ../FIGS/LSMR/fig:GrowthIncrements.pdf used on input li
-ne 125.
-(pdftex.def)             Requested size: 469.75499pt x 469.76276pt.
-
-<../FIGS/LSMR/fig:AnnualGrowthIncrements.pdf, id=30, 504.88625pt x 504.88625pt>
-File: ../FIGS/LSMR/fig:AnnualGrowthIncrements.pdf Graphic file (type pdf)
-<use ../FIGS/LSMR/fig:AnnualGrowthIncrements.pdf>
-Package pdftex.def Info: ../FIGS/LSMR/fig:AnnualGrowthIncrements.pdf used on in
-put line 132.
-(pdftex.def)             Requested size: 469.75499pt x 469.76276pt.
-
-<../FIGS/LSMR/fig:LinfPosteriors.pdf, id=31, 722.7pt x 361.35pt>
-File: ../FIGS/LSMR/fig:LinfPosteriors.pdf Graphic file (type pdf)
-
-<use ../FIGS/LSMR/fig:LinfPosteriors.pdf>
-Package pdftex.def Info: ../FIGS/LSMR/fig:LinfPosteriors.pdf used on input line
- 139.
-(pdftex.def)             Requested size: 469.75499pt x 234.88023pt.
-
-<../FIGS/LSMR/fig:kPosteriors.pdf, id=32, 722.7pt x 361.35pt>
-File: ../FIGS/LSMR/fig:kPosteriors.pdf Graphic file (type pdf)
-
-<use ../FIGS/LSMR/fig:kPosteriors.pdf>
-Package pdftex.def Info: ../FIGS/LSMR/fig:kPosteriors.pdf used on input line 14
-0.
-(pdftex.def)             Requested size: 469.75499pt x 234.88023pt.
-) (./Results/Results.tex
+(./Methods/LSMRmethods.tex [2] [3] [4]) (./Results/Results.tex
 (./Results/Results:EffortLengthComps.tex (../TABLES/LSMR/tableEffort.tex)
-<../FIGS/LSMR/fig:CaptureLFbubbles.pdf, id=33, 556.0775pt x 459.7175pt>
+[5] [6] [7]
+<../FIGS/LSMR/fig:CaptureLFbubbles.pdf, id=42, 556.0775pt x 459.7175pt>
 File: ../FIGS/LSMR/fig:CaptureLFbubbles.pdf Graphic file (type pdf)
 
 <use ../FIGS/LSMR/fig:CaptureLFbubbles.pdf>
 Package pdftex.def Info: ../FIGS/LSMR/fig:CaptureLFbubbles.pdf used on input li
-ne 19.
+ne 21.
 (pdftex.def)             Requested size: 469.75499pt x 388.36269pt.
- [5] [6] [7 <../FIGS/LSMR/fig:GrowthIncrements.pdf>] [8 <../FIGS/LSMR/fig:Annua
-lGrowthIncrements.pdf>] [9 <../FIGS/LSMR/fig:LinfPosteriors.pdf> <../FIGS/LSMR/
-fig:kPosteriors.pdf>] [10] [11 <../FIGS/LSMR/fig:CaptureLFbubbles.pdf>]
-<../FIGS/LSMR/fig:MarksAtLengthHOOP.pdf, id=96, 504.88625pt x 504.88625pt>
+ [8 <../FIGS/LSMR/fig:CaptureLFbubbles.pdf>]
+<../FIGS/LSMR/fig:MarksAtLengthHOOP.pdf, id=53, 504.88625pt x 504.88625pt>
 File: ../FIGS/LSMR/fig:MarksAtLengthHOOP.pdf Graphic file (type pdf)
 
 <use ../FIGS/LSMR/fig:MarksAtLengthHOOP.pdf>
 Package pdftex.def Info: ../FIGS/LSMR/fig:MarksAtLengthHOOP.pdf used on input l
-ine 28.
+ine 30.
 (pdftex.def)             Requested size: 469.75499pt x 469.76276pt.
 
-<../FIGS/LSMR/fig:MarksAtLengthGILL.pdf, id=97, 504.88625pt x 504.88625pt>
+<../FIGS/LSMR/fig:MarksAtLengthGILL.pdf, id=54, 504.88625pt x 504.88625pt>
 File: ../FIGS/LSMR/fig:MarksAtLengthGILL.pdf Graphic file (type pdf)
 
 <use ../FIGS/LSMR/fig:MarksAtLengthGILL.pdf>
 Package pdftex.def Info: ../FIGS/LSMR/fig:MarksAtLengthGILL.pdf used on input l
-ine 37.
+ine 39.
 (pdftex.def)             Requested size: 469.75499pt x 469.76276pt.
 
 (../TABLES/LSMR/tableCaptureNumbers.tex
@@ -685,12 +653,52 @@ Overfull \hbox (9.41272pt too wide) in paragraph at lines 8--42
  [] 
  []
 
-) (../TABLES/LSMR/tableCaptureGear.tex))) (./HBCmain.bbl [12] [13 <../FIGS/LSMR
-/fig:MarksAtLengthHOOP.pdf>] [14 <../FIGS/LSMR/fig:MarksAtLengthGILL.pdf>]
-[15]) [16]
+) (../TABLES/LSMR/tableCaptureGear.tex)) (./Results/Results:Growth.tex
+<../FIGS/LSMR/fig:GrowthIncrements.pdf, id=55, 504.88625pt x 504.88625pt>
+File: ../FIGS/LSMR/fig:GrowthIncrements.pdf Graphic file (type pdf)
+
+<use ../FIGS/LSMR/fig:GrowthIncrements.pdf>
+Package pdftex.def Info: ../FIGS/LSMR/fig:GrowthIncrements.pdf used on input li
+ne 13.
+(pdftex.def)             Requested size: 469.75499pt x 469.76276pt.
+
+<../FIGS/LSMR/fig:AnnualGrowthIncrements.pdf, id=56, 504.88625pt x 504.88625pt>
+File: ../FIGS/LSMR/fig:AnnualGrowthIncrements.pdf Graphic file (type pdf)
+<use ../FIGS/LSMR/fig:AnnualGrowthIncrements.pdf>
+Package pdftex.def Info: ../FIGS/LSMR/fig:AnnualGrowthIncrements.pdf used on in
+put line 20.
+(pdftex.def)             Requested size: 469.75499pt x 469.76276pt.
+
+<../FIGS/LSMR/fig:LinfPosteriors.pdf, id=57, 722.7pt x 361.35pt>
+File: ../FIGS/LSMR/fig:LinfPosteriors.pdf Graphic file (type pdf)
+
+<use ../FIGS/LSMR/fig:LinfPosteriors.pdf>
+Package pdftex.def Info: ../FIGS/LSMR/fig:LinfPosteriors.pdf used on input line
+ 29.
+(pdftex.def)             Requested size: 469.75499pt x 234.88023pt.
+
+<../FIGS/LSMR/fig:kPosteriors.pdf, id=58, 722.7pt x 361.35pt>
+File: ../FIGS/LSMR/fig:kPosteriors.pdf Graphic file (type pdf)
+
+<use ../FIGS/LSMR/fig:kPosteriors.pdf>
+Package pdftex.def Info: ../FIGS/LSMR/fig:kPosteriors.pdf used on input line 30
+.
+(pdftex.def)             Requested size: 469.75499pt x 234.88023pt.
+ [9] [10 <../FIGS/LSMR/fig:MarksAtLengthHOOP.pdf>] [11 <../FIGS/LSMR/fig:MarksA
+tLengthGILL.pdf>] [12] [13] [14 <../FIGS/LSMR/fig:GrowthIncrements.pdf>] [15 <.
+./FIGS/LSMR/fig:AnnualGrowthIncrements.pdf>] [16 <../FIGS/LSMR/fig:LinfPosterio
+rs.pdf> <../FIGS/LSMR/fig:kPosteriors.pdf>] <../FIGS/LSMR/fig:TransitionMatrix.
+pdf, id=126, 504.88625pt x 504.88625pt>
+File: ../FIGS/LSMR/fig:TransitionMatrix.pdf Graphic file (type pdf)
+
+<use ../FIGS/LSMR/fig:TransitionMatrix.pdf>
+Package pdftex.def Info: ../FIGS/LSMR/fig:TransitionMatrix.pdf used on input li
+ne 40.
+(pdftex.def)             Requested size: 469.75499pt x 469.76276pt.
+)) (./HBCmain.bbl) [17] [18 <../FIGS/LSMR/fig:TransitionMatrix.pdf>]
 \openout2 = `./Appendix1/WorkPlan.aux'.
 
- (./Appendix1/WorkPlan.tex [17
+ (./Appendix1/WorkPlan.tex [19
 
 ]
 Overfull \hbox (448.82011pt too wide) in paragraph at lines 54--54
@@ -699,14 +707,14 @@ Overfull \hbox (448.82011pt too wide) in paragraph at lines 54--54
  tagno[] 
  []
 
-[18] <../FIGS/fig:lengthTransition.pdf, id=132, 556.0775pt x 459.7175pt>
+[20] <../FIGS/fig:lengthTransition.pdf, id=151, 556.0775pt x 459.7175pt>
 File: ../FIGS/fig:lengthTransition.pdf Graphic file (type pdf)
 
 <use ../FIGS/fig:lengthTransition.pdf>
 Package pdftex.def Info: ../FIGS/fig:lengthTransition.pdf used on input line 80
 .
 (pdftex.def)             Requested size: 361.44609pt x 298.81282pt.
- [19] [20 <../FIGS/fig:lengthTransition.pdf>]) [21]
+ [21] [22 <../FIGS/fig:lengthTransition.pdf>]) [23]
 \openout2 = `./Appendix2/SimulationModel.aux'.
 
  (./Appendix2/SimulationModel.tex
@@ -727,7 +735,7 @@ File: omlcmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 LaTeX Font Info:    Font shape `OML/cmr/m/it' in size <10> not available
 (Font)              Font shape `OML/cmm/m/it' tried instead on input line 8.
 
-[22
+[24
 
 
 ]
@@ -739,19 +747,19 @@ File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/bx/n' in size <10> not available
 (Font)              Font shape `OMS/cmsy/b/n' tried instead on input line 67.
- [23]
+ [25]
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 90.
 
-[24]
+[26]
 LaTeX Font Info:    Font shape `OML/cmr/m/n' in size <10> not available
 (Font)              Font shape `OML/cmm/m/it' tried instead on input line 174.
- [25] [26]
+ [27] [28]
 Overfull \hbox (4.2498pt too wide) in paragraph at lines 244--246
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
-[27])) [28]
+[29])) [30]
 \openout2 = `./Appendix3/Database.aux'.
 
  (./Appendix3/Database.tex
@@ -822,10 +830,10 @@ Overfull \hbox (10.24986pt too wide) in paragraph at lines 14--15
 [][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
-[29
+[31
 
 
-] [30] [31] [32] [33] [34]
+] [32] [33] [34] [35] [36]
 Overfull \hbox (28.25005pt too wide) in paragraph at lines 24--25
 [][][][][][][] 
  []
@@ -860,7 +868,7 @@ Overfull \hbox (28.25005pt too wide) in paragraph at lines 62--63
 [][][][][][][] 
  []
 
-[35]
+[37]
 Overfull \hbox (4.2498pt too wide) in paragraph at lines 72--73
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
@@ -890,7 +898,7 @@ Overfull \hbox (28.25005pt too wide) in paragraph at lines 97--98
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
-[36]
+[38]
 Overfull \hbox (94.25072pt too wide) in paragraph at lines 120--121
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][] 
@@ -921,7 +929,7 @@ Overfull \hbox (16.24992pt too wide) in paragraph at lines 165--166
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
-[37]
+[39]
 Overfull \hbox (28.25005pt too wide) in paragraph at lines 175--176
 [][][][][][][] 
  []
@@ -941,7 +949,7 @@ Overfull \hbox (28.25005pt too wide) in paragraph at lines 197--198
 [][][][][][][] 
  []
 
-[38]
+[40]
 Overfull \hbox (28.25005pt too wide) in paragraph at lines 224--225
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][] 
@@ -989,13 +997,13 @@ Overfull \hbox (10.24986pt too wide) in paragraph at lines 270--271
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
-[39]
+[41]
 Overfull \hbox (4.2498pt too wide) in paragraph at lines 308--309
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][] 
  []
 
-[40]
+[42]
 Overfull \hbox (28.25005pt too wide) in paragraph at lines 330--331
 [][][][][][][] 
  []
@@ -1021,13 +1029,13 @@ Overfull \hbox (28.25005pt too wide) in paragraph at lines 366--367
 [][][][][][][] 
  []
 
-[41]
+[43]
 Overfull \hbox (46.25023pt too wide) in paragraph at lines 387--388
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][] 
  []
 
-)) [42]
+)) [44]
 Package minitoc Info: I0009
 (minitoc)             Listing minitoc auxiliary files. 
 (minitoc)             Creating the HBCmain.maf file.
@@ -1039,10 +1047,10 @@ Package minitoc(hints) Info: I0019
  (./HBCmain.aux (./Appendix1/WorkPlan.aux)
 (./Appendix2/SimulationModel.aux) (./Appendix3/Database.aux)) ) 
 Here is how much of TeX's memory you used:
- 7758 strings out of 493633
- 101918 string characters out of 3143378
- 503474 words of memory out of 3000000
- 10616 multiletter control sequences out of 15000+200000
+ 7768 strings out of 493633
+ 102273 string characters out of 3143378
+ 501802 words of memory out of 3000000
+ 10622 multiletter control sequences out of 15000+200000
  19804 words of font info for 80 fonts, out of 3000000 for 9000
  831 hyphenation exceptions out of 8191
  38i,13n,46p,1553b,2294s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -1070,10 +1078,10 @@ e1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2011/texmf-dist/fonts/type
 1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1
 /public/amsfonts/cm/cmtt12.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/
 public/amsfonts/cm/cmtt8.pfb>
-Output written on HBCmain.pdf (42 pages, 1154575 bytes).
+Output written on HBCmain.pdf (44 pages, 1273619 bytes).
 PDF statistics:
- 296 PDF objects out of 1000 (max. 8388607)
- 210 compressed objects within 3 object streams
+ 315 PDF objects out of 1000 (max. 8388607)
+ 225 compressed objects within 3 object streams
  0 named destinations out of 1000 (max. 500000)
- 41 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 46 words of extra memory for PDF output out of 10000 (max. 10000000)
 
