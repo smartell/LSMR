@@ -56,7 +56,7 @@ THETA <- list( lmin=lmin,
                lh=lh, 
                gamma=gamma )
 
-set.seed(991)
+set.seed(999)
 iclr <- rev(topo.colors(length(syr:nyr),0.5))
 Rt<-floor(rlnorm(length(syr:nyr), log(300), 0.9))
 h1 <- 0.04

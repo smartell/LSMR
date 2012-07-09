@@ -11,13 +11,34 @@
 //               Oct 27/11    8    Simulation model in R & ADMB code         //
 //               Oct 31/11    4    LSMR.tpl code  (PAID $11,000)             //
 //               Apr 26/12    4    LSMR code development.                    //
-//                                                                           //
+//               Jul 08/12    8    LSMR simulation routine.                  //
 //                                                                           //
 // ************************************************************************* //
 
 
 DATA_SECTION
+	init_adstring data_file;
+	init_adstring control_file;
 	
+	int SimFlag;
+	int rseed;
+	LOC_CALCS
+		SimFlag = 0;
+		rseed   = 1;
+		int on,opt;
+		//the following line checks for the "-SimFlag" command line option
+		//if it exists the if statement retreives the random number seed
+		//that is required for the simulation model
+		if((on=option_match(ad_comm::argc,ad_comm::argv,"-sim",opt))>-1)
+		{
+			SimFlag = 1;
+			rseed   = atoi(ad_comm::argv[on+1]);
+			if(SimFlag) cout<<"In Simulation Mode\n";
+		}
+		
+	END_CALCS
+	
+	!! ad_comm::change_datafile_name(data_file);
 	
 	// Read input data from data file //
 	init_int syr;   //first year
@@ -40,6 +61,38 @@ DATA_SECTION
 	init_matrix i_M(1,nrow,1,ncol); //New Marks-at-length
 	init_matrix i_R(1,nrow,1,ncol); //Recaptures-at-length
 	
+	
+	init_int eof;
+	!! if(eof!=999){cout<<"Error reading data\n"; exit(1);}
+	!! cout<< "____ End of Data file! ____\n"<<endl;
+	
+	
+	!! ad_comm::change_datafile_name(control_file);
+	init_int npar
+	init_matrix theta_control(1,npar,1,7);
+	matrix trans_theta_control(1,7,1,npar);
+	vector theta_ival(1,npar);
+	vector theta_lbnd(1,npar);
+	vector theta_ubnd(1,npar);
+	ivector theta_phz(1,npar);
+	ivector theta_prior(1,npar);
+	LOC_CALCS
+		trans_theta_control = trans(theta_control);
+		theta_ival = trans_theta_control(1);
+		theta_lbnd = trans_theta_control(2);
+		theta_ubnd = trans_theta_control(3);
+		theta_phz  = ivector(trans_theta_control(4));
+		theta_prior = ivector(trans_theta_control(5));
+	END_CALCS
+	
+	init_int nflags;
+	init_vector flag(1,nflags);
+	// 1) minimum size of fish for tagging.
+	
+	
+	
+	// Pre-processing some of the data.
+	ivector j_min(1,nrow);
 	matrix C(1,nrow,1,nx);
 	matrix M(1,nrow,1,nx);
 	matrix R(1,nrow,1,nx);
@@ -49,42 +102,49 @@ DATA_SECTION
 			C(i)(1,nx) = i_C(i)(3,ncol).shift(1);
 			M(i)(1,nx) = i_M(i)(3,ncol).shift(1);
 			R(i)(1,nx) = i_R(i)(3,ncol).shift(1);
+			
+			//set up index for minimum size for tagging fish.
+			for(int j=1;j<=nx;j++)
+			{
+				if( M(i,j)>0 || xbin(j) > flag(1) )
+				{
+					j_min(i)=j;
+					break;
+				}
+			}
 		}
 	END_CALCS
 	
-	init_int eof;
-	!! if(eof!=999){cout<<"Error reading data\n"; exit(1);}
-	!! cout<< "____ End of Data file! ____\n"<<endl;
-
 	
 PARAMETER_SECTION
-	init_number log_Ninit;
-	init_number log_rbar;
-	init_number log_fbar;
-	init_number log_m_linf(4);
-	!! log_m_linf = log(0.08);
-	!! log_Ninit = 7;
-	!! log_rbar = 9;
-	!! log_fbar = log(0.1);
+	init_bounded_number_vector theta(1,npar,theta_lbnd,theta_ubnd,theta_phz);
+	number log_ddot_r;
+	number log_bar_r;
+	number log_bar_f;
+	number m_infty;
+
+	//Variables for growth.
+	number l_infty;
+	number vbk;
+	number beta;
+	
+	//Variables for size distribution of new recruits
+	number mu_r;
+	number cv_r
+	
 	//Selectivity parameters
 	init_number log_lx(2);
 	init_number log_gx(2);
-	!! log_lx = log(10);
-	!! log_gx = log(2.5);
 	
-	
-	init_bounded_dev_vector init_log_Ninit_devs(1,nx,-15,15,1);
-	init_bounded_dev_vector log_rec_devs(syr+1,nyr,-15,15,3);
-	init_bounded_dev_vector log_fi_devs(1,nrow,-15.0,15.0,2);
+	init_bounded_dev_vector ddot_r_devs(1,nx,-15,15,1);
+	init_bounded_dev_vector bar_r_devs(syr+1,nyr,-15,15,3);
+	init_bounded_dev_vector bar_f_devs(1,nrow,-15.0,15.0,2);
 	
 	
 	
 	objective_function_value f;
 	
-	//Variables for growth.
-	number linf;
-	number k;
-	number beta;
+
 	number dl_cv;
 	number fpen;
 	
@@ -93,55 +153,165 @@ PARAMETER_SECTION
 	number gx;				//std in length at 50% selectivity
 	vector mx(1,nx);		//Mortality rate at length xmid
 	vector sx(1,nx);		//Selectivity at length xmid
+	vector rx(1,nx);		//size pdf for new recruits
+	
 	vector log_rt(syr+1,nyr);
 	vector fi(1,nrow);		//capture probability in period i.
-	matrix N(1,nr+1,1,nx);	//Numbers(time step, length bins)
-	matrix T(1,nr+1,1,nx);  //Marks-at-large (time step, length bins)
+	matrix N(1,nr,1,nx);	//Numbers(time step, length bins)
+	matrix T(1,nr,1,nx);	//Marks-at-large (time step, length bins)
+	matrix P(1,nx,1,nx);	// Size-Transition Matrix
 	
 	// predicted observations
 	matrix Chat(1,nrow,1,nx);
 	matrix Mhat(1,nrow,1,nx);	//Newly marked animals
 	matrix Rhat(1,nrow,1,nx);
 	
+INITIALIZATION_SECTION
+	theta theta_ival;
+	
+
 RUNTIME_SECTION
     maximum_function_evaluations 500,1500,2500,25000,25000
     convergence_criteria 0.01,1.e-4,1.e-5,1.e-5
 
+PRELIMINARY_CALCS_SECTION
+	if(SimFlag)
+	{
+		cout<<"******************************"<<endl;
+		cout<<"**                          **"<<endl;
+		cout<<"** Running Simulation Model **"<<endl;
+		cout<<"** Random seed = "<<rseed<<"        **"<<endl;
+		cout<<"**                          **"<<endl;
+		cout<<"******************************"<<endl;
+		runSimulationModel(rseed);
+		
+	}
+
 
 PROCEDURE_SECTION
-	initialize_model();
-	calc_survival_at_length();
-	calc_selectivity_at_length();
-	calc_numbers_at_length();
-	calc_catch_at_length();
+	initParameters();
+	calcSurvivalAtLength();
+	calcSizeTransitionMatrix();
+	initializeModel();
+	calcNumbersAtLength();
+	calcSelectivityAtLength();
+	calcNewMarksAndRecaptures();
+		
+	//calc_catch_at_length();
 	calc_objective_function();
 	
-	
-FUNCTION initialize_model
+FUNCTION void runSimulationModel(const int& seed)
   {
-	fpen = 0.;
+	int i,j;
+	random_number_generator rng(seed);
 	
-	//Set up the initial states.
-	N.initialize();
-	T.initialize();
-	N(1) = mfexp(log_Ninit+init_log_Ninit_devs);
+	dvector tmp_ddot_r_devs = value(ddot_r_devs);
+	dvector tmp_bar_r_devs  = value(bar_r_devs);
+	tmp_ddot_r_devs.fill_randn(rng);
+	tmp_bar_r_devs.fill_randn(rng);
 	
-	fi  = mfexp(log_fbar + log_fi_devs);
+	ddot_r_devs = 0.6*tmp_ddot_r_devs;
+	bar_r_devs  = 0.6*tmp_bar_r_devs;
 	
-	log_rt = log_rbar + log_rec_devs;
-	m_linf=mfexp(log_m_linf);
-	lx = mfexp(log_lx);
-	gx = mfexp(log_gx);
+	/* Capture probabilities */
+	//Et <- h1+(h2-h1)*cos(0.5+(sample.yrs-t)/(T-t)*pr*pi)^2
+	double h1 = -1.;
+	double h2 =  1.;
+	for(i=1;i<=nrow;i++)
+	{
+		bar_f_devs(i) = h1 + (h2-h1)*square(sin((i-1.)/(nrow-1.)*1.5*PI));
+	}
 	
-	linf=40;
-	k=0.18;
-	beta = 0.75;
-	dl_cv = 0.75;
-		
+	initParameters();
+	calcSurvivalAtLength();
+	calcSizeTransitionMatrix();
+	initializeModel();
+	calcNumbersAtLength();
+	calcSelectivityAtLength();
+	calcNewMarksAndRecaptures();
+	C=value(Chat);
+	M=value(Mhat);
+	R=value(Rhat);
+	
+	for(i=1;i<=nrow;i++)
+	{
+		for(j=1;j<=nx;j++)
+		{
+			C(i,j) = randnegbinomial(C(i,j),8.0,rng);
+			if(M(i,j)>0)
+			{
+				M(i,j) = randnegbinomial(M(i,j),8.0,rng);
+			}
+			if(R(i,j)>0)
+			{
+				R(i,j) = randnegbinomial(R(i,j),8.0,rng);
+			}
+			
+		}
+		i_C(i)(3,ncol) = C(i)(1,nx).shift(3);
+		i_M(i)(3,ncol) = M(i)(1,nx).shift(3);
+		i_R(i)(3,ncol) = R(i)(1,nx).shift(3);
+	}
+  }
+
+FUNCTION initParameters
+  {
+	/* Leading parameters */
+	log_ddot_r = theta(1);
+	log_bar_r  = theta(2);
+	log_bar_f  = theta(3);
+	m_infty    = theta(4);
+	l_infty    = theta(5);
+	vbk        = theta(6);
+	beta       = theta(7);
+	mu_r       = theta(8);
+	cv_r       = theta(9);
+	
+	/* Selex parameters */
+	lx         = mfexp(log_lx);
+	gx         = mfexp(log_gx);
+	
 	
   }
 
-FUNCTION calc_survival_at_length
+FUNCTION calcSizeTransitionMatrix
+	/*
+	This function calls the necessary routines to compute the Size Transition Matrix (P)
+	*/
+	
+	P = calcLTM(xbin,l_infty,vbk,beta);
+	
+
+FUNCTION initializeModel
+  {
+	int i;
+	//Set up the initial states.
+	N.initialize();
+	T.initialize();
+	
+	
+	/* Initialize numbers at length at the first time step. */
+	dvariable a=1/(cv_r*cv_r);  //a=1/cv^2
+	dvariable b=mu_r/a;		  //b=mu/a
+	rx  = dgamma(xmid,a,b);
+	rx /= sum(rx);
+	
+	for(i=1;i<=nx;i++)
+	{
+		dvar_vector init_r = mfexp(log_ddot_r + ddot_r_devs(i)) * rx;
+		N(1) = elem_prod(N(1),mfexp(-mx)) * P + init_r;
+	}
+	
+	
+	/* Annual recruitment */
+	log_rt = log_bar_r + bar_r_devs;
+	
+	
+	/* Sampling effort at each time step. */
+	fi  = mfexp(log_bar_f + bar_f_devs);		
+  }
+
+FUNCTION calcSurvivalAtLength
   {
 	/*
 	This function calculates the length-specific survival rate
@@ -151,11 +321,10 @@ FUNCTION calc_survival_at_length
 	mortality rate at length x  mx=m.linf*linf/xbin
 	note that m_linf is an annual rate.
 	*/
-	mx = m_linf*linf/xmid;
-	
+	mx = m_infty*l_infty/xmid;
   }
 
-FUNCTION calc_selectivity_at_length
+FUNCTION calcSelectivityAtLength
   {
 	/*
 	This function calculates the length-specific selectivity.
@@ -167,44 +336,55 @@ FUNCTION calc_selectivity_at_length
 	//cout<<sx<<endl;
   }
 
-FUNCTION calc_numbers_at_length
+FUNCTION calcNumbersAtLength
   {
 	/*	This function updates the numbers at length
 		over time as a function of the numbers at length
 		times the survival rate.
-	  	N_{t+dt} = elem_prod(N_{t},exp(-mx)) * LTM
+	  	N_{t+dt} = elem_prod(N_{t},exp(-mx*dt)) * P + rt*rx
 	
 	  	These are the total number of fish (tagged + untagged)
 		at large in the population.  N is used in the observation
-		models to determine number of captures and recaptures.
+		models to determine number of captures and recaptures is
+		based on T.
+		
+		i = index for nrow
+		j = index for size class
+		t = index for year
+		im= index for month/season/quarter (fraction of a year)
 	*/
 	int i,j,t,im;
-	
-	dvar_matrix LTM = dv_LTM(xbin,linf,k,beta);
-	//dvar_matrix LTM = dLTM(xbin,linf,k*dt,dl_cv);
-	dvariable a=1/(0.2*0.2);  //a=1/cv^2
-	dvariable b=10/a;		  //b=mu/a
-	dvar_vector p1 = dgamma(xmid,a,b);
-	p1/=sum(p1);
+	dvector newMarks(1,nx);	
 	
 	i=0; j=1;
-	for(t=syr;t<=nyr;t++)
+	for(t = syr;t < nyr;t++)
 	{
 		for(im=1;im<=int(1/dt);im++)
 		{
 			i++;
-			//recruitment if in period 1
+			/* Recruitment if in period 1 */
 			if(im==1 && t > syr)
 			{
-				N(i)+= mfexp(log_rt(t))*p1;
+				N(i)+= mfexp(log_rt(t))*rx;
 			}
 			
-			N(i+1)=elem_prod(N(i),mfexp(-mx*dt))*LTM;
+			N(i+1)=elem_prod(N(i),mfexp(-mx*dt))*P;
 			
-			//Set up accounting for predicted marks at large
-			//By adding observed marks to Mhat.
-			//Mhat(i+1)= elem_prod(Mhat(i),exp(-mx*dt))*LTM + M(i)
-			dvector newMarks(1,nx);
+			/*
+			SJDM Might change this below.  As it currently stands the model
+			is conditioned on the numbers of marks released, and these same
+			data appear in the likelihood. Rather, the accounting of the Tagged
+			and Untagged populations should be done in a separate routine where
+			the predicted number of new marks released is based on the number of 
+			untagged fish (N-T) captured at each sampling event.
+			
+			Set up accounting for predicted marks at large
+			by adding observed marks to Mhat.
+			T(i+1)= elem_prod(T(i),exp(-mx*dt))*P + M(i)
+			
+			
+			
+
 			newMarks.initialize();
 			if(t==i_M(j,1) && im==i_M(j,2)) 
 			{
@@ -212,71 +392,50 @@ FUNCTION calc_numbers_at_length
 				if(j>nrow) j=nrow;
 			}
 			
-			T(i+1) = elem_prod(T(i),mfexp(-mx*dt)) * LTM + newMarks;
-			
-			//cout<<t<<"\t"<<i<<"\t"<<sum(N(i))<<endl;
+			T(i+1) = elem_prod(T(i),mfexp(-mx*dt)) * P + newMarks;
+			*/
+			//cout<<t<<"\t"<<i<<"\t"<<sum(N(i))<<"\t"<<sum(T(i))<<endl;
 		} //end of im
 	} // end of t
+	//cout<<setprecision(3)<<N<<endl;
   }
 
-FUNCTION calc_catch_at_length
+FUNCTION calcNewMarksAndRecaptures
   {
 	/*
-		This function calculates the total catch at length
-		at each time step in the model. It also calculates
-		the number of new marks released for fish greater 
-		than 150mm (15 cm), and the number of recaptures.
-		
-		i = index for time
-		j = index for length
-		f_i = capture probabilty in year i.
-		C_ij = f_i*sx_j*N_ij
-		N_ij = total number of (marked & unmarked) fish at large
-		T_ij = number of marked fish at large.
-		markRate = T_ij/N_ij
-		
-	*/
-	int i,j,t,im,ir;
+	The accounting of the Tagged and Untagged populations where
+	the predicted number of new marks released is based on the number of 
+	untagged fish (N-T) captured at each sampling event. The precited 
+	number of recaptures is based on the number of marks at large (T)
 	
+	j_min = index for minimum size of fish tagged (based on M data and flag(1))
+	
+	*/
+	int i;
+	
+	Chat.initialize();
+	Mhat.initialize();
+	Rhat.initialize();
+	T.initialize();
+	dvar_vector zx(1,nx);
+	dvar_vector ox(1,nx);
 	for(i=1;i<=nrow;i++)
 	{
-		t  = i_C(i,1);		//year
-		im = i_C(i,2);		//im
-		ir = int((t-syr)/dt+im);
-		//fi(i) = sum(C(i)) / (N(ir)*sx);
-		//Chat(i) = fi(i)*elem_prod(N(ir),sx);
-		dvar_vector zj = mx*dt;
-		Chat(i) = elem_prod(elem_div(elem_prod(fi(i)*sx,1.-exp(-zj)),zj),N(ir));
-		//cout<<t<<"\t"<<im<<"\t"<<ir<<"\tfi = "<<fi(i)<<endl;
+		zx      = mx*dt;
+		ox      = 1.0-mfexp(-zx);
+		Chat(i) = elem_div(elem_prod(elem_prod(fi(i)*sx,ox),N(i)),zx);
 		
-		//Might also think about trying:
-		Mhat(i)(12,nx) = fi(i)*elem_prod(N(ir)(12,nx)-T(ir)(12,nx),sx(12,nx));
-		Rhat(i) = fi(i)*elem_prod(T(ir),sx);
+		Rhat(i) = elem_div(elem_prod(elem_prod(fi(i)*sx,ox),T(i)),zx);
 		
+		Mhat(i)(j_min(i),nx) = Chat(i)(j_min(i),nx) - Rhat(i)(j_min(i),nx);
 		
-		//New Marks based on proportion of Chat that is unmarked (1-T/N)
-		//dvar_vector markRate = 1. - vposfun(1. - elem_div(T(ir),N(ir)),0.01,fpen);
-		//cout<<min(N(ir))<<endl;
-		//Mhat(i)(13,nx) = elem_prod( Chat(i)(13,nx), 1.-markRate(13,nx) );
-		
-		
-		//Recaptures based on proportion of Chat that is marked (T/N)
-		//Rhat(i) = elem_prod( Chat(i), markRate );
-		
+		if( i<nrow )
+		{
+			T(i+1) = elem_prod(T(i),mfexp(-zx)) * P + Mhat(i);
+		}
 	}
-  }
-
-FUNCTION dvar_vector vposfun(const dvar_vector &x,const double eps, dvariable& fpen)
-  {
-	int i,i1,i2;
-	i1=x.indexmin();
-	i2=x.indexmax();
-	dvar_vector tmp(i1,i2);
-	for(i=i1;i<=i2;i++)
-	{
-		tmp(i) = posfun(x(i),eps,fpen);
-	}
-	return(tmp);
+	
+	//cout<<Mhat(2)<<endl;
   }
 
 
@@ -291,37 +450,69 @@ FUNCTION calc_objective_function;
 	//Priors (pvec)
 	if(!last_phase())
 	{
-		pvec(1) = norm2(init_log_Ninit_devs);
-		pvec(2) = norm2(log_rec_devs);
-		pvec(3) = dnorm(log_fbar,log(0.1),0.05);
+		pvec(1) = dnorm(ddot_r_devs,0,0.4);
+		pvec(2) = dnorm(bar_r_devs,0,0.4);
+		pvec(3) = dnorm(log_bar_f,log(0.1108032),0.05);
 	}
 	else
 	{
-		pvec(1) = dnorm(init_log_Ninit_devs,0,2.5);
-		pvec(2) = dnorm(log_rec_devs,0,2.5);
-		pvec(3) = dnorm(log_fbar,log(0.1),2.5);
+		pvec(1) = dnorm(first_difference(ddot_r_devs),0,0.4);
+		pvec(2) = dnorm(bar_r_devs,0,2.5);
+		pvec(3) = dnorm(log_bar_f,log(0.1108032),2.5);
 	}
 	
 	//Likelihoods (fvec);
 	fvec(1) = 10.*norm2(sqrt(C)-sqrt(Chat));
-	//fvec(2) = 10.*norm2(M-Mhat);
-	//fvec(3) = 10.*norm2(R-Rhat);
+	fvec(2) = 10.*norm2(M-Mhat);
+	fvec(3) = 10.*norm2(R-Rhat);
+	//cout<<fvec<<endl;	
 	
-	/* Likelihood for new marks */
-	for(i=1;i<=nrow;i++)
+	/*
+	PRIORS for estimated model parameters from the control file.
+	*/
+	dvar_vector priors(1,npar);
+	dvariable ptmp; priors.initialize();
+	for(i=1;i<=npar;i++)
 	{
-		fvec(2) += dmultinom(M(i),Mhat(i)+EPS);
-		fvec(3) += dmultinom(R(i),Rhat(i)+EPS);
+		if(active(theta(i)))
+		{
+			switch(theta_prior(i))
+			{
+			case 1:		//normal
+				ptmp=dnorm(theta(i),theta_control(i,6),theta_control(i,7));
+				break;
+				
+			case 2:		//lognormal CHANGED RF found an error in dlnorm prior. rev 116
+				ptmp=dlnorm(theta(i),theta_control(i,6),theta_control(i,7));
+				break;
+				
+			case 3:		//beta distribution (0-1 scale)
+				double lb,ub;
+				lb=theta_lbnd(i);
+				ub=theta_ubnd(i);
+				ptmp=dbeta((theta(i)-lb)/(ub-lb),theta_control(i,6),theta_control(i,7));
+				break;
+				
+			case 4:		//gamma distribution
+				ptmp=dgamma(theta(i),theta_control(i,6),theta_control(i,7));
+				break;
+				
+			default:	//uniform density
+				ptmp=-log(1./(theta_control(i,3)-theta_control(i,2)));
+				break;
+			}
+			priors(i)=ptmp;	
+		}
 	}
 	
 	
 	if(fpen > 0 ) cout<<"Fpen = "<<fpen<<endl;
-	f = sum(fvec) + sum(pvec);//	 + 1.e6*fpen;
+	f = sum(fvec) + sum(pvec) + sum(priors);//	 + 1.e6*fpen;
   }
 
 
 
-FUNCTION dvar_vector dgamma(dvector& x, dvariable& a, dvariable& b)
+FUNCTION dvar_vector dgamma(const dvector& x, const dvariable& a, const dvariable& b)
   {
 	//returns the gamma density with a & b as parameters
 	RETURN_ARRAYS_INCREMENT();
@@ -330,6 +521,17 @@ FUNCTION dvar_vector dgamma(dvector& x, dvariable& a, dvariable& b)
 	RETURN_ARRAYS_DECREMENT();
 	return(t1*exp(t2));
   }
+
+FUNCTION dvariable dgamma(const prevariable& x, const double& a, const double& b)
+  {
+	//returns the gamma density with a & b as parameters
+	RETURN_ARRAYS_INCREMENT();
+	dvariable t1 = 1./(pow(b,a)*exp(gammln(a)));
+	dvariable t2 = (a-1.)*log(x)-x/b;
+	RETURN_ARRAYS_DECREMENT();
+	return(t1*exp(t2));
+  }
+
 
 FUNCTION dvar_matrix dLTM(dvector& x, const dvariable &linf, const dvariable &k, const dvariable &cv)
   {
@@ -391,7 +593,7 @@ FUNCTION dvar_matrix dLTM(dvector& x, const dvariable &linf, const dvariable &k,
   }
 
 
-FUNCTION dvar_matrix dv_LTM(dvector& x, const dvariable &linf, const dvariable &k, const dvariable &beta)
+FUNCTION dvar_matrix calcLTM(dvector& x, const dvariable &linf, const dvariable &k, const dvariable &beta)
   {
 	/*This function computes the length transition matrix.*/
 	/*
@@ -439,12 +641,42 @@ FUNCTION dvar_matrix dv_LTM(dvector& x, const dvariable &linf, const dvariable &
   }
 	
 REPORT_SECTION
-	REPORT(f);
-	REPORT(log_Ninit);
-	REPORT(log_rbar);
-	REPORT(log_fbar);
-	REPORT(log_m_linf);
+	int i,j,im;
+	REPORT(f          );
+	REPORT(log_ddot_r );
+	REPORT(log_bar_r  );
+	REPORT(log_bar_f  );
+	REPORT(m_infty    );
+	REPORT(l_infty    );
+	REPORT(vbk        );
+	REPORT(beta       );
+	REPORT(mu_r       );
+	REPORT(cv_r       );
+	
+	ivector yr(syr,nyr);
+	yr.fill_seqadd(syr,1);
+	REPORT(yr);
+	REPORT(xmid);
 	REPORT(mx);
+	REPORT(sx);
+	
+	dvector Nt(syr,nyr);
+	dvector Rt(syr,nyr);
+	Nt.initialize();
+	Rt.initialize();
+	
+	j = 1;
+	for(i=syr;i<=nyr;i++)
+	{
+		if(i==syr) Rt(i) = value(exp(log_ddot_r+ddot_r_devs(nx)));
+		else       Rt(i) = value(exp(log_rt(i)));
+		for(im=1;im<=int(1/dt);im++)
+		{
+			Nt(i) += sum(value(N(j++)));
+		}
+	}
+	REPORT(Nt);
+	REPORT(Rt);
 	
 	REPORT(log_rt);
 	REPORT(fi);
@@ -478,7 +710,7 @@ GLOBALS_SECTION
 
 	#include <admodel.h>
 	#include <time.h>
-	#include <contrib.h>
+	#include <statsLib.h>
 	//#include <stats.cxx>
 	//#include <martool.cxx>
 	time_t start,finish;

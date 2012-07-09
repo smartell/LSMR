@@ -1,7 +1,8 @@
 #Makefile for building and running the LSMR model on a Linux or Mac OSX
 EXEC=LSMR
 TPL=$(EXEC).tpl
-DAT=simLSMR.dat
+CTL=simLSMR.ctl
+DAT=LSMR.dat
 ARG=
 
 all: $(EXEC) $(EXEC).rep
@@ -9,7 +10,7 @@ all: $(EXEC) $(EXEC).rep
 $(EXEC): $(TPL)
 	admb -s -g $(EXEC)
 
-$(EXEC).rep: $(TPL) $(DAT)
+$(EXEC).rep: $(TPL) $(DAT) $(CTL)
 	./$(EXEC) -ind $(DAT) $(ARG)
 
 clean:
