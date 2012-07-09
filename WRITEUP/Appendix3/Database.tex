@@ -1,0 +1,42 @@
+%!TEX root = /Users/stevenmartell/Documents/CONSULTING/HumpbackChub/HBC_2011_Assessment/WRITEUP/HBCmain.tex
+\section{Processing mark-recapture by length information} % (fold)
+\label{sec:processing_mark_recapture_by_length_information}
+
+The following description details how the raw data from the GCMRC database was used to construct the tables of data used in this assessment. The raw data obtained from Glenn Bennet (\texttt{gbennet@usgs.gov}) contained the following fields:
+\begin{scriptsize}
+\begin{verbatim}
+CAPTURE_ID SPECIES_CODE    TRIP_ID     START_DATETIME START_RM RIVER_CODE TOTAL_LENGTH TH_ENCOUNTER_RANKING GEAR_CODE
+      1496          HBC LC20000417 4/17/2000 17:15:00       NA        LCR          380                20397        HS
+        48          HBC LC20000417 4/18/2000 16:10:00       NA        LCR          285                49293        HS
+        49          HBC LC20000417 4/18/2000 16:10:00       NA        LCR          219                49220        HS
+       100          HBC LC20000417  4/18/2000 8:06:00       NA        LCR          170                49255        HS
+       156          HBC LC20000417 4/17/2000 18:20:00       NA        LCR          325                49238        HS
+       241          HBC LC20000417 4/18/2000 17:15:00       NA        LCR          214                49309        HS
+\end{verbatim}
+\end{scriptsize}
+The \verb"TH_ENCOUNTER_RANKING" field is a unique number for each individual marked fish and occurs in the database one or more times depending on the number of recapture events for that individual, this is also referred to as the \verb"TAGNO".  At the time of writing this report, there were a total of 81,812 records in the database for humpback chub, of which 35,696 are unique individuals (some of which may occur in the database only once).  These data were first imported into R \citep{R-Development-Core-Team:2009fk}, the year and month was then extracted from the \verb"START_DATETIME" field and appended to the data frame.  Next the total length of measured humpback chub were assigned to corresponding 10mm size intervals ranging from 50mm to 600mm.  Note that the R-code for manipulating the database can be found in subsection \ref{sub:r_code_for_database_manipulation}.
+
+There are 110 unique \verb"GEAR_CODE"s in the database; these gear codes were classified into 12 gear groups, of which tramel nets (GILL)  and hoop nets (HOOP) were used to reconstruct the marks and recaptures at length.
+
+The last step in constructing the data frame (see the function \verb"get.DF") was to assign initial marks and recapture event to each of the records.  To do so, the data frame was ordered by date and tag number in ascending order and all duplicate occurrences of \verb"TAGNO" were assigned a boolean TRUE value.  The additional columns added to the data frame was necessary to extract the total number of fish caught by month in each year (Table \ref{table:Captures}), and the total number fish captured each year by specific gear types (Table \ref{table:Gear}).
+
+Key input data to the LSMR assessment model is the number of marked fish released (by size class) and the number of recaptured fish (by size class) in subsequent sampling events by specific gear types.  To construct these data, an R-function (\verb"tableMarks") was developed to construct Tables \ref{sidewaystable:Mark_HOOP}--\ref{sidewaystable:Recapture_GILL}.  I only consider marks and recaptures from the hoop nets and gillnet (tramel nets) sampling gears in this analysis, as these two gear types were responsible for sampling the majority of humpback chub in the system.
+
+
+\input{../TABLES/LSMR/tableCaptureLF.tex}
+\input{../TABLES/LSMR/table:Mark:HOOP.tex}
+\input{../TABLES/LSMR/table:Recapture:HOOP.tex}
+\input{../TABLES/LSMR/table:Mark:GILL.tex}
+\input{../TABLES/LSMR/table:Recapture:GILL.tex}
+
+
+
+
+\subsection{R-Code for Database manipulation} % (fold)
+\label{sub:r_code_for_database_manipulation}
+\footnotesize
+\lstinputlisting[language=R]{../R/2012HBCData/LSMR_dataScript.R}
+% subsection r_code_for_database_manipulation (end)
+
+
+% section processing_mark_recapture_by_length_information (end)

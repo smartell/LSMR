@@ -75,13 +75,13 @@ Growth parameters were estimated based on growth increment data from individual 
 		&\mbox{set of midpoints of length intervals}
 		&\Lambda = \{x_1, \ldots,x_J\}\\
 		&\mbox{catch, new marks, recaptures} 
-		&\mathbf{C}_{i,j}, \mathbf{M}_{i,j}, \mathbf{R}_{i,j}\\[1ex]
+		&\mathbf{C}, \mathbf{M}, \mathbf{R}\\[1ex]
 		%%
 		%%
 		&\mbox{PARAMETERS \& DERIVED VARIABLES} \nonumber\\
 		&\mbox{estimated parameters} 
-		&\Theta=\{\dot{N},\bar{R},M_\infty,l_\infty,k,\beta,l_x,g_x,
-			\vec{\eta},\vec{\nu} \}\\
+		&\Theta=\{\dot{N},\bar{R},\bar{f},M_\infty,l_\infty,k,\beta,l_x,g_x,
+			\vec{\eta},\vec{\nu},\vec{\zeta} \}\\
 		&\mbox{mortality-at-length} 
 		& \vec{m} = \frac{M_\infty l_\infty}{\Lambda}
 		\label{eq:T1.6}\\
@@ -114,8 +114,10 @@ Growth parameters were estimated based on growth increment data from individual 
 		&\mathbf{N}_{i+1,j+1} = \mathbf{N}_{i,j} \exp(-m_j \tau) \mathbf{P}_{j,j'}\\
 		&\mbox{Tagged numbers-at-length}
 		&\mathbf{T}_{i+1,j+1} = \mathbf{T}_{i,j} \exp(-m_j \tau) \mathbf{P}_{j,j'} + \mathbf{M}_{i,j}\\
-		&\mbox{capture probability} 
-		& f_i\\
+		&\mbox{Capture probability} 
+		&f_i = \bar{f} \exp(\zeta_i)\\
+		&\mbox{Catch-at-length}
+		&\mathbf{\hat{C}}_{i,j} = \frac{N_{i,j}f_i s_j(1-\exp(-m_j\tau-f_is_j))}{m_j\tau}\\
 		\hline \nonumber
     \end{align}
 \end{small}

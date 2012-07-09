@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=pdflatex 2011.7.3)  6 JUL 2012 16:14
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=pdflatex 2011.7.3)  8 JUL 2012 13:27
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -894,12 +894,12 @@ Overfull \hbox (28.25005pt too wide) in paragraph at lines 94--95
  []
 
 
-Overfull \hbox (28.25005pt too wide) in paragraph at lines 97--98
+Overfull \hbox (4.2498pt too wide) in paragraph at lines 97--98
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
 [38]
-Overfull \hbox (94.25072pt too wide) in paragraph at lines 120--121
+Overfull \hbox (22.24998pt too wide) in paragraph at lines 120--121
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][] 
  []
@@ -1014,7 +1014,7 @@ Overfull \hbox (28.25005pt too wide) in paragraph at lines 332--333
  []
 
 
-Overfull \hbox (28.25005pt too wide) in paragraph at lines 357--358
+Overfull \hbox (4.2498pt too wide) in paragraph at lines 357--358
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][] 
  []
@@ -1030,7 +1030,7 @@ Overfull \hbox (28.25005pt too wide) in paragraph at lines 366--367
  []
 
 [43]
-Overfull \hbox (46.25023pt too wide) in paragraph at lines 387--388
+Overfull \hbox (22.24998pt too wide) in paragraph at lines 387--388
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][] 
  []
@@ -1049,11 +1049,11 @@ Package minitoc(hints) Info: I0019
 Here is how much of TeX's memory you used:
  7768 strings out of 493633
  102273 string characters out of 3143378
- 501802 words of memory out of 3000000
+ 501932 words of memory out of 3000000
  10622 multiletter control sequences out of 15000+200000
  19804 words of font info for 80 fonts, out of 3000000 for 9000
  831 hyphenation exceptions out of 8191
- 38i,13n,46p,1553b,2294s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 38i,13n,46p,1555b,2294s stack positions out of 5000i,500n,10000p,200000b,50000s
 </usr/local/texl
 ive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmbsy10.pfb></usr/local/texl
 ive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texli
@@ -1078,7 +1078,7 @@ e1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2011/texmf-dist/fonts/type
 1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1
 /public/amsfonts/cm/cmtt12.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/
 public/amsfonts/cm/cmtt8.pfb>
-Output written on HBCmain.pdf (44 pages, 1273619 bytes).
+Output written on HBCmain.pdf (44 pages, 1273926 bytes).
 PDF statistics:
  315 PDF objects out of 1000 (max. 8388607)
  225 compressed objects within 3 object streams

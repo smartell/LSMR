@@ -94,34 +94,34 @@ getGrowthIncrement <- function(DF)
 # ------------------------------------------------------------------------------- #
 annualGrowthIncrement <- function(DF)
 {
-	# Goal: for each year compute the length-at-capture & growth increment into
-	#       the following year.
-	# PSEUDOCODE:
-	# - get vector of unique years.
-	# - find unique individuals recaptured year i and year i+1
-	# - get TL from each capture event
-	
-	ATR    <- data.frame()
-	iyr    <- unique(DF$YEAR)
-	for(i in iyr)
-	{
-		iDF  <- rbind(subset(DF,DF$YEAR==i), subset(DF, DF$YEAR==i+1))
-		iDF  <- iDF[order(iDF$TAGNO, iDF$DATE), ]
-		irc  <- unique(iDF$TAGNO[duplicated(iDF$TAGNO)])
-		
-		for(j in irc)
-		{
-			ijDF <- subset(iDF, iDF$TAGNO==j)
-			nj   <- dim(ijDF)[1]
-			dt   <- as.integer(ijDF$DATE[nj] - ijDF$DATE[1])
-			l1   <- ijDF$TL[1]
-			l2   <- ijDF$TL[nj]
-			loc  <- ijDF$RIVER_CODE[1]
-			ATR  <- rbind(ATR, c(YEAR=i, RIVER=loc, TAGNO=j, l1=l1, l2=l2, dt=dt))
-		}
-	}
-	colnames(ATR)=c("YEAR","RIVER","TAGNO","l1","l2","dt")
-	return(ATR)
+    # Goal: for each year compute the length-at-capture & growth increment into
+    #       the following year.
+    # PSEUDOCODE:
+    # - get vector of unique years.
+    # - find unique individuals recaptured year i and year i+1
+    # - get TL from each capture event
+    
+    ATR    <- data.frame()
+    iyr    <- unique(DF$YEAR)
+    for(i in iyr)
+    {
+        iDF  <- rbind(subset(DF,DF$YEAR==i), subset(DF, DF$YEAR==i+1))
+        iDF  <- iDF[order(iDF$TAGNO, iDF$DATE), ]
+        irc  <- unique(iDF$TAGNO[duplicated(iDF$TAGNO)])
+        
+        for(j in irc)
+        {
+            ijDF <- subset(iDF, iDF$TAGNO==j)
+            nj   <- dim(ijDF)[1]
+            dt   <- as.integer(ijDF$DATE[nj] - ijDF$DATE[1])
+            l1   <- ijDF$TL[1]
+            l2   <- ijDF$TL[nj]
+            loc  <- ijDF$RIVER_CODE[1]
+            ATR  <- rbind(ATR, c(YEAR=i, RIVER=loc, TAGNO=j, l1=l1, l2=l2, dt=dt))
+        }
+    }
+    colnames(ATR)=c("YEAR","RIVER","TAGNO","l1","l2","dt")
+    return(ATR)
 }
 
 
@@ -197,7 +197,7 @@ tableGear <- function(DF)
 # ------------------------------------------------------------------------------- #
 tableEffort <- function(DF)
 {
-	names(DF) <- toupper(names(DF))
+    names(DF) <- toupper(names(DF))
     DFm       <- melt(DF, id=c("YEAR","GROUP"), na.rm=FALSE)
     tx        <- cast(DFm,YEAR~.,function(x) length(unique(x))
                       ,subset=variable=="TRIP_ID",margins=TRUE )
@@ -225,7 +225,7 @@ tableEffort <- function(DF)
                   not be used as a relative abundance index because zero catch of HBC 
                   have been excluded from the effort data."
     d1        <-latex(Effort[-25,], file=fn, caption=cap
-	            , label="table:Effort", size="scriptsize", rowname=NULL)
+                , label="table:Effort", size="scriptsize", rowname=NULL)
 }
 
 
@@ -347,18 +347,18 @@ if(!exists("TR"))
 }
 if(!exists("ATR"))
 {
-	ATR  <- annualGrowthIncrement(DF)
-	O    <- na.omit(ATR[ATR$dt>365, -3])
-	O$dl <- round((O$l2-O$l1)/(O$dt/365.25), 2)
-	
-	print(head(O))
-	fn  <- "HBC_Annual_GI.dat"
-	write(dim(O)[1], file=fn)
-	write(c("#YEAR","RIVER","l1","l2","dt","dl"), ncol=6, file=fn, append=TRUE)
-	write.table(O, file=fn, row.names=FALSE, col.names=FALSE, append=TRUE)
-	
-	fig <-"../../FIGS/LSMR/fig:AnnualGrowthIncrements.pdf"
-	plot.atr(O, file=fig)
+    ATR  <- annualGrowthIncrement(DF)
+    O    <- na.omit(ATR[ATR$dt>365, -3])
+    O$dl <- round((O$l2-O$l1)/(O$dt/365.25), 2)
+    
+    print(head(O))
+    fn  <- "HBC_Annual_GI.dat"
+    write(dim(O)[1], file=fn)
+    write(c("#YEAR","RIVER","l1","l2","dt","dl"), ncol=6, file=fn, append=TRUE)
+    write.table(O, file=fn, row.names=FALSE, col.names=FALSE, append=TRUE)
+    
+    fig <-"../../FIGS/LSMR/fig:AnnualGrowthIncrements.pdf"
+    plot.atr(O, file=fig)
 }
 
 # ------------------------------------------------------------------------------- #
@@ -379,14 +379,14 @@ plot.gi <- function(TR, file=NULL,  ...)
 
 plot.atr <- function(ATR, file=NULL, ...)
 {
-	O    <- ATR[ATR$dt>365, ]
-	O$gi <- (O$l2-O$l1)/(O$dt/365.25)
-	p    <- ggplot(O, aes(l1, gi))
-	p    <- p + geom_point(aes(color=factor(RIVER), levels=2), alpha=0.5)
-	p    <- p + stat_quantile(alpha=0.7, col="black") + facet_wrap(~YEAR)
-	p    <- p + labs(colour="River")+theme_grey(base_size =  12, base_family = "")
-	p
-	if(!is.null(file))
+    O    <- ATR[ATR$dt>365, ]
+    O$gi <- (O$l2-O$l1)/(O$dt/365.25)
+    p    <- ggplot(O, aes(l1, gi))
+    p    <- p + geom_point(aes(color=factor(RIVER), levels=2), alpha=0.5)
+    p    <- p + stat_quantile(alpha=0.7, col="black") + facet_wrap(~YEAR)
+    p    <- p + labs(colour="River")+theme_grey(base_size =  12, base_family = "")
+    p
+    if(!is.null(file))
         dev.copy2pdf(file=file)
     
     return(p)

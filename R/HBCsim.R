@@ -27,7 +27,7 @@ require( ggplot2 )
 #  Model Dimensions
 syr     <- 1950     #initial year
 nyr     <- 2011     #final year
-dt      <- 3/12     #time step
+dt      <- 1.0      #time step
 tmax    <- 50/dt    #max longevity index (50 yrs)
 dyr     <- seq(syr, nyr, by=dt)
 xbin    <- seq(3, 55, by=1)

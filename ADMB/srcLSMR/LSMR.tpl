@@ -56,22 +56,26 @@ DATA_SECTION
 	!! if(eof!=999){cout<<"Error reading data\n"; exit(1);}
 	!! cout<< "____ End of Data file! ____\n"<<endl;
 
+	
 PARAMETER_SECTION
 	init_number log_Ninit;
 	init_number log_rbar;
-	init_number log_m_linf;
+	init_number log_fbar;
+	init_number log_m_linf(4);
 	!! log_m_linf = log(0.08);
 	!! log_Ninit = 7;
 	!! log_rbar = 9;
+	!! log_fbar = log(0.1);
 	//Selectivity parameters
-	init_number log_lx;
-	init_number log_gx;
+	init_number log_lx(2);
+	init_number log_gx(2);
 	!! log_lx = log(10);
 	!! log_gx = log(2.5);
 	
 	
-	init_bounded_vector init_log_Ninit_devs(1,nx,-15,15,1);
-	init_bounded_vector log_rec_devs(syr+1,nyr,-15,15,1);
+	init_bounded_dev_vector init_log_Ninit_devs(1,nx,-15,15,1);
+	init_bounded_dev_vector log_rec_devs(syr+1,nyr,-15,15,3);
+	init_bounded_dev_vector log_fi_devs(1,nrow,-15.0,15.0,2);
 	
 	
 	
@@ -99,6 +103,10 @@ PARAMETER_SECTION
 	matrix Mhat(1,nrow,1,nx);	//Newly marked animals
 	matrix Rhat(1,nrow,1,nx);
 	
+RUNTIME_SECTION
+    maximum_function_evaluations 500,1500,2500,25000,25000
+    convergence_criteria 0.01,1.e-4,1.e-5,1.e-5
+
 
 PROCEDURE_SECTION
 	initialize_model();
@@ -118,6 +126,8 @@ FUNCTION initialize_model
 	T.initialize();
 	N(1) = mfexp(log_Ninit+init_log_Ninit_devs);
 	
+	fi  = mfexp(log_fbar + log_fi_devs);
+	
 	log_rt = log_rbar + log_rec_devs;
 	m_linf=mfexp(log_m_linf);
 	lx = mfexp(log_lx);
@@ -127,6 +137,7 @@ FUNCTION initialize_model
 	k=0.18;
 	beta = 0.75;
 	dl_cv = 0.75;
+		
 	
   }
 
@@ -232,23 +243,25 @@ FUNCTION calc_catch_at_length
 		t  = i_C(i,1);		//year
 		im = i_C(i,2);		//im
 		ir = int((t-syr)/dt+im);
-		fi(i) = sum(C(i)) / (N(ir)*sx);
-		Chat(i) = fi(i)*elem_prod(N(ir),sx);
+		//fi(i) = sum(C(i)) / (N(ir)*sx);
+		//Chat(i) = fi(i)*elem_prod(N(ir),sx);
+		dvar_vector zj = mx*dt;
+		Chat(i) = elem_prod(elem_div(elem_prod(fi(i)*sx,1.-exp(-zj)),zj),N(ir));
 		//cout<<t<<"\t"<<im<<"\t"<<ir<<"\tfi = "<<fi(i)<<endl;
 		
-		/*Might also think about trying:
-		Mhat(i) = fi(i)*elem_prod(N(ir)(ix)-T(ir)(ix),sx(ix));
+		//Might also think about trying:
+		Mhat(i)(12,nx) = fi(i)*elem_prod(N(ir)(12,nx)-T(ir)(12,nx),sx(12,nx));
 		Rhat(i) = fi(i)*elem_prod(T(ir),sx);
-		*/
+		
 		
 		//New Marks based on proportion of Chat that is unmarked (1-T/N)
-		dvar_vector markRate = 1. - vposfun(1. - elem_div(T(ir),N(ir)),0.01,fpen);
+		//dvar_vector markRate = 1. - vposfun(1. - elem_div(T(ir),N(ir)),0.01,fpen);
 		//cout<<min(N(ir))<<endl;
-		Mhat(i)(13,nx) = elem_prod( Chat(i)(13,nx), 1.-markRate(13,nx) );
+		//Mhat(i)(13,nx) = elem_prod( Chat(i)(13,nx), 1.-markRate(13,nx) );
 		
 		
 		//Recaptures based on proportion of Chat that is marked (T/N)
-		Rhat(i) = elem_prod( Chat(i), markRate );
+		//Rhat(i) = elem_prod( Chat(i), markRate );
 		
 	}
   }
@@ -269,17 +282,38 @@ FUNCTION dvar_vector vposfun(const dvar_vector &x,const double eps, dvariable& f
 
 FUNCTION calc_objective_function;
   {
+	int i;
 	dvar_vector fvec(1,3);
 	dvar_vector pvec(1,3);
 	
+	fvec.initialize();
+	pvec.initialize();
 	//Priors (pvec)
-	pvec(1) = norm2(init_log_Ninit_devs);
-	pvec(2) = norm2(log_rec_devs);
+	if(!last_phase())
+	{
+		pvec(1) = norm2(init_log_Ninit_devs);
+		pvec(2) = norm2(log_rec_devs);
+		pvec(3) = dnorm(log_fbar,log(0.1),0.05);
+	}
+	else
+	{
+		pvec(1) = dnorm(init_log_Ninit_devs,0,2.5);
+		pvec(2) = dnorm(log_rec_devs,0,2.5);
+		pvec(3) = dnorm(log_fbar,log(0.1),2.5);
+	}
 	
 	//Likelihoods (fvec);
-	fvec(1) = norm2(sqrt(C)-sqrt(Chat));
-	fvec(2) = norm2(M-Mhat);
-	fvec(3) = norm2(R-Rhat);
+	fvec(1) = 10.*norm2(sqrt(C)-sqrt(Chat));
+	//fvec(2) = 10.*norm2(M-Mhat);
+	//fvec(3) = 10.*norm2(R-Rhat);
+	
+	/* Likelihood for new marks */
+	for(i=1;i<=nrow;i++)
+	{
+		fvec(2) += dmultinom(M(i),Mhat(i)+EPS);
+		fvec(3) += dmultinom(R(i),Rhat(i)+EPS);
+	}
+	
 	
 	if(fpen > 0 ) cout<<"Fpen = "<<fpen<<endl;
 	f = sum(fvec) + sum(pvec);//	 + 1.e6*fpen;
@@ -406,6 +440,15 @@ FUNCTION dvar_matrix dv_LTM(dvector& x, const dvariable &linf, const dvariable &
 	
 REPORT_SECTION
 	REPORT(f);
+	REPORT(log_Ninit);
+	REPORT(log_rbar);
+	REPORT(log_fbar);
+	REPORT(log_m_linf);
+	REPORT(mx);
+	
+	REPORT(log_rt);
+	REPORT(fi);
+	
 	REPORT(N);
 	REPORT(T);
 	REPORT(i_C);
@@ -435,11 +478,27 @@ GLOBALS_SECTION
 
 	#include <admodel.h>
 	#include <time.h>
+	#include <contrib.h>
 	//#include <stats.cxx>
 	//#include <martool.cxx>
 	time_t start,finish;
 	long hour,minute,second;
 	double elapsed_time;
+	
+	dvariable dpois(const dvector& k, const dvar_vector& lambda)
+	{
+		RETURN_ARRAYS_INCREMENT();
+		int i;
+		int n = size_count(k);
+		dvariable nll=0;
+		for(i = 1; i <= n; i++)
+		{
+			nll -= k(i)*log(lambda(i))+lambda(i)+gammln(k(i)+1.);
+		}
+		RETURN_ARRAYS_DECREMENT();
+		return nll;
+	}
+	
 	
 FINAL_SECTION
 	time(&finish);

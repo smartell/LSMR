@@ -2,6 +2,7 @@
 EXEC=LSMR
 TPL=$(EXEC).tpl
 DAT=simLSMR.dat
+ARG=
 
 all: $(EXEC) $(EXEC).rep
 
@@ -9,7 +10,7 @@ $(EXEC): $(TPL)
 	admb -s -g $(EXEC)
 
 $(EXEC).rep: $(TPL) $(DAT)
-	./$(EXEC) -ind $(DAT)
+	./$(EXEC) -ind $(DAT) $(ARG)
 
 clean:
 	rm -f $(EXEC) *.eva *.log *.rpt *.htp *.cor *.par *.r*
