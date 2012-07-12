@@ -235,9 +235,11 @@ tableEffort <- function(DF)
 tableLf <- function(DF)
 {
     names(DF) <- toupper(names(DF))
-    DFm       <- melt(DF, id=c("YEAR","XI"), na.rm=TRUE)
-    tx        <- cast(DFm,YEAR~XI,length, subset=variable=="TL")
-    
+    DFm       <- melt(DF, id=c("YEAR","XI","GROUP"), na.rm=TRUE)
+	tx        <- cast(DFm,YEAR~XI,length, subset=variable=="TL")
+    rtx       <- cast(DFm,YEAR~XI|GROUP,length, subset=variable=="TL")
+    gear      <- c("GILL", "HOOP") # Add gear group here to plot results
+
     plotBubbles(t(tx[,c(-1,-48)]),xval=1989:2011,yval=sort(unique(DF$XI,na.rm=T))
                 , size=0.15, hide0=TRUE, frange=0.01
                 , xlab="Year", ylab="Length (mm)")
@@ -258,6 +260,7 @@ tableLf <- function(DF)
     sed.exp <- paste("sed -i~ 's/table/sidewaystable/g' ", fn)
     system(sed.exp)
 
+	return(rtx)
 }
 
 # ------------------------------------------------------------------------------- #
@@ -267,7 +270,7 @@ tableMarks <- function(DF)
 {
     names(DF) <- toupper(names(DF))
     DFm       <- melt(DF, id=c("YEAR","MONTH","XI","RECAP","GROUP"), na.rm=TRUE)
-    tx        <- cast(DFm,YEAR~XI~RECAP|GROUP, length, subset=c(variable=="TL"))
+    tx        <- cast(DFm,YEAR~XI~RECAP|GROUP, length, subset=c(variable=="TL"), fill=0)
     gear      <- c("GILL", "HOOP") # Add gear group here to plot results
     
     # Barplots of marks released and recaptured.
@@ -325,7 +328,57 @@ tableMarks <- function(DF)
     lapply(tx[ii], fn.plot)
     jj       <<- 1
     lapply(tx[ii], fn.write)
+	
+	return(tx)
 }
+# ------------------------------------------------------------------------------- #
+# Create LSMR datafile
+# ------------------------------------------------------------------------------- #
+write.LSMRdatafile <- function()
+{
+	dfn <- "../../ADMB/srcLSMR/HBC2011.dat"
+	gr  <- c("HOOP", "GILL")
+	
+	C   <- tableLf(DF)        # Total number of captures C[year, length]
+	MR  <- tableMarks(DF)     # Total number of markes released and recaptured.
+	ic  <- names(C) %in% gr
+	im  <- names(MR) %in% gr
+	
+	write("#Data for HBC 1989:2011", file=dfn)
+	write("#syr, nyr, dt", file=dfn, append=TRUE)
+	write(c(1989, 2011, 1), file=dfn, append=TRUE)
+	write("#Number of gears",file=dfn, append=TRUE)
+	write(length(gr), file=dfn, append=TRUE)
+	xbin = seq(50, 500, by=10)
+	write("#nbin", file=dfn, append=TRUE)
+	write(length(xbin), file=dfn, append=TRUE)
+	write("#xbin", file=dfn, append=TRUE)
+	write(xbin, file=dfn, append=TRUE)
+	
+	write("#Array dimensions(C)", file=dfn, append=TRUE)
+	write.table(matrix(unlist(lapply(C[ic],dim)),nrow=2,byrow=TRUE),file=dfn,row.names=F, col.names=FALSE, append=TRUE)
+	write("#Array dimensions(MR)", file=dfn, append=TRUE)
+	write.table(matrix(unlist(lapply(MR[im],dim)),nrow=2,byrow=TRUE),file=dfn,row.names=F, col.names=FALSE,  append=TRUE)
+	
+	write("#Length Intervals for (C)", file=dfn, append=TRUE)
+	x = lapply(C[ic],colnames)
+	for(i in 1:length(x))
+	  write(as.numeric(x[[i]][-1]), file=dfn, append=TRUE)
+	write("#Length Intervals for (MR)", file=dfn, append=TRUE)
+	write(as.numeric(colnames(MR$GILL[,,1])), file=dfn, append=TRUE)
+	write(as.numeric(colnames(MR$HOOP[,,1])), file=dfn, append=TRUE)
+	
+	write("#Captures by year (row) and length (col)", file=dfn, append=TRUE)
+	lapply(C[ic],write.table,file=dfn,row.names=F,col.names=F,append=T)
+	
+	write("#Marks and Recaptures by year (row) and length (col)", file=dfn, append=TRUE)
+	lapply(MR[im],write.table,file=dfn,row.names=T,col.names=F,append=T, quote=FALSE)
+	
+	write("#End of file", file=dfn, append=TRUE)
+	write(999, file=dfn, append=TRUE)
+	
+}
+
 
 # ------------------------------------------------------------------------------- #
 # Read in data frames and obtain tag-recapture data
