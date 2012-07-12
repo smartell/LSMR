@@ -24,6 +24,7 @@
 # ------------------------------------------------------------------------------- #
 require(ggplot2)
 # require(hacks) #deprecated
+source("../read.admb.R")
 require(reshape)
 require(Hmisc)
 require(PBSmodelling)
@@ -370,9 +371,15 @@ write.LSMRdatafile <- function()
 	
 	write("#Captures by year (row) and length (col)", file=dfn, append=TRUE)
 	lapply(C[ic],write.table,file=dfn,row.names=F,col.names=F,append=T)
-	
-	write("#Marks and Recaptures by year (row) and length (col)", file=dfn, append=TRUE)
-	lapply(MR[im],write.table,file=dfn,row.names=T,col.names=F,append=T, quote=FALSE)
+	#order is GILL then HOOP
+	write("#Marks by year (row) and length (col)", file=dfn, append=TRUE)
+	write.table(MR$GILL[,,1],file=dfn, col.names=F,quote=F, append=TRUE)
+	write.table(MR$HOOP[,,1],file=dfn, col.names=F,quote=F, append=TRUE)
+
+	write("#Recaps by year (row) and length (col)", file=dfn, append=TRUE)
+	write.table(MR$GILL[,,2],file=dfn, col.names=F,quote=F, append=TRUE)
+	write.table(MR$HOOP[,,2],file=dfn, col.names=F,quote=F, append=TRUE)
+
 	
 	write("#End of file", file=dfn, append=TRUE)
 	write(999, file=dfn, append=TRUE)

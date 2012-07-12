@@ -52,27 +52,51 @@ DATA_SECTION
 	!! ad_comm::change_datafile_name(data_file);
 	
 	// Read input data from data file //
-	init_int syr;   //first year
-	init_int nyr;   //last year
-	init_number dt; //time-step
+	init_int syr;   	// first year
+	init_int nyr;   	// last year
+	init_number dt; 	// time-step
+	init_int ngear; 	// number of gears
+	init_int nbin;		// number of length intervals
 	
-	// Array dimensions //
-	init_int nrow;  //number of rows in observed data
-	init_int ncol;  //number of cols in observed data
-	init_int nbin;	//number of length intervals
+	init_vector xbin(1,nbin);  //length-intervals (not mid-points)
+	
+	vector xmid(1,nx);
+	!! xmid = xbin(1,nbin-1)+0.5*first_difference(xbin);
 	int nx;			//number of length bins (nbin-1)
 	int nr;			//number of rows in predicted arrays
 	!! nr = int((nyr-syr+1)/dt);
 	!! nx = nbin-1;
-	init_vector xbin(1,nbin);  //length-intervals (not mid-points)
-	vector xmid(1,nx);
-	!! xmid = xbin(1,nbin-1)+0.5*first_difference(xbin);
+		
+	// Array dimensions //
+	init_imatrix C_dim(1,ngear,1,2);
+	init_imatrix MR_dim(1,ngear,1,3);
+	ivector irow_C(1,ngear);
+	ivector jcol_C(1,ngear);
+	ivector irow_MR(1,ngear);
+	ivector jcol_MR(1,ngear);
+	LOC_CALCS
+		irow_C  = column(C_dim,1);
+		jcol_C  = column(C_dim,2);
+		irow_MR = column(MR_dim,1);
+		jcol_MR = column(MR_dim,2);
+	END_CALCS
+
+	// Length Intervals for data //
+	init_imatrix x_C(1,ngear,1,jcol_C);
+	init_imatrix x_MR(1,ngear,1,jcol_MR);
+
+	// Read in Capture, Mark, and Recapture arrays //
+	init_3darray i_C(1,ngear,1,irow_C,1,jcol_C);
+	init_3darray i_M(1,ngear,1,irow_MR,1,jcol_MR);
+	init_3darray i_R(1,ngear,1,irow_MR,1,jcol_MR);
 	
-	init_matrix i_C(1,nrow,1,ncol); //Catch-at-length
-	init_matrix i_M(1,nrow,1,ncol); //New Marks-at-length
-	init_matrix i_R(1,nrow,1,ncol); //Recaptures-at-length
+	//init_matrix i_C(1,nrow,1,ncol); //Catch-at-length
+	//init_matrix i_M(1,nrow,1,ncol); //New Marks-at-length
+	//init_matrix i_R(1,nrow,1,ncol); //Recaptures-at-length
 	
-	vector ct(1,nrow);              //colsums of Catch-at-length
+	
+	// colsums of Catch-at-length //
+	matrix ct(1,ngear,1,irow_C); 
 	
 	init_int eof;
 	!! if(eof!=999){cout<<"Error reading data\n"; exit(1);}
@@ -104,26 +128,33 @@ DATA_SECTION
 	
 	
 	// Pre-processing some of the data.
-	ivector j_min(1,nrow);
-	matrix C(1,nrow,1,nx);
-	matrix M(1,nrow,1,nx);
-	matrix R(1,nrow,1,nx);
+	imatrix j_min(1,ngear,1,irow_MR);
+	3darray C(1,ngear,1,irow_C-1,1,jcol_C);
+	3darray M(1,ngear,1,irow_MR-1,1,jcol_MR);
+	3darray R(1,ngear,1,irow_MR-1,1,jcol_MR);
 	LOC_CALCS
-		for(int i=1;i<=nrow;i++)
+		int i,j,k;
+		for(k=1;k<=ngear;k++)
 		{
-			C(i)(1,nx) = i_C(i)(3,ncol).shift(1);
-			M(i)(1,nx) = i_M(i)(3,ncol).shift(1);
-			R(i)(1,nx) = i_R(i)(3,ncol).shift(1);
-			
-			ct(i) = sum(C(i));
-			
-			//set up index for minimum size for tagging fish.
-			for(int j=1;j<=nx;j++)
+			for(i=1;i<=irow_C(k);i++)
 			{
-				if( M(i,j)>0 || xbin(j) > flag(1) )
+				C(k)(i)(1,nx) = i_C(k)(i)(2,jcol_C(k)).shift(1);
+				ct(k)(i) = sum(C(k)(i));
+			}
+			
+			for(i=1;i<=irow_MR(k);i++)
+			{
+				M(k)(i)(1,nx) = i_M(k)(i)(2,jcol_MR(k)).shift(1);
+				R(k)(i)(1,nx) = i_R(k)(i)(2,jcol_MR(k)).shift(1);
+
+				//set up index for minimum size for tagging fish.
+				for(j=1;j<=jcol_MR(k);j++)
 				{
-					j_min(i)=j;
-					break;
+					if( M(k)(i,j)>0 || xbin(j) > flag(1) )
+					{
+						j_min(k)(i)=j;
+						break;
+					}
 				}
 			}
 		}
@@ -133,7 +164,7 @@ DATA_SECTION
 	vector true_Nt(syr,nyr);
 	vector true_Rt(syr,nyr);
 	vector true_Tt(syr,nyr);
-	vector true_fi(1,nrow);
+	matrix true_fi(1,ngear,1,irow_C);
 	
 PARAMETER_SECTION
 	init_bounded_number_vector theta(1,npar,theta_lbnd,theta_ubnd,theta_phz);
