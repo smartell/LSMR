@@ -19,7 +19,6 @@ source("read.admb.R", echo=FALSE)
 .FIGDIR			<- "../FIGS/LSMR/"
 
 obj				<- read.admb(.FILENAME)
-
 class(obj)		<- c(class(obj), "lsmr")
 
 
@@ -34,7 +33,7 @@ print.lsmr <- function(obj, ...)
 	print(attributes(obj))
 }
 
-plot.lsmr <- function(obj, ...)
+plot.lsmr <- function(obj, ..1000.)
 {
 	opar <- par(no.readonly=TRUE)
 	
@@ -42,14 +41,18 @@ plot.lsmr <- function(obj, ...)
 		par(mfcol=c(2, 2), las=1)
 		plot(yr, Nt, type="l", ylim=c(0, max(Nt))
 		, xlab="Year", ylab="Abundance (numbers > 30 mm)")
+		if(exists("true_Nt")) lines(yr, true_Nt, col=2, lwd=2)
 		gletter(1)
 		
 		plot(yr, Rt, type="h", ylim=c(0, max(Rt)) 
 		, xlab="Year", ylab="Annual recruits ")
+		if(exists("true_Rt"))points(yr, true_Rt, pch=20, col=2)
 		gletter(2)
+		
 		
 		plot(yr, fi, type="o", ylim=c(0, max(fi))
 		, xlab="Year", ylab="Capture probability")
+		if(exists("true_fi"))lines(yr, true_fi, type="o", pch=2, col=2)
 		gletter(3)
 		
 		plot(xmid, mx, type="o", ylim=c(0, max(mx))

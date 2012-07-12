@@ -61,6 +61,7 @@ DATA_SECTION
 	init_matrix i_M(1,nrow,1,ncol); //New Marks-at-length
 	init_matrix i_R(1,nrow,1,ncol); //Recaptures-at-length
 	
+	vector ct(1,nrow);              //colsums of Catch-at-length
 	
 	init_int eof;
 	!! if(eof!=999){cout<<"Error reading data\n"; exit(1);}
@@ -103,6 +104,8 @@ DATA_SECTION
 			M(i)(1,nx) = i_M(i)(3,ncol).shift(1);
 			R(i)(1,nx) = i_R(i)(3,ncol).shift(1);
 			
+			ct(i) = sum(C(i));
+			
 			//set up index for minimum size for tagging fish.
 			for(int j=1;j<=nx;j++)
 			{
@@ -115,6 +118,11 @@ DATA_SECTION
 		}
 	END_CALCS
 	
+	// Variables for Simulated Data
+	vector true_Nt(syr,nyr);
+	vector true_Rt(syr,nyr);
+	vector true_Tt(syr,nyr);
+	vector true_fi(1,nrow);
 	
 PARAMETER_SECTION
 	init_bounded_number_vector theta(1,npar,theta_lbnd,theta_ubnd,theta_phz);
@@ -138,7 +146,7 @@ PARAMETER_SECTION
 	
 	init_bounded_dev_vector ddot_r_devs(1,nx,-15,15,1);
 	init_bounded_dev_vector bar_r_devs(syr+1,nyr,-15,15,3);
-	init_bounded_dev_vector bar_f_devs(1,nrow,-15.0,15.0,2);
+	init_bounded_dev_vector bar_f_devs(1,nrow,-5.0,5.0,2);
 	
 	
 	
@@ -162,6 +170,7 @@ PARAMETER_SECTION
 	matrix P(1,nx,1,nx);	// Size-Transition Matrix
 	
 	// predicted observations
+	vector hat_ct(1,nrow);		//predicted total catch
 	matrix Chat(1,nrow,1,nx);
 	matrix Mhat(1,nrow,1,nx);	//Newly marked animals
 	matrix Rhat(1,nrow,1,nx);
@@ -202,7 +211,7 @@ PROCEDURE_SECTION
 	
 FUNCTION void runSimulationModel(const int& seed)
   {
-	int i,j;
+	int i,j,im;
 	random_number_generator rng(seed);
 	
 	dvector tmp_ddot_r_devs = value(ddot_r_devs);
@@ -219,7 +228,7 @@ FUNCTION void runSimulationModel(const int& seed)
 	double h2 =  1.;
 	for(i=1;i<=nrow;i++)
 	{
-		bar_f_devs(i) = h1 + (h2-h1)*square(sin((i-1.)/(nrow-1.)*1.5*PI));
+		bar_f_devs(i) = h1 + (h2-h1)*square(cos((i-1.)/(nrow-1.)*0.85*PI));
 	}
 	
 	initParameters();
@@ -229,30 +238,41 @@ FUNCTION void runSimulationModel(const int& seed)
 	calcNumbersAtLength();
 	calcSelectivityAtLength();
 	calcNewMarksAndRecaptures();
+	
+	/* Overwrite observations and draw from multinomial distribution */
 	C=value(Chat);
 	M=value(Mhat);
 	R=value(Rhat);
 	
 	for(i=1;i<=nrow;i++)
 	{
-		for(j=1;j<=nx;j++)
-		{
-			C(i,j) = randnegbinomial(C(i,j),8.0,rng);
-			if(M(i,j)>0)
-			{
-				M(i,j) = randnegbinomial(M(i,j),8.0,rng);
-			}
-			if(R(i,j)>0)
-			{
-				R(i,j) = randnegbinomial(R(i,j),8.0,rng);
-			}
-			
-		}
+		ct(i) = sum(C(i));
+		C(i)  = rmultinom(rng,int(ct(i)),C(i));
+		M(i)  = rmultinom(rng,int(sum(M(i))),M(i));
+		R(i)  = rmultinom(rng,int(sum(R(i))),R(i));
+		
 		i_C(i)(3,ncol) = C(i)(1,nx).shift(3);
 		i_M(i)(3,ncol) = M(i)(1,nx).shift(3);
 		i_R(i)(3,ncol) = R(i)(1,nx).shift(3);
 	}
+	
+	/*Save true data*/
+	true_Nt.initialize();
+	true_Rt.initialize();
+	true_fi = value(fi);
+	j = 1;
+	for(i=syr;i<=nyr;i++)
+	{
+		if(i==syr) true_Rt(i) = value(exp(log_ddot_r+ddot_r_devs(nx)));
+		else       true_Rt(i) = value(exp(log_rt(i)));
+		for(im=1;im<=int(1/dt);im++)
+		{
+			true_Nt(i) += sum(value(N(j++)));
+		}
+	}
+	
   }
+
 
 FUNCTION initParameters
   {
@@ -308,7 +328,7 @@ FUNCTION initializeModel
 	
 	
 	/* Sampling effort at each time step. */
-	fi  = mfexp(log_bar_f + bar_f_devs);		
+	fi  = mfexp(log_bar_f + bar_f_devs);
   }
 
 FUNCTION calcSurvivalAtLength
@@ -424,6 +444,8 @@ FUNCTION calcNewMarksAndRecaptures
 		zx      = mx*dt;
 		ox      = 1.0-mfexp(-zx);
 		Chat(i) = elem_div(elem_prod(elem_prod(fi(i)*sx,ox),N(i)),zx);
+		//cout<<fi<<endl;
+		hat_ct(i) = sum(Chat(i));
 		
 		Rhat(i) = elem_div(elem_prod(elem_prod(fi(i)*sx,ox),T(i)),zx);
 		
@@ -442,7 +464,7 @@ FUNCTION calcNewMarksAndRecaptures
 FUNCTION calc_objective_function;
   {
 	int i;
-	dvar_vector fvec(1,3);
+	dvar_vector fvec(1,4);
 	dvar_vector pvec(1,3);
 	
 	fvec.initialize();
@@ -462,10 +484,40 @@ FUNCTION calc_objective_function;
 	}
 	
 	//Likelihoods (fvec);
-	fvec(1) = 10.*norm2(sqrt(C)-sqrt(Chat));
-	fvec(2) = 10.*norm2(M-Mhat);
-	fvec(3) = 10.*norm2(R-Rhat);
+	//fvec(1) = 10.*norm2(sqrt(C)-sqrt(Chat));
+	//fvec(2) = 10.*norm2(M-Mhat);
+	//fvec(3) = 10.*norm2(R-Rhat);
 	//cout<<fvec<<endl;	
+	/*dvariable mu =3.0;
+		dvariable size = 8.0;
+		cout<<dnbinom(0,mu,size)<<endl;
+		exit(1);*/
+	double tau;
+	double itau;
+	for(i=1;i<=nrow;i++)
+	{
+		tau      = sum(C(i));
+		fvec(1) += multifan(C(i),Chat(i),tau);
+		
+		itau      = sum(M(i));
+		//cout<<endl<<Mhat(i)(j_min(i),nx)<<endl<<endl;
+		fvec(2) += dmultifan(M(i)(j_min(i),nx),Mhat(i)(j_min(i),nx),itau);
+		
+		if(i>1){
+		itau      = sum(R(i));
+		fvec(3) += dmultifan(R(i)(j_min(i),nx),Rhat(i)(j_min(i),nx),itau);
+		}
+		/*Trying to figure out why I get nan's in fvec*/
+	}
+	dvar_vector delta = log(ct)-log(hat_ct);
+	if(!last_phase())
+	{
+		fvec(4)  = dnorm(delta,0,flag(2));
+	}
+	else
+	{
+		fvec(4)  = dnorm(delta,0,flag(3));
+	}
 	
 	/*
 	PRIORS for estimated model parameters from the control file.
@@ -689,6 +741,14 @@ REPORT_SECTION
 	REPORT(Chat);
 	REPORT(Mhat);
 	REPORT(Rhat);
+	
+	if(SimFlag)
+	{
+		REPORT(true_Nt);
+		REPORT(true_Rt);
+		REPORT(true_Tt);
+		REPORT(true_fi);
+	}
 
 
 TOP_OF_MAIN_SECTION
@@ -710,7 +770,7 @@ GLOBALS_SECTION
 
 	#include <admodel.h>
 	#include <time.h>
-	#include <statsLib.h>
+	#include <contrib.h>
 	//#include <stats.cxx>
 	//#include <martool.cxx>
 	time_t start,finish;
@@ -729,6 +789,55 @@ GLOBALS_SECTION
 		}
 		RETURN_ARRAYS_DECREMENT();
 		return nll;
+	}
+	
+	dvariable dmultifan(const dvector& o,const dvar_vector& p,const double& s)
+	{
+		RETURN_ARRAYS_INCREMENT();
+		dvariable like;
+		dvariable tau;
+		int lb=o.indexmin();
+		int nb=o.indexmax();
+		int I = (nb-lb)+1;
+
+		dvar_vector epsilon(lb,nb);
+		dvar_vector O=o/sum(o);
+		dvar_vector P=p/sum(p);
+
+		tau=1./s;
+		epsilon=elem_prod(1.-P,P);
+
+
+		like=0.5*sum(log(2.*M_PI*(epsilon+0.1/I)))+I*log(sqrt(tau));
+		like+= -1.*sum(log(mfexp(-1.*elem_div(square(O-P),2.*tau*(epsilon+0.1/I)))+0.01));
+		
+		RETURN_ARRAYS_DECREMENT();
+		return like;
+	}
+	
+	dvariable dnbinom(const dvector& x, const dvar_vector& mu, const prevariable& k)
+	{
+		//the observed counts are in x
+		//mu is the predicted mean
+		//k is the overdispersion parameter
+		if (value(k)<0.0)
+		{
+			cerr<<"k is <=0.0 in dnbinom()";
+			return(0.0);
+		}
+		RETURN_ARRAYS_INCREMENT();
+		int i,imin,imax;
+		imin=x.indexmin();
+		imax=x.indexmax();
+		dvariable loglike = 0.;
+
+		for(i = imin; i<=imax; i++)
+		{
+			cout<<"mu "<<mu(i)<<endl;
+			loglike += gammln(k+x(i))-gammln(k)-gammln(x(i)+1)+k*log(k)-k*log(mu(i)+k)+x(i)*log(mu(i))-x(i)*log(mu(i)+k);
+		}
+		RETURN_ARRAYS_DECREMENT();
+		return(-loglike);
 	}
 	
 	

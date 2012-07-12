@@ -1,20 +1,23 @@
 \contentsline {section}{\numberline {1}Introduction}{2}
-\contentsline {section}{\numberline {2}Methods}{2}
+\contentsline {section}{\numberline {2}Methods}{3}
 \contentsline {subsection}{\numberline {2.1}Input data}{3}
-\contentsline {subsection}{\numberline {2.2}Estimated parameters \& parametric functions}{3}
+\contentsline {subsubsection}{\numberline {2.1.1}Processing length frequency data}{3}
+\contentsline {subsection}{\numberline {2.2}Estimated parameters \& parametric functions}{4}
 \contentsline {subsection}{\numberline {2.3}Growth transition}{4}
-\contentsline {subsection}{\numberline {2.4}Dynamics of numbers-at-length}{5}
-\contentsline {subsection}{\numberline {2.5}Length-based capture probability}{5}
-\contentsline {subsection}{\numberline {2.6}Negative log-likelihoods and prior densities}{5}
-\contentsline {subsection}{\numberline {2.7}Length-structured mark-recapture model (LSMR)}{5}
-\contentsline {subsection}{\numberline {2.8}Processing length frequency data}{5}
-\contentsline {section}{\numberline {3}Results}{5}
-\contentsline {subsection}{\numberline {3.1}Sampling effort}{5}
-\contentsline {subsection}{\numberline {3.2}Length composition}{5}
-\contentsline {subsection}{\numberline {3.3}Annual growth rates from capture-recapture information}{9}
-\contentsline {section}{\numberline {A}Work plan}{19}
-\contentsline {section}{\numberline {B}Individual based model for simulating the dynamics and sampling of humpback chub in the Grand Canyon}{24}
-\contentsline {subsection}{\numberline {B.1}Introduction}{24}
-\contentsline {subsection}{\numberline {B.2}R-code}{24}
-\contentsline {section}{\numberline {C}Processing mark-recapture by length information}{31}
-\contentsline {subsection}{\numberline {C.1}R-Code for Database manipulation}{31}
+\contentsline {subsection}{\numberline {2.4}Size distribution of new recruits}{4}
+\contentsline {subsection}{\numberline {2.5}Initial states}{5}
+\contentsline {subsection}{\numberline {2.6}Dynamics of numbers-at-length}{5}
+\contentsline {subsection}{\numberline {2.7}Capture probability}{5}
+\contentsline {subsection}{\numberline {2.8}Predicted captures and recaptures}{5}
+\contentsline {subsection}{\numberline {2.9}Residuals \& negative log likelihoods}{6}
+\contentsline {section}{\numberline {3}Results}{6}
+\contentsline {subsection}{\numberline {3.1}Sampling effort}{6}
+\contentsline {subsection}{\numberline {3.2}Length composition}{6}
+\contentsline {subsection}{\numberline {3.3}Annual growth rates from capture-recapture information}{10}
+\contentsline {section}{\numberline {A}Work plan}{18}
+\contentsline {section}{\numberline {B}Individual based model for simulating the dynamics and sampling of humpback chub in the Grand Canyon}{23}
+\contentsline {subsection}{\numberline {B.1}Introduction}{23}
+\contentsline {subsection}{\numberline {B.2}R-code}{23}
+\contentsline {section}{\numberline {C}Processing mark-recapture by length information}{30}
+\contentsline {subsection}{\numberline {C.1}R-Code for Database manipulation}{30}
+\contentsline {section}{\numberline {D}Size Transition Matrix from Mark-Recapture data}{44}

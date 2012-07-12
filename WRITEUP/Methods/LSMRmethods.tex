@@ -4,84 +4,93 @@
 
 There are two major methodological components in this length-based model: (1) the development of an individual based model (IBM) for simulating a capture recapture program, and (2) a statistical catch-at-length mark-recapture model to estimate the number of individual fish in each length-class in each sampling year.  A detailed description of the IBM simulation model is provided in the appendix; in short, this simulation model generates a matrix of the number of fish captured-at-length, a matrix of the number of newly marked fish released-at-length, and a matrix of marked fish recaptured-at-length.  The remained of this section is a detailed analytical description of the statistical catch-at-length model used to estimate the abundance-at-length of humpback chub in the Grand Canyon.
 
-The following is a description of the analytical model for the length-structured mark-recapture model (hereafter, LSMR) used in this assessment.  I present the analytical model in the form of a table where the order in which model equations are presented also represent the order in which the calculations proceed in the computer code.  Equations presented in each table are referenced, for example, as \eqref{eq:T1.1}, where the T1 refers to Table \ref{table:LSMRmodel}, and the .1 refers to the first equation in that table. The LSMR model was implemented in AD Model Builder \citep{fournier2011ad}, and the template code is available in the appendix of this document as well as a Git code repository (\url{https://code.google.com/p/lsmr-project/}).  The description of the Length-Structured Mark-Recapture (LSMR) model is broken down into: input data, estimated parameters, dynamics of numbers-at-length, capture probability, and negative log-likelihoods and prior densities.
+The following is a description of the analytical model for the length-structured mark-recapture model (hereafter, LSMR) used in this assessment.  I present the analytical model in the form of a table (Table \ref{table:LSMRmodel}) where the order in which model equations are presented also represent the order in which the calculations proceed in the computer code.  Equations presented in each table are referenced, for example, as \eqref{eq:T1.1}, where the T1 refers to Table \ref{table:LSMRmodel}, and the .1 refers to the first equation in that table. The LSMR model was implemented in AD Model Builder \citep{fournier2011ad}, and the template code is available in the appendix of this document as well as a Git code repository (\url{https://code.google.com/p/lsmr-project/}).  The description of the Length-Structured Mark-Recapture (LSMR) model is broken down into: input data, estimated parameters, dynamics of numbers-at-length, capture probability, and negative log-likelihoods and prior densities.
 
 The following notation is used to define the dimensions of various variables. Vector quantities are designated with an an arrow ($\vec{x}$) or with a single subscript, and matrix is denoted by boldface uppercase letters ($\mathbf{X}$) and where two subscripts are shown denotes the element specific calculation.  Higher dimensional arrays are indicated by normal upper case letters with 3 or more subscripts.  
 
 \subsection{Input data} % (fold)
 \label{sub:input_data}
+The model dimensions consists of time intervals (year indexed by $i$) and length intervals (index by $j$, \ref{eq:T1.1}).  Capture-recapture data for the humpback chub have been collected on an annual basis since May 1, 1989,  and the latest capture record in this analysis is February 27, 2012.  The principle input data for LSMR consists of model dimensions (e.g., years, length intervals $\Lambda$), a matrix of catch-at-length data $\mathbf{C}$ for each year, the number of new marks released-at-length $\mathbf{M}$, and the number of recaptured marks-at-length $\mathbf{R}$.
 
-The model dimensions consists of time intervals (year indexed by $i$) and length intervals (index by $j$, \ref{eq:T1.1}).  Capture-recapture data for the humpback chub have been collected on an annual basis since May 1, 1989,  and the latest capture record in this analysis is February 27, 2012.  The principle input data for LSMR consists of model dimensions (e.g., years, length intervals), catch-at-length $\mathbf{C}_{ij}$ for each year, the number of new marks released at length $\mathbf{M}_{ij}$, and the number of recaptured marks at length $\mathbf{R}_{ij}$.
 
+\subsubsection{Processing length frequency data} % (fold)
+\label{ssub:processing_length_frequency_data}
+At the time of writing this report, there were a total of 81,812 records in the database for humpback chub, of which 35,696 are unique individuals (some of which may occur in the database only once).  Details on the construction of Tables \ref{table:Captures}--\ref{sidewaystable:Recapture_GILL} can be found in Appendix \ref{sec:processing_mark_recapture_by_length_information}. In short, the length composition and mark-recapture information, along with summary statistics about the number of trips, days fished and other units of effort were obtained.
 
+The length composition of the newly marked and recaptured individuals each year were compiled in tables (Appendix \ref{sec:processing_mark_recapture_by_length_information}) and bar charts to characterize recruitment and growth of newly marked and previously marked HBC, respectively.
+% subsection processing_length_frequency_data (end)
 % subsection input_data (end)
 
 \subsection{Estimated parameters \& parametric functions} % (fold)
 \label{sub:estimated_parameters}
-An array of estimated parameters is denoted by $\Theta$ and consists of 8 +$(I-1)$ +$J$ unknowns where $I$ is the total number of years and $J$ is the total number of length intervals.  The average initial numbers-at-length is defined as $\dot{N}$, and the average number of new recruits at each time step is denoted by $\bar{R}$.  To initialize the number of individuals in each length interval $\Lambda$ in the initial year $i=1$, the average initial number is multiplied by a length specific lognormal deviate $\eta_j$ \eqref{eq:T1.11} with the added constraint $\sum_j \eta_j = 0$ to ensure that $\dot{N}$ is identifiable. Similarly, the average number of newly recruiting fish in each time step is based on deviates at each time-step from the mean recruitment \eqref{eq:T1.12}, where again the constraint $\sum_i \nu_i = 0$ ensures that $\bar{R}$ is identifiable.
+An array of estimated parameters \eqref{eq:T1.5} is denoted by $\Theta$ and consists of 9 +$(2I-1)$ +$J$ unknowns, where $I$ is the total number of time steps (years) and $J$ is the total number of length intervals.  
 
-Natural mortality is a function of length \eqref{eq:T1.6}, where the natural mortality at the asymptotic length $M_\infty$ is estimated from the data. Selectivity is also assumed to be a parametric function of length \eqref{eq:T1.7} where $l_x$ and $g_x$ represent length-at-50\% vulnerability and the standard deviation of the logistic function, respectively.  Note that in \eqref{eq:T1.6} the estimated natural mortality rate is confounded with asymptotic length $l_\infty$ which is also an estimated parameter along with the von Bertalanffy growth coefficient $k$.  The growth parameters are used to calculate a vector of growth increment $\vec{\Delta}$ assuming von Bertalanffy growth \eqref{eq:T1.8}. An additional parameter $\beta$ is used to characterize the variability in annual growth increments for individual fish. 
+Natural mortality is a function of length \eqref{eq:T1.6}, where the natural mortality at the asymptotic length $M_\infty$ is estimated from the data.   Note that in \eqref{eq:T1.6} the estimated natural mortality rate is confounded with asymptotic length $l_\infty$ which is also an estimated parameter along with the von Bertalanffy growth coefficient $k$. Selectivity is also assumed to be a parametric function of length \eqref{eq:T1.7} where $l_x$ and $g_x$ represent length-at-50\% vulnerability and the standard deviation of the logistic function, respectively.  
+% subsection estimated_parameters (end)
 
 \subsection{Growth transition} % (fold)
 \label{sub:growth_transition}
-The asymptotic length $l_\infty$ is defined as the average asymptotic length for a population of fish.  It is assumed in \eqref{eq:T1.8} that individuals greater than $l_\infty$ continue to grow at a much reduced rate $k$; this is accomplished by exponentiating the growth increment equation ($(l_\infty-x_j)(1-\exp(-k\tau))$), adding 1.0, and taking the natural logarithm ensuring that \eqref{eq:T1.8} remains positive for all positive values of $l_\infty$, $k$, and $\Lambda$.
-The probability of transitioning from one length interval $x_j$ to length intervals greater than $x_{j}$ is based on a gamma density function \eqref{eq:T1.9}, where the mean is denoted by $\Delta_j$ and a variance equal to $\Delta_j \beta$.  Each row of $\mathbf{P}_{j,j'}$ is normalized to sum to 1.0, and $\mathbf{P}_{j,j'}=1.0$ when $j=j'=n$, where $n$ is the number of length intervals (i.e., individuals in the last length interval represent a plus group).
+The growth parameters are used to calculate a vector of growth increments $\vec{\Delta}$ assuming von Bertalanffy growth \eqref{eq:T1.8}. An additional parameter $\beta$ is used to characterize the variability in annual growth increments for individual fish.  The asymptotic length $l_\infty$ is defined as the average asymptotic length for a population of fish.  It is assumed in \eqref{eq:T1.8} that individuals greater than $l_\infty$ continue to grow at a much reduced rate $k$; this is accomplished by exponentiating the growth increment equation ($(l_\infty-x_j)(1-\exp(-k\tau))$), adding 1.0, and taking the natural logarithm ensuring that \eqref{eq:T1.8} remains positive for all positive values of $l_\infty$, $k$, and $\Lambda$.
 
-% Alternative method for constructing the Length Transition Matrix. (Move to Appendix?)
-There is an alternative method for independently constructing annual length transition matrix based on individual capture-recapture information that incorporates both parametric uncertainty and measurement error.  The alternative method of constructing length-based transition matrices can be used as an alternative to internally estimating growth parameters, rather than jointly estimating them and introducing addition parameter confounding.  This method was recently described by \cite{hillary2010new}. In short, the method first estimates von Bertalanffy growth parameters based on the length-at-release and growth increment information, growth parameters are then sampled from the joint posterior distribution, and for each posterior sample measurement error is then added to the predicted growth increment  from $x_j$ to $x_{j'}$ and the overlap between $(x_{j'}-x^*) \cap (x_{j'}+x^*)$ is calculated.  To numerically approximate the length transition matrix, 1,000 samples from the joint posterior distribution are used to construct 1,000 length-transition matrixes ($P_{j,j'}$) and the mean values from the 1000 matrixes are used as the length transition matrix.
+The model assumes that the distribution of size transitions from length bin $x_j$ to subsequent length bins $x_j'$ follows a gamma distribution \eqref{eq:T1.9}. The mean of this function is denoted by the growth increment ($\Delta_j$) and a variance equal to $\Delta_j \beta$.  Each row of the size transition matrix $\mathbf{P}$ is normalized to sum to 1.0, and $\mathbf{P}_{j,j'}=1.0$ when $j=j'=J$, where $J$ is the number of length intervals (i.e., individuals in the last length interval represent a plus group).
 
-Growth parameters were estimated based on growth increment data from individual fish that were captured and recaptured in the subsequent year only.  Initially, growth increment data based on length-at-tagging and the most recent capture event was used (i.e., the longest time at liberty) were going to be used; but, upon further inspection of the raw data  there is evidence of changes in growth rates over time (see increasing negative slopes in Figure \ref{fig:FIGS_LSMR_fig:GrowthIncrements}).  To minimize the impact of changing growth rates, the growth increment data were based only on individuals that were captured and recaptured in the subsequent calendar year (Figure \ref{fig:FIGS_LSMR_fig:AnnualGrowthIncrements}), hereafter referred to as annual growth increment data.
-
-
+There is also an alternative to jointly estimating a size transition matrix based on mark recapture data.  A series of size transition matrices based on annual growth increments for humpback chub captured and recaptured in the subsequent year was also constructed. Details are outlined in Appendix \ref{sec:size_transition_matrix_from_mark_recapture_data}.
 
 % subsection growth_transition (end)
 
+\subsection{Size distribution of new recruits} % (fold)
+\label{sub:size_distribution_of_new_recruits}
+Newly recruiting individuals at each time step are assumed to have a distribution of lengths that follows a gamma distribution \eqref{eq:T1.10}, where $\vec{p}$ represents the probability of a new recruit being in size interval $x_j$. Two parameters ($\mu$ and $\sigma$) corresponding to the mean and the coefficient of variation of the gamma distribution, respectively, are jointly estimated in the model.  Note that the vector $\vec{p}$ is also normalized to sum to 1.0.
+% subsection size_distribution_of_new_recruits (end)
 
-% subsection estimated_parameters (end)
+\subsection{Initial states} % (fold)
+\label{sub:initial_states}
+A matrix of the total numbers-at-length in a given time step is denoted by $\mathbf{N}$, and the total number of marked individuals at large is denoted by $\mathbf{T}$, \eqref{eq:T1.11}.  To initialize the vector of numbers-at-length in the initial year ($i=1$), a $J$ by $J$ matrix of recruits prior to the initial year $\mathbf{R}$ is constructed using \eqref{eq:T1.12}, where $\ddot{R}$ and $\vec{\eta}$ is an estimated scaler and vector respectively.  Note that the additional constraint  of $\sum_j \eta_j = 0$ is also required to properly estimate the scaler $\ddot{R}$.
+
+The initial numbers-at-length in the initial year is based on the recursive equation defined by \eqref{eq:T1.13}.  This recursion occurs $J$ times where the initial recruits in the first iteration survive at a rate $\exp(-\vec{m})$ and then grow based on the size transition matrix $\mathbf{P}$.  In the second recursion, the next vector of new recruits is added and the survival and growth repeats.  Note that if $\vec{\eta}=0$, then a stable size distribution is set up based on the natural mortality, size transition and initial recruitment.  The addition of $\vec{\eta}$ allows for a no stable size distribution to be set up in the initial year.
+% subsection initial_states (end)
 
 \subsection{Dynamics of numbers-at-length} % (fold)
 \label{sub:dynamics_of_numbers_at_length}
-
+The size transition matrix $\mathbf{P}$ is the key component when modelling a population using length and not age. First, a matrix of annual recruits distributed over size intervals based on $\vec{p}$ is constructed in \eqref{eq:T1.14}, where $\bar{R}$ is the average recruitment over all years except the initial year, $\vec{\nu}$ is a vector of annual recruitment deviates.  The  vector of numbers-at-length in the next time step $\tau$ is given by \eqref{eq:T1.15}, where $\vec{R}_i$ is the corresponding row of recruitment from \eqref{eq:T1.14}.
 % subsection dynamics_of_numbers_at_length (end)
 
-\subsection{Length-based capture probability} % (fold)
-\label{sub:length_based_capture_probability}
+\subsection{Capture probability} % (fold)
+\label{sub:capture_probability}
+Capture probability of fully selected fish at each time step is an unknown parameter to be estimated from the data.  A total of $I+1$ capture probability parameters are estimated \eqref{eq:T1.16}, where $\bar{f}$ is a scaler and $\vec{\zeta}$ is a vector of annual deviates with the constraint $\sum_i \zeta_i = 0$. 
+% subsection capture_probability (end)
 
-% subsection length_based_capture_probability (end)
-
-\subsection{Negative log-likelihoods and prior densities} % (fold)
-\label{sub:negative_log_likelihoods_and_prior_densities}
-
-% subsection negative_log_likelihoods_and_prior_densities (end)
-
-\subsection{Length-structured mark-recapture model (LSMR)}
-
-
-
-
-
+\subsection{Predicted captures and recaptures} % (fold)
+\label{sub:predicted_captures_and_recaptures}
+Predicted captures of unmarked and marked fish are based on the average number of fish available over each time step.  The total number of marked and unmarked fish captured at each time step $\tau$ is denoted by $\hat{C}$, and in \eqref{eq:T1.17} no additional mortality associated with handling and tagging unmarked fish was assumed. Handling mortality could easily be incorporated into the catch equations, however, it is completely confounded with the capture probability and in this case not estimable without additional information.  The predicted number of recaptured individual fish ($\mathbf{R}$) is based on the same catch equation \ref{eq:T1.18} and an estimate of the total number of tags at large ($\mathbf{T}$).  For the initial time step, the total number of tags at large is $\mathbf{T}=0$, as no fish have been tagged.  For time steps greater than 1, the total number of tags at large is based on the recursive survival, growth and recruitment of newly marked animals ($\mathbf{M}$).  This recursive equation is defined by \eqref{eq:T1.20}, where it is assumed that tagged and untagged individuals have the same natural mortality rate and size transition matrix.  The number of newly marked fish at each time step is based on the difference between the total catch and number of recaptured fish in the total catch \eqref{eq:T1.19}.
+% subsection predicted_captures_and_recaptures (end)
 
 \begin{table}
   \centering
 \caption{Data, parameters, and analytical procedures for the length-based mark-recapture model.}\label{table:LSMRmodel} 
 \tableEq
-	\begin{small}
+	\begin{footnotesize}
     \begin{align}
         \hline
 		&\mbox{INDEXES, DATA \& CONSTANTS} \nonumber\\
 		&\mbox{index for time, index for length interval} 
-		&i,j \label{eq:T1.1}\\ 
-		&\mbox{time step}  & \tau\\
+		&i,j 
+		\label{eq:T1.1}\\ 
+		&\mbox{time step}  & \tau 
+		\label{eq:T1.2}\\
 		&\mbox{set of midpoints of length intervals}
-		&\Lambda = \{x_1, \ldots,x_J\}\\
+		&\Lambda = \{x_1, \ldots,x_J\}
+		\label{eq:T1.3}\\
 		&\mbox{catch, new marks, recaptures} 
-		&\mathbf{C}, \mathbf{M}, \mathbf{R}\\[1ex]
+		&\mathbf{C}, \mathbf{M}, \mathbf{R}
+		\label{eq:T1.4}\\[1ex]
 		%%
 		%%
 		&\mbox{PARAMETERS \& DERIVED VARIABLES} \nonumber\\
 		&\mbox{estimated parameters} 
-		&\Theta=\{\dot{N},\bar{R},\bar{f},M_\infty,l_\infty,k,\beta,l_x,g_x,
-			\vec{\eta},\vec{\nu},\vec{\zeta} \}\\
+		&\Theta=\{\ddot{R},\bar{R},\bar{f},M_\infty,l_\infty,k,\beta,\mu,\sigma,l_x,g_x,
+		\vec{\eta},\vec{\nu},\vec{\zeta} \}
+		\label{eq:T1.5}\\
 		&\mbox{mortality-at-length} 
 		& \vec{m} = \frac{M_\infty l_\infty}{\Lambda}
 		\label{eq:T1.6}\\
@@ -96,47 +105,102 @@ Growth parameters were estimated based on growth increment data from individual 
 		e^{x_{j'}/\beta}}{\beta^{\Delta_{j}/\beta} \Gamma(\Delta_{j}/\beta)}dx_{j'}, \nonumber\\
 		& &\quad \sum_{j'=1}^J P_{j,j'}= 1 
 		\label{eq:T1.9}\\
+		&\mbox{length distribution of recruits}
+		&\vec{p} = \frac{1}{\Gamma(a)b^a} \Lambda^{a-1}\exp(-\Lambda/b),\quad
+		a=\frac{1}{\sigma^2}, b=\mu/a
+		\label{eq:T1.10}\\
 		&\mbox{total numbers, marked numbers} 
-		& \mathbf{N}, \mathbf{T}\\[1ex]
+		& \mathbf{N}, \mathbf{T}
+		\label{eq:T1.11}\\[1ex]
 		%%
 		%%
-		&\mbox{INITIAL STATES ($i=1$, $j=1$)}  \nonumber\\
-		&\mbox{initial numbers-at-length}
-		&\mathbf{N}_{i,j} = \dot{N}\exp(\eta_j), \quad \mbox{where} \sum_j \eta_j=0
-		\label{eq:T1.11}\\
-		&\mbox{new recruits}
-		&\mathbf{N}_{i,j} = \bar{R}\exp(\nu_i), \quad \mbox{where} \sum_i \nu_i=0
+		&\mbox{INITIAL STATES ($i=1$)}  \nonumber\\
+		&\mbox{recruits-at-length prior to 1989}
+		&\mathbf{R} = \ddot{R}\exp(\vec{\eta}) (\vec{p})^T 
 		\label{eq:T1.12}\\
+		&\mbox{initial numbers-at-length}
+		&\vec{N}_{i}^{j+1} = \vec{N}_{i}^j \exp(-\vec{m}) \mathbf{P}+
+		\vec{R}_{j}
+		\label{eq:T1.13}\\
 		%%
 		%%
 		&\mbox{DYNAMIC STATES ($i>1$)} \nonumber\\
+		&\mbox{new recruits}
+		&\mathbf{R} = \bar{R}\exp(\vec{\nu}) (\vec{p})^T
+		\label{eq:T1.14}\\
 		&\mbox{Numbers-at-length}
-		&\mathbf{N}_{i+1,j+1} = \mathbf{N}_{i,j} \exp(-m_j \tau) \mathbf{P}_{j,j'}\\
-		&\mbox{Tagged numbers-at-length}
-		&\mathbf{T}_{i+1,j+1} = \mathbf{T}_{i,j} \exp(-m_j \tau) \mathbf{P}_{j,j'} + \mathbf{M}_{i,j}\\
+		&\vec{N}_{i+\tau} = \vec{N}_{i} \exp(-\vec{m} \tau) \mathbf{P} + \vec{R}_i
+		\label{eq:T1.15}\\[1ex]
 		&\mbox{Capture probability} 
-		&f_i = \bar{f} \exp(\zeta_i)\\
+		&f_i = \bar{f} \exp(\zeta_i)
+		\label{eq:T1.16}\\
 		&\mbox{Catch-at-length}
-		&\mathbf{\hat{C}}_{i,j} = \frac{N_{i,j}f_i s_j(1-\exp(-m_j\tau-f_is_j))}{m_j\tau}\\
+		&\hat{C}_{i,j} = \frac{N_{i,j}f_i s_j(1-\exp(-m_j\tau))}
+		{m_j\tau}
+		\label{eq:T1.17}\\
+		&\mbox{Recapture-at-length}
+		&\hat{R}_{i,j} = \frac{T_{i,j}f_i s_j(1-\exp(-m_j\tau))}
+		{m_j\tau}
+		\label{eq:T1.18}\\
+		&\mbox{New marks-at-length}
+		&\hat{M}_{i,j} = \hat{C}_{i,j} - \hat{R}_{i,j}
+		\label{eq:T1.19}\\
+		&\mbox{Tagged numbers-at-length}
+		&\vec{T}_{i+\tau} = \vec{T}_{i}\exp(-\vec{m} \tau) \mathbf{P} 
+		+ \vec{\hat{M}}_{i}
+		\label{eq:T1.20}\\[1ex]
 		\hline \nonumber
     \end{align}
-\end{small}
+\end{footnotesize}
     \normalEq
 \end{table}
+
+\subsection{Residuals \& negative log likelihoods} % (fold)
+\label{sub:residuals_&_negative_log_likelihoods}
+Information for global scaling is a function of the total number of fish captured, the capture probability and the mark rate.
+
+
+% subsection residuals_&_negative_log_likelihoods (end)
+
+\begin{table}
+	\caption{caption}
+	\label{table:LSMRresiduals}
+	\tableEq
+	\begin{align}
+		\hline \nonumber \\
+		&\mbox{RESIDUALS}\nonumber\\
+		&\mbox{Total catch numbers} 
+		&\delta_i = \ln\left(\sum_j {C}_{i,j}\right) 
+		-\ln \left(\sum_j \hat{C}_{i,j}\right)
+		\label{eq:T2.1}\\
+		%%
+		&\mbox{NEGATIVE LOG LIKELIHOODS}\nonumber \\
+		&\mbox{total catch}
+		&\ell_1(\Theta)=0.5I\left[\ln(2\pi) + \ln(\sigma)\right]
+		+\sum_{i=1}^I\frac{\delta_i^2}{2\sigma^2}\\
+		%%
+		%%
+		\hline \nonumber
+	\end{align}
+	\normalEq
+\end{table}
+
+
+
+
+
 
 % section methods (end)
 
 
 
-\subsection{Processing length frequency data} % (fold)
-\label{sub:processing_length_frequency_data}
-At the time of writing this report, there were a total of 81,812 records in the database for humpback chub, of which 35,696 are unique individuals (some of which may occur in the database only once).  Details on the construction of Tables \ref{table:Captures}--\ref{sidewaystable:Recapture_GILL} can be found in Appendix \ref{sec:processing_mark_recapture_by_length_information}. In short, the length composition and mark-recapture information, along with summary statistics about the number of trips, days fished and other units of effort were obtained.
 
-The length composition of the newly marked and recaptured individuals each year were compiled in tables (Appendix \ref{sec:processing_mark_recapture_by_length_information}) and bar charts to characterize recruitment and growth of newly marked and previously marked HBC, respectively.
-
-% subsection processing_length_frequency_data (end)
-
-
+\begin{equation}
+	0.5 \sum_{i=1}^I \ln \left[2 \pi (\epsilon + 0.1/I)  \right]
+	+ I  \ln(\tau)
+	-\sum_{i=1}^I \ln \left[\exp\left\{ \frac{-(o_i-p_i)^2}
+	{2 \pi (\epsilon_i + 0.1/I) \tau^2}\right\}+0.01 \right]
+\end{equation}
 
 
 
