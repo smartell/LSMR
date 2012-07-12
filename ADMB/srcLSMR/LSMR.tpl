@@ -12,6 +12,17 @@
 //               Oct 31/11    4    LSMR.tpl code  (PAID $11,000)             //
 //               Apr 26/12    4    LSMR code development.                    //
 //               Jul 08/12    8    LSMR simulation routine.                  //
+//               Jul 10/12    8    LSMR simulation routine & likelihoods     //
+//               Jul 11/12    8    R-scripts for HBC2011.dat                 //
+//                                                                           //
+//                                                                           //
+// GIT REPOSITORY LOG:                                                       //
+//  -BRANCHES: master     -> the finished product.                           //
+//             ASMR       -> update using old ASMR model with presentation   //
+//             developer  -> where code is developed to merge into master    //
+//             |->newdata -> major code change to accomodate GILL & HOOP gear//
+//                                                                           //
+//                                                                           //
 //                                                                           //
 // ************************************************************************* //
 
