@@ -68,6 +68,7 @@ DATA_SECTION
 	!! xmid = xbin(1,nbin-1)+0.5*first_difference(xbin);
 		
 	// Array dimensions //
+	int fi_count;
 	init_imatrix C_dim(1,ngear,1,2);
 	init_imatrix MR_dim(1,ngear,1,3);
 	ivector irow_C(1,ngear);
@@ -79,6 +80,9 @@ DATA_SECTION
 		jcol_C  = column(C_dim,2);
 		irow_MR = column(MR_dim,1);
 		jcol_MR = column(MR_dim,2);
+		
+		/* number of capture probability deviates */
+		fi_count = sum(irow_C);
 	END_CALCS
 
 	// Length Intervals for data //
@@ -184,10 +188,10 @@ PARAMETER_SECTION
 	number cv_r
 	
 	//Selectivity parameters
-	init_number log_lx(2);
-	init_number log_gx(2);
+	init_vector log_lx(1,ngear,2);
+	init_vector log_gx(1,ngear,2);
 	
-	init_bounded_dev_vector ddot_r_devs(1,nx,-15,15,1);
+	init_bounded_dev_vector ddot_r_devs(1,nx,-15,15,2);
 	init_bounded_dev_vector bar_r_devs(syr+1,nyr,-15,15,3);
 	init_bounded_dev_vector bar_f_devs(1,nrow,-5.0,5.0,2);
 	
