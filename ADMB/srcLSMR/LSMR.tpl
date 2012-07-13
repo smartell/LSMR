@@ -252,7 +252,7 @@ PRELIMINARY_CALCS_SECTION
 PROCEDURE_SECTION
 	cout<<"Top of Procedure Section"<<endl;
 	initParameters();
-//	calcSurvivalAtLength();
+	calcSurvivalAtLength();
 //	calcSizeTransitionMatrix();
 //	initializeModel();
 //	calcNumbersAtLength();
@@ -384,19 +384,19 @@ FUNCTION initParameters
 //	fi  = mfexp(log_bar_f + bar_f_devs);
 //  }
 //
-//FUNCTION calcSurvivalAtLength
-//  {
-//	/*
-//	This function calculates the length-specific survival rate
-//	based on the Lorenzen function, where survival increases
-//	with increasing length.
-//	
-//	mortality rate at length x  mx=m.linf*linf/xbin
-//	note that m_linf is an annual rate.
-//	*/
-//	mx = m_infty*l_infty/xmid;
-//  }
-//
+FUNCTION calcSurvivalAtLength
+  {
+	/*
+	This function calculates the length-specific survival rate
+	based on the Lorenzen function, where survival increases
+	with increasing length.
+	
+	mortality rate at length x  mx=m.linf*linf/xbin
+	note that m_linf is an annual rate.
+	*/
+	mx = m_infty*l_infty/xmid;
+  }
+
 //FUNCTION calcSelectivityAtLength
 //  {
 //	/*
