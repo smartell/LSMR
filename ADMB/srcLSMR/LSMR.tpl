@@ -128,29 +128,30 @@ DATA_SECTION
 	init_int nflags;
 	init_vector flag(1,nflags);
 	// 1) minimum size of fish for tagging.
-	
+	// 2) std of catch residuals in 1st phase
+	// 3) std of catch residuals in last phase
 	
 	
 	// Pre-processing some of the data.
 	imatrix j_min(1,ngear,1,irow_MR);
-	3darray C(1,ngear,1,irow_C-1,1,jcol_C);
-	3darray M(1,ngear,1,irow_MR-1,1,jcol_MR);
-	3darray R(1,ngear,1,irow_MR-1,1,jcol_MR);
+	3darray C(1,ngear,1,irow_C,1,jcol_MR);
+	3darray M(1,ngear,1,irow_MR,1,jcol_MR);
+	3darray R(1,ngear,1,irow_MR,1,jcol_MR);
 	LOC_CALCS
 		int i,j,k;
+		
 		for(k=1;k<=ngear;k++)
 		{
 			for(i=1;i<=irow_C(k);i++)
 			{
-				C(k)(i)(1,nx) = i_C(k)(i)(2,jcol_C(k)).shift(1);
-				ct(k)(i) = sum(C(k)(i));
+				C(k)(i) = i_C(k)(i)(2,jcol_C(k)).shift(1);
+				ct(k,i) = sum(C(k)(i));
 			}
 			
 			for(i=1;i<=irow_MR(k);i++)
 			{
-				M(k)(i)(1,nx) = i_M(k)(i)(2,jcol_MR(k)).shift(1);
-				R(k)(i)(1,nx) = i_R(k)(i)(2,jcol_MR(k)).shift(1);
-
+				M(k)(i) = i_M(k)(i)(2,jcol_C(k)).shift(1);
+				R(k)(i) = i_R(k)(i)(2,jcol_C(k)).shift(1);
 				//set up index for minimum size for tagging fish.
 				for(j=1;j<=jcol_MR(k);j++)
 				{
@@ -163,13 +164,15 @@ DATA_SECTION
 			}
 		}
 	END_CALCS
-	int nrow;
-	!!nrow=1;
+	
 	// Variables for Simulated Data
 	vector true_Nt(syr,nyr);
 	vector true_Rt(syr,nyr);
 	vector true_Tt(syr,nyr);
 	matrix true_fi(1,ngear,1,irow_C);
+	
+	!! cout<<"**** END OF DATA SECTION ****"<<endl;
+	
 	
 PARAMETER_SECTION
 	init_bounded_number_vector theta(1,npar,theta_lbnd,theta_ubnd,theta_phz);
@@ -193,7 +196,7 @@ PARAMETER_SECTION
 	
 	init_bounded_dev_vector ddot_r_devs(1,nx,-15,15,2);
 	init_bounded_dev_vector bar_r_devs(syr+1,nyr,-15,15,3);
-	init_bounded_dev_vector bar_f_devs(1,nrow,-5.0,5.0,2);
+	init_bounded_dev_vector bar_f_devs(1,fi_count,-5.0,5.0,2);
 	
 	
 	
@@ -204,23 +207,25 @@ PARAMETER_SECTION
 	number fpen;
 	
 	number m_linf;
-	number lx;				//length at 50% selectivity
-	number gx;				//std in length at 50% selectivity
+	vector lx(1,ngear);		//length at 50% selectivity
+	vector gx(1,ngear);		//std in length at 50% selectivity
 	vector mx(1,nx);		//Mortality rate at length xmid
 	vector sx(1,nx);		//Selectivity at length xmid
 	vector rx(1,nx);		//size pdf for new recruits
 	
 	vector log_rt(syr+1,nyr);
-	vector fi(1,nrow);		//capture probability in period i.
+	vector fi(1,fi_count);	//capture probability in period i.
 	matrix N(1,nr,1,nx);	//Numbers(time step, length bins)
 	matrix T(1,nr,1,nx);	//Marks-at-large (time step, length bins)
 	matrix P(1,nx,1,nx);	// Size-Transition Matrix
 	
-	// predicted observations
-	vector hat_ct(1,nrow);		//predicted total catch
-	matrix Chat(1,nrow,1,nx);
-	matrix Mhat(1,nrow,1,nx);	//Newly marked animals
-	matrix Rhat(1,nrow,1,nx);
+	// Predicted observations //
+	matrix hat_ct(1,ngear,1,irow_C);			// Predicted total catch
+	3darray Chat(1,ngear,1,irow_C,1,jcol_C);	// Predicted catch-at-length
+	3darray Mhat(1,ngear,1,irow_C,1,jcol_C);	// Predicted new marks-at-length
+	3darray Rhat(1,ngear,1,irow_C,1,jcol_C);	// Predicted recaptures-at-length
+	
+	
 	
 INITIALIZATION_SECTION
 	theta theta_ival;
@@ -245,7 +250,8 @@ PRELIMINARY_CALCS_SECTION
 
 
 PROCEDURE_SECTION
-//	initParameters();
+	cout<<"Top of Procedure Section"<<endl;
+	initParameters();
 //	calcSurvivalAtLength();
 //	calcSizeTransitionMatrix();
 //	initializeModel();
@@ -321,26 +327,26 @@ PROCEDURE_SECTION
 //  }
 //
 //
-//FUNCTION initParameters
-//  {
-//	/* Leading parameters */
-//	log_ddot_r = theta(1);
-//	log_bar_r  = theta(2);
-//	log_bar_f  = theta(3);
-//	m_infty    = theta(4);
-//	l_infty    = theta(5);
-//	vbk        = theta(6);
-//	beta       = theta(7);
-//	mu_r       = theta(8);
-//	cv_r       = theta(9);
-//	
-//	/* Selex parameters */
-//	lx         = mfexp(log_lx);
-//	gx         = mfexp(log_gx);
-//	
-//	
-//  }
-//
+FUNCTION initParameters
+  {
+	/* Leading parameters */
+	log_ddot_r = theta(1);
+	log_bar_r  = theta(2);
+	log_bar_f  = theta(3);
+	m_infty    = theta(4);
+	l_infty    = theta(5);
+	vbk        = theta(6);
+	beta       = theta(7);
+	mu_r       = theta(8);
+	cv_r       = theta(9);
+	
+	/* Selex parameters */
+	lx         = mfexp(log_lx);
+	gx         = mfexp(log_gx);
+	
+	
+  }
+
 //FUNCTION calcSizeTransitionMatrix
 //	/*
 //	This function calls the necessary routines to compute the Size Transition Matrix (P)
