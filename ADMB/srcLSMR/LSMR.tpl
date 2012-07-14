@@ -23,6 +23,11 @@
 //             |->newdata -> major code change to accomodate GILL & HOOP gear//
 //                                                                           //
 //                                                                           //
+// TO DO LIST:                                                               //
+//  -Change indexing of data such that input observations have the same      //
+//   indexing as the model dimensions.                                       //
+//                                                                           //
+//                                                                           //
 //                                                                           //
 // ************************************************************************* //
 
@@ -88,7 +93,7 @@ DATA_SECTION
 	// Length Intervals for data //
 	init_imatrix x_C(1,ngear,1,jcol_MR);
 	init_imatrix x_MR(1,ngear,1,jcol_MR);
-	!! cout<<x_MR<<endl;
+	
 	// Read in Capture, Mark, and Recapture arrays //
 	init_3darray i_C(1,ngear,1,irow_C,1,jcol_C);
 	init_3darray i_M(1,ngear,1,irow_C,1,jcol_C);
@@ -207,29 +212,29 @@ PARAMETER_SECTION
 	number fpen;
 	
 	number m_linf;
-	vector lx(1,ngear);		//length at 50% selectivity
-	vector gx(1,ngear);		//std in length at 50% selectivity
-	vector mx(1,nx);		//Mortality rate at length xmid
-	vector sx(1,nx);		//Selectivity at length xmid
-	vector rx(1,nx);		//size pdf for new recruits
+	vector lx(1,ngear);		// length at 50% selectivity
+	vector gx(1,ngear);		// std in length at 50% selectivity
+	vector mx(1,nx);		// Mortality rate at length xmid
+	vector rx(1,nx);		// size pdf for new recruits
 	
 	vector log_rt(syr+1,nyr);
-	vector fi(1,fi_count);	//capture probability in period i.
-	matrix N(1,nr,1,nx);	//Numbers(time step, length bins)
-	matrix T(1,nr,1,nx);	//Marks-at-large (time step, length bins)
-	matrix P(1,nx,1,nx);	// Size-Transition Matrix
+	matrix fi(1,ngear,1,irow_C);// capture probability in period i.
+	matrix sx(1,ngear,1,jcol_MR);	// Selectivity at length xmid
+	matrix N(1,nr,1,nx);		// Numbers(time step, length bins)
+	matrix T(1,nr,1,nx);		// Marks-at-large (time step, length bins)
+	matrix P(1,nx,1,nx);		// Size-Transition Matrix
 	
 	// Predicted observations //
 	matrix hat_ct(1,ngear,1,irow_C);			// Predicted total catch
-	3darray Chat(1,ngear,1,irow_C,1,jcol_C);	// Predicted catch-at-length
-	3darray Mhat(1,ngear,1,irow_C,1,jcol_C);	// Predicted new marks-at-length
-	3darray Rhat(1,ngear,1,irow_C,1,jcol_C);	// Predicted recaptures-at-length
+	3darray Chat(1,ngear,1,irow_C,1,jcol_MR);	// Predicted catch-at-length
+	3darray Mhat(1,ngear,1,irow_C,1,jcol_MR);	// Predicted new marks-at-length
+	3darray Rhat(1,ngear,1,irow_C,1,jcol_MR);	// Predicted recaptures-at-length
 	
 	
 	
 INITIALIZATION_SECTION
 	theta theta_ival;
-	
+	log_lx 2.3;
 
 RUNTIME_SECTION
     maximum_function_evaluations 500,1500,2500,25000,25000
@@ -253,11 +258,11 @@ PROCEDURE_SECTION
 	cout<<"Top of Procedure Section"<<endl;
 	initParameters();
 	calcSurvivalAtLength();
-//	calcSizeTransitionMatrix();
-//	initializeModel();
-//	calcNumbersAtLength();
-//	calcSelectivityAtLength();
-//	calcNewMarksAndRecaptures();
+	calcSizeTransitionMatrix();
+	initializeModel();
+	calcNumbersAtLength();
+	calcSelectivityAtLength();
+	calcNewMarksAndRecaptures();
 //		
 //	//calc_catch_at_length();
 //	calc_objective_function();
@@ -346,43 +351,52 @@ FUNCTION initParameters
 	
 	
   }
-
-//FUNCTION calcSizeTransitionMatrix
-//	/*
-//	This function calls the necessary routines to compute the Size Transition Matrix (P)
-//	*/
-//	
-//	P = calcLTM(xbin,l_infty,vbk,beta);
-//	
 //
-//FUNCTION initializeModel
-//  {
-//	int i;
-//	//Set up the initial states.
-//	N.initialize();
-//	T.initialize();
-//	
-//	
-//	/* Initialize numbers at length at the first time step. */
-//	dvariable a=1/(cv_r*cv_r);  //a=1/cv^2
-//	dvariable b=mu_r/a;		  //b=mu/a
-//	rx  = dgamma(xmid,a,b);
-//	rx /= sum(rx);
-//	
-//	for(i=1;i<=nx;i++)
-//	{
-//		dvar_vector init_r = mfexp(log_ddot_r + ddot_r_devs(i)) * rx;
-//		N(1) = elem_prod(N(1),mfexp(-mx)) * P + init_r;
-//	}
-//	
-//	
-//	/* Annual recruitment */
-//	log_rt = log_bar_r + bar_r_devs;
-//	
-//	
-//	/* Sampling effort at each time step. */
-//	fi  = mfexp(log_bar_f + bar_f_devs);
-//  }
+FUNCTION calcSizeTransitionMatrix
+  {
+	/*
+	This function calls the necessary routines to compute the Size Transition Matrix (P)
+	*/
+	
+	P = calcLTM(xbin,l_infty,vbk,beta);
+  }
+//
+FUNCTION initializeModel
+  {
+	int i,k,ik;
+	//Set up the initial states.
+	N.initialize();
+	T.initialize();
+	
+	
+	/* Initialize numbers at length at the first time step. */
+	dvariable a=1/(cv_r*cv_r);  //a=1/cv^2
+	dvariable b=mu_r/a;		  //b=mu/a
+	rx  = dgamma(xmid,a,b);
+	rx /= sum(rx);
+	
+	for(i=1;i<=nx;i++)
+	{
+		dvar_vector init_r = mfexp(log_ddot_r + ddot_r_devs(i)) * rx;
+		N(1) = elem_prod(N(1),mfexp(-mx)) * P + init_r;
+	}
+	
+	
+	/* Annual recruitment */
+	log_rt = log_bar_r + bar_r_devs;
+	
+	
+	/* Sampling effort at each time step. */
+	ik = 1;
+	for(k=1;k<=ngear;k++)
+	{
+		for(i=1;i<=irow_C(k);i++)
+		{
+			fi(k,i)  = mfexp(log_bar_f + bar_f_devs(ik++));
+		}
+	}
+
+  }
 //
 FUNCTION calcSurvivalAtLength
   {
@@ -396,123 +410,186 @@ FUNCTION calcSurvivalAtLength
 	*/
 	mx = m_infty*l_infty/xmid;
   }
+//
+FUNCTION calcSelectivityAtLength
+  {
+	/*
+	This function calculates the length-specific selectivity.
+	The parametric option is a logistic curve (plogis(x,lx,gx))
+	*/
+	int k;
+	sx.initialize();
+	for(k=1;k<=ngear;k++)
+	{
+		//sx(k) = 1./(1+mfexp(-(xmid-lx(k))/gx(k)));
+		sx(k) = plogis(x_C(k),lx(k),gx(k));
+	}
+	
+	//cout<<sx<<endl;
+  }
+//
+FUNCTION calcNumbersAtLength
+  {
+	/*	This function updates the numbers at length
+		over time as a function of the numbers at length
+		times the survival rate.
+	  	N_{t+dt} = elem_prod(N_{t},exp(-mx*dt)) * P + rt*rx
+	
+	  	These are the total number of fish (tagged + untagged)
+		at large in the population.  N is used in the observation
+		models to determine number of captures and recaptures is
+		based on T.
+		
+		i = index for nrow
+		j = index for size class
+		t = index for year
+		im= index for month/season/quarter (fraction of a year)
+	*/
+	int i,j,t,im;
+	dvector newMarks(1,nx);	
+	
+	i=0; j=1;
+	for(t = syr;t < nyr;t++)
+	{
+		for(im=1;im<=int(1/dt);im++)
+		{
+			i++;
+			/* Recruitment if in period 1 */
+			if(im==1 && t > syr)
+			{
+				N(i)+= mfexp(log_rt(t))*rx;
+			}
+			
+			N(i+1)=elem_prod(N(i),mfexp(-mx*dt))*P;
+			
+			/*
+			SJDM Might change this below.  As it currently stands the model
+			is conditioned on the numbers of marks released, and these same
+			data appear in the likelihood. Rather, the accounting of the Tagged
+			and Untagged populations should be done in a separate routine where
+			the predicted number of new marks released is based on the number of 
+			untagged fish (N-T) captured at each sampling event.
+			
+			Set up accounting for predicted marks at large
+			by adding observed marks to Mhat.
+			T(i+1)= elem_prod(T(i),exp(-mx*dt))*P + M(i)
+			
+			
+			
 
-//FUNCTION calcSelectivityAtLength
-//  {
-//	/*
-//	This function calculates the length-specific selectivity.
-//	The parametric option is a logistic curve (plogis(x,lx,gx))
-//	*/
-//	sx.initialize();
-//	
-//	sx = 1./(1+mfexp(-(xmid-lx)/gx));
-//	//cout<<sx<<endl;
-//  }
+			newMarks.initialize();
+			if(t==i_M(j,1) && im==i_M(j,2)) 
+			{
+				newMarks = M(j++);
+				if(j>nrow) j=nrow;
+			}
+			
+			T(i+1) = elem_prod(T(i),mfexp(-mx*dt)) * P + newMarks;
+			*/
+			//cout<<t<<"\t"<<i<<"\t"<<sum(N(i))<<"\t"<<sum(T(i))<<endl;
+		} //end of im
+	} // end of t
+	//cout<<setprecision(3)<<N<<endl;
+  }
 //
-//FUNCTION calcNumbersAtLength
-//  {
-//	/*	This function updates the numbers at length
-//		over time as a function of the numbers at length
-//		times the survival rate.
-//	  	N_{t+dt} = elem_prod(N_{t},exp(-mx*dt)) * P + rt*rx
-//	
-//	  	These are the total number of fish (tagged + untagged)
-//		at large in the population.  N is used in the observation
-//		models to determine number of captures and recaptures is
-//		based on T.
-//		
-//		i = index for nrow
-//		j = index for size class
-//		t = index for year
-//		im= index for month/season/quarter (fraction of a year)
-//	*/
-//	int i,j,t,im;
-//	dvector newMarks(1,nx);	
-//	
-//	i=0; j=1;
-//	for(t = syr;t < nyr;t++)
-//	{
-//		for(im=1;im<=int(1/dt);im++)
-//		{
-//			i++;
-//			/* Recruitment if in period 1 */
-//			if(im==1 && t > syr)
-//			{
-//				N(i)+= mfexp(log_rt(t))*rx;
-//			}
-//			
-//			N(i+1)=elem_prod(N(i),mfexp(-mx*dt))*P;
-//			
-//			/*
-//			SJDM Might change this below.  As it currently stands the model
-//			is conditioned on the numbers of marks released, and these same
-//			data appear in the likelihood. Rather, the accounting of the Tagged
-//			and Untagged populations should be done in a separate routine where
-//			the predicted number of new marks released is based on the number of 
-//			untagged fish (N-T) captured at each sampling event.
-//			
-//			Set up accounting for predicted marks at large
-//			by adding observed marks to Mhat.
-//			T(i+1)= elem_prod(T(i),exp(-mx*dt))*P + M(i)
-//			
-//			
-//			
-//
-//			newMarks.initialize();
-//			if(t==i_M(j,1) && im==i_M(j,2)) 
-//			{
-//				newMarks = M(j++);
-//				if(j>nrow) j=nrow;
-//			}
-//			
-//			T(i+1) = elem_prod(T(i),mfexp(-mx*dt)) * P + newMarks;
-//			*/
-//			//cout<<t<<"\t"<<i<<"\t"<<sum(N(i))<<"\t"<<sum(T(i))<<endl;
-//		} //end of im
-//	} // end of t
-//	//cout<<setprecision(3)<<N<<endl;
-//  }
-//
-//FUNCTION calcNewMarksAndRecaptures
-//  {
-//	/*
-//	The accounting of the Tagged and Untagged populations where
-//	the predicted number of new marks released is based on the number of 
-//	untagged fish (N-T) captured at each sampling event. The precited 
-//	number of recaptures is based on the number of marks at large (T)
-//	
-//	j_min = index for minimum size of fish tagged (based on M data and flag(1))
-//	
-//	*/
-//	int i;
-//	
-//	Chat.initialize();
-//	Mhat.initialize();
-//	Rhat.initialize();
-//	T.initialize();
-//	dvar_vector zx(1,nx);
-//	dvar_vector ox(1,nx);
-//	for(i=1;i<=nrow;i++)
-//	{
-//		zx      = mx*dt;
-//		ox      = 1.0-mfexp(-zx);
-//		Chat(i) = elem_div(elem_prod(elem_prod(fi(i)*sx,ox),N(i)),zx);
-//		//cout<<fi<<endl;
-//		hat_ct(i) = sum(Chat(i));
-//		
-//		Rhat(i) = elem_div(elem_prod(elem_prod(fi(i)*sx,ox),T(i)),zx);
-//		
-//		Mhat(i)(j_min(i),nx) = Chat(i)(j_min(i),nx) - Rhat(i)(j_min(i),nx);
-//		
-//		if( i<nrow )
-//		{
-//			T(i+1) = elem_prod(T(i),mfexp(-zx)) * P + Mhat(i);
-//		}
-//	}
-//	
-//	//cout<<Mhat(2)<<endl;
-//  }
-//
+FUNCTION calcNewMarksAndRecaptures
+  {
+	/*
+	The accounting of the Tagged and Untagged populations where
+	the predicted number of new marks released is based on the number of 
+	untagged fish (N-T) captured at each sampling event. The precited 
+	number of recaptures is based on the number of marks at large (T)
+	
+	j_min = index for minimum size of fish tagged (based on M data and flag(1))
+	
+	PSUEDOCODE:
+		-1) loop over years and within each time step determine if a trip occured
+		-2) get corresponding row index for C, M, and R for gear k
+		-3) get corresponding col index for C, M, and R for gear k
+	
+	*/
+	cout<<"calcNewMarksAndRecaptures"<<endl;
+	int i,j,k,t,im,ik,jj;
+	ivector iyr(1,ngear);
+	
+	/* Match index for size bins in the model with those in the data. */
+	imatrix ix(1,ngear,1,jcol_MR);
+	for(k=1;k<=ngear;k++)
+	{
+		ix(k) = match(x_MR(k),xbin);
+	}
+	
+	dvariable ftmp;
+	Chat.initialize();
+	Mhat.initialize();
+	Rhat.initialize();
+	T.initialize();
+	dvar_vector zx(1,nx);
+	dvar_vector ox(1,nx);
+	dvar_vector newMarks(1,nx);
+	
+	i   = 0;
+	ik  = 0;
+	iyr = 1;
+	zx  = mx*dt;
+	ox  = 1.0-mfexp(-zx);
+	for(t=syr;t<=nyr;t++)
+	{
+		for(im=1;im<=int(1/dt);im++)
+		{
+			i++;	// index for row of N and T
+			newMarks = 0;
+			for(k=1;k<=ngear;k++)
+			{
+				if( i_C(k)(iyr(k))(1)==t && iyr(k)<=irow_C(k) )
+				{
+					ftmp = fi(k,iyr(k));
+					
+					dvar_vector t1 = elem_prod( ftmp*sx(k),ox(ix(k)) );
+					dvar_vector t2 = elem_div( N(i)(ix(k)),zx(ix(k)) );
+					dvar_vector t3 = elem_div( T(i)(ix(k)),zx(ix(k)) );
+					
+					Chat(k)(iyr(k)) = elem_prod(t1,t2);
+					Rhat(k)(iyr(k)) = elem_prod(t1,t3);
+					
+					//jx              = j_min(k,iyr(k));
+					//Mhat(k)(iyr(k))(jx,nx) = 
+					
+					//T(i) = 1.0;//T(i)(ix(k)) + Mhat(k)(iyr(k));
+					
+					//cout<<T(i)<<endl;
+					if(iyr(k) < irow_C(k)) iyr(k) ++;
+				}
+				
+			}
+			if( i<nr )
+			{
+				T(i+1) = elem_prod(T(i),mfexp(-zx)) * P + newMarks;
+			}
+		}
+	}
+	//cout<<Chat(1)<<endl;
+	/*for(i=1;i<=nrow;i++)
+		{
+			zx      = mx*dt;
+			ox      = 1.0-mfexp(-zx);
+			Chat(i) = elem_div(elem_prod(elem_prod(fi(i)*sx,ox),N(i)),zx);
+			//cout<<fi<<endl;
+			hat_ct(i) = sum(Chat(i));
+			
+			Rhat(i) = elem_div(elem_prod(elem_prod(fi(i)*sx,ox),T(i)),zx);
+			
+			Mhat(i)(j_min(i),nx) = Chat(i)(j_min(i),nx) - Rhat(i)(j_min(i),nx);
+			
+			if( i<nrow )
+			{
+				T(i+1) = elem_prod(T(i),mfexp(-zx)) * P + Mhat(i);
+			}
+		}*/
+	
+	//cout<<Chat(2)<<endl;
+  }
+
 //
 //FUNCTION calc_objective_function;
 //  {
@@ -617,26 +694,45 @@ FUNCTION calcSurvivalAtLength
 //
 //
 //
-//FUNCTION dvar_vector dgamma(const dvector& x, const dvariable& a, const dvariable& b)
-//  {
-//	//returns the gamma density with a & b as parameters
-//	RETURN_ARRAYS_INCREMENT();
-//	dvariable t1 = 1./(pow(b,a)*exp(gammln(a)));
-//	dvar_vector t2 = (a-1.)*log(x)-x/b;
-//	RETURN_ARRAYS_DECREMENT();
-//	return(t1*exp(t2));
-//  }
+FUNCTION dvar_vector dgamma(const dvector& x, const dvariable& a, const dvariable& b)
+  {
+	//returns the gamma density with a & b as parameters
+	RETURN_ARRAYS_INCREMENT();
+	dvariable t1 = 1./(pow(b,a)*exp(gammln(a)));
+	dvar_vector t2 = (a-1.)*log(x)-x/b;
+	RETURN_ARRAYS_DECREMENT();
+	return(t1*exp(t2));
+  }
 //
-//FUNCTION dvariable dgamma(const prevariable& x, const double& a, const double& b)
-//  {
-//	//returns the gamma density with a & b as parameters
-//	RETURN_ARRAYS_INCREMENT();
-//	dvariable t1 = 1./(pow(b,a)*exp(gammln(a)));
-//	dvariable t2 = (a-1.)*log(x)-x/b;
-//	RETURN_ARRAYS_DECREMENT();
-//	return(t1*exp(t2));
-//  }
-//
+FUNCTION dvariable dgamma(const prevariable& x, const double& a, const double& b)
+  {
+	//returns the gamma density with a & b as parameters
+	RETURN_ARRAYS_INCREMENT();
+	dvariable t1 = 1./(pow(b,a)*exp(gammln(a)));
+	dvariable t2 = (a-1.)*log(x)-x/b;
+	RETURN_ARRAYS_DECREMENT();
+	return(t1*exp(t2));
+  }
+
+FUNCTION ivector match(const ivector& x, const ivector& table)
+  {
+	//returns a vector of positions of first matches of x in table.
+	int i,j;
+	ivector pos(x.indexmin(),x.indexmax());
+	for(i=x.indexmin();i<=x.indexmax();i++)
+	{
+		for(j=table.indexmin();j<=table.indexmax();j++)
+		{
+			if(x(i) == table(j) )
+			{
+				pos(i) = j;
+				break;
+			}
+		}
+	}
+	return(pos);
+  }
+
 //
 //FUNCTION dvar_matrix dLTM(dvector& x, const dvariable &linf, const dvariable &k, const dvariable &cv)
 //  {
@@ -698,53 +794,53 @@ FUNCTION calcSurvivalAtLength
 //  }
 //
 //
-//FUNCTION dvar_matrix calcLTM(dvector& x, const dvariable &linf, const dvariable &k, const dvariable &beta)
-//  {
-//	/*This function computes the length transition matrix.*/
-//	/*
-//	- cumd_gamma(x,a) is the same as Igamma(a,x) in R.
-//	- If length interval > linf, then assume now further growth.
-//	- Note the use of posfun to ensure differentiable.
-//	*/
-//	RETURN_ARRAYS_INCREMENT();
-//	int i,j;
-//	double dx;
-//	int n = size_count(x);     //number of length intervals
-//	dvar_vector alpha(1,n-1);
-//	dvar_matrix P(1,n-1,1,n-1);
-//	P.initialize();
-//	
-//	//Growth increment
-//	dvariable pen;
-//	dvar_vector xm(1,n-1);
-//	dvar_vector dl(1,n-1);
-//	xm = x(1,n-1)+0.5*first_difference(x);
-//	for(j=1;j<=n-1;j++)
-//	{
-//		//dvariable t2=posfun(linf-xm(j),1./n,pen);
-//		//dl(j) = (t2)*(1.-exp(-k*dt));
-//		dl(j) = log(mfexp( (linf-xm(j))*(1.-mfexp(-k*dt)) )+1.0);
-//	}
-//	alpha = dl/beta;
-//	
-//	
-//	for(i=1;i<=n-1;i++)
-//	{
-//		dvar_vector t1(i,n);
-//		for(j=i;j<=n;j++)
-//		{
-//			dx = x(j)-x(i);
-//			//cout<<j<<" "<<x(i)<<" "<<x(j)<<" "<<cumd_gamma(dx,alpha(i))<<endl;
-//			t1(j) = cumd_gamma(dx,alpha(i));
-//		}
-//		P(i)(i,n-1) = first_difference(t1);
-//		P(i) /= sum(P(i));
-//	}
-//	RETURN_ARRAYS_DECREMENT();
-//	//cout<<P<<endl;
-//	return(P);
-//  }
-//	
+FUNCTION dvar_matrix calcLTM(dvector& x, const dvariable &linf, const dvariable &k, const dvariable &beta)
+  {
+	/*This function computes the length transition matrix.*/
+	/*
+	- cumd_gamma(x,a) is the same as Igamma(a,x) in R.
+	- If length interval > linf, then assume now further growth.
+	- Note the use of posfun to ensure differentiable.
+	*/
+	RETURN_ARRAYS_INCREMENT();
+	int i,j;
+	double dx;
+	int n = size_count(x);     //number of length intervals
+	dvar_vector alpha(1,n-1);
+	dvar_matrix P(1,n-1,1,n-1);
+	P.initialize();
+	
+	//Growth increment
+	dvariable pen;
+	dvar_vector xm(1,n-1);
+	dvar_vector dl(1,n-1);
+	xm = x(1,n-1)+0.5*first_difference(x);
+	for(j=1;j<=n-1;j++)
+	{
+		//dvariable t2=posfun(linf-xm(j),1./n,pen);
+		//dl(j) = (t2)*(1.-exp(-k*dt));
+		dl(j) = log(mfexp( (linf-xm(j))*(1.-mfexp(-k*dt)) )+1.0);
+	}
+	alpha = dl/beta;
+	
+	
+	for(i=1;i<=n-1;i++)
+	{
+		dvar_vector t1(i,n);
+		for(j=i;j<=n;j++)
+		{
+			dx = x(j)-x(i);
+			//cout<<j<<" "<<x(i)<<" "<<x(j)<<" "<<cumd_gamma(dx,alpha(i))<<endl;
+			t1(j) = cumd_gamma(dx,alpha(i));
+		}
+		P(i)(i,n-1) = first_difference(t1);
+		P(i) /= sum(P(i));
+	}
+	RETURN_ARRAYS_DECREMENT();
+	//cout<<P<<endl;
+	return(P);
+  }
+	
 //REPORT_SECTION
 //	int i,j,im;
 //	REPORT(f          );
@@ -813,87 +909,87 @@ FUNCTION calcSurvivalAtLength
 //	gradient_structure::set_NUM_DEPENDENT_VARIABLES(5000);
 // 
 //
-//GLOBALS_SECTION
-//	/**
-//	\def REPORT(object)
-//	Prints name and value of \a object on ADMB report %ofstream file.
-//	*/
-//	#undef REPORT
-//	#define REPORT(object) report << #object "\n" << object << endl;
-//
-//	#include <admodel.h>
-//	#include <time.h>
-//	#include <contrib.h>
-//	//#include <stats.cxx>
-//	//#include <martool.cxx>
-//	time_t start,finish;
-//	long hour,minute,second;
-//	double elapsed_time;
-//	
-//	dvariable dpois(const dvector& k, const dvar_vector& lambda)
-//	{
-//		RETURN_ARRAYS_INCREMENT();
-//		int i;
-//		int n = size_count(k);
-//		dvariable nll=0;
-//		for(i = 1; i <= n; i++)
-//		{
-//			nll -= k(i)*log(lambda(i))+lambda(i)+gammln(k(i)+1.);
-//		}
-//		RETURN_ARRAYS_DECREMENT();
-//		return nll;
-//	}
-//	
-//	dvariable dmultifan(const dvector& o,const dvar_vector& p,const double& s)
-//	{
-//		RETURN_ARRAYS_INCREMENT();
-//		dvariable like;
-//		dvariable tau;
-//		int lb=o.indexmin();
-//		int nb=o.indexmax();
-//		int I = (nb-lb)+1;
-//
-//		dvar_vector epsilon(lb,nb);
-//		dvar_vector O=o/sum(o);
-//		dvar_vector P=p/sum(p);
-//
-//		tau=1./s;
-//		epsilon=elem_prod(1.-P,P);
-//
-//
-//		like=0.5*sum(log(2.*M_PI*(epsilon+0.1/I)))+I*log(sqrt(tau));
-//		like+= -1.*sum(log(mfexp(-1.*elem_div(square(O-P),2.*tau*(epsilon+0.1/I)))+0.01));
-//		
-//		RETURN_ARRAYS_DECREMENT();
-//		return like;
-//	}
-//	
-//	dvariable dnbinom(const dvector& x, const dvar_vector& mu, const prevariable& k)
-//	{
-//		//the observed counts are in x
-//		//mu is the predicted mean
-//		//k is the overdispersion parameter
-//		if (value(k)<0.0)
-//		{
-//			cerr<<"k is <=0.0 in dnbinom()";
-//			return(0.0);
-//		}
-//		RETURN_ARRAYS_INCREMENT();
-//		int i,imin,imax;
-//		imin=x.indexmin();
-//		imax=x.indexmax();
-//		dvariable loglike = 0.;
-//
-//		for(i = imin; i<=imax; i++)
-//		{
-//			cout<<"mu "<<mu(i)<<endl;
-//			loglike += gammln(k+x(i))-gammln(k)-gammln(x(i)+1)+k*log(k)-k*log(mu(i)+k)+x(i)*log(mu(i))-x(i)*log(mu(i)+k);
-//		}
-//		RETURN_ARRAYS_DECREMENT();
-//		return(-loglike);
-//	}
-//	
-//	
+GLOBALS_SECTION
+	/**
+	\def REPORT(object)
+	Prints name and value of \a object on ADMB report %ofstream file.
+	*/
+	#undef REPORT
+	#define REPORT(object) report << #object "\n" << object << endl;
+
+	#include <admodel.h>
+	#include <time.h>
+	#include <contrib.h>
+	//#include <stats.cxx>
+	//#include <martool.cxx>
+	time_t start,finish;
+	long hour,minute,second;
+	double elapsed_time;
+	
+	dvariable dpois(const dvector& k, const dvar_vector& lambda)
+	{
+		RETURN_ARRAYS_INCREMENT();
+		int i;
+		int n = size_count(k);
+		dvariable nll=0;
+		for(i = 1; i <= n; i++)
+		{
+			nll -= k(i)*log(lambda(i))+lambda(i)+gammln(k(i)+1.);
+		}
+		RETURN_ARRAYS_DECREMENT();
+		return nll;
+	}
+	
+	dvariable dmultifan(const dvector& o,const dvar_vector& p,const double& s)
+	{
+		RETURN_ARRAYS_INCREMENT();
+		dvariable like;
+		dvariable tau;
+		int lb=o.indexmin();
+		int nb=o.indexmax();
+		int I = (nb-lb)+1;
+
+		dvar_vector epsilon(lb,nb);
+		dvar_vector O=o/sum(o);
+		dvar_vector P=p/sum(p);
+
+		tau=1./s;
+		epsilon=elem_prod(1.-P,P);
+
+
+		like=0.5*sum(log(2.*M_PI*(epsilon+0.1/I)))+I*log(sqrt(tau));
+		like+= -1.*sum(log(mfexp(-1.*elem_div(square(O-P),2.*tau*(epsilon+0.1/I)))+0.01));
+		
+		RETURN_ARRAYS_DECREMENT();
+		return like;
+	}
+	
+	dvariable dnbinom(const dvector& x, const dvar_vector& mu, const prevariable& k)
+	{
+		//the observed counts are in x
+		//mu is the predicted mean
+		//k is the overdispersion parameter
+		if (value(k)<0.0)
+		{
+			cerr<<"k is <=0.0 in dnbinom()";
+			return(0.0);
+		}
+		RETURN_ARRAYS_INCREMENT();
+		int i,imin,imax;
+		imin=x.indexmin();
+		imax=x.indexmax();
+		dvariable loglike = 0.;
+
+		for(i = imin; i<=imax; i++)
+		{
+			cout<<"mu "<<mu(i)<<endl;
+			loglike += gammln(k+x(i))-gammln(k)-gammln(x(i)+1)+k*log(k)-k*log(mu(i)+k)+x(i)*log(mu(i))-x(i)*log(mu(i)+k);
+		}
+		RETURN_ARRAYS_DECREMENT();
+		return(-loglike);
+	}
+	
+	
 //FINAL_SECTION
 //	time(&finish);
 //	elapsed_time=difftime(finish,start);
