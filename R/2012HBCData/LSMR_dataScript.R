@@ -30,6 +30,7 @@ require(Hmisc)
 require(PBSmodelling)
 dfile    <- "raw2012data.csv"
 xbin     <- seq(50, 600, by=10)
+seas     <- seq(1,12,by=3)
 
 # ------------------------------------------------------------------------------- #
 # Read data file and create data.frame object for use. Returns (DF)
@@ -44,6 +45,7 @@ get.DF   <- function(dfile)
     DF$TAGNO <- DF$TH_ENCOUNTER_RANKING
     DF$TL    <- DF$TOTAL_LENGTH
     DF$XI    <- xbin[findInterval(DF$TL, xbin)]
+    DF$QTR   <- findInterval(DF$MONTH, seas)
     
     # Read in Gear codes and convert to Gear Group
     gearType  <- read.table("gearCode.txt", header=T, sep="\t")
@@ -335,51 +337,80 @@ tableMarks <- function(DF)
 # ------------------------------------------------------------------------------- #
 # Create LSMR datafile
 # ------------------------------------------------------------------------------- #
-write.LSMRdatafile <- function()
+write.LSMRdatafile <- function(DF, ...)
 {
-	dfn <- "../../ADMB/srcLSMR/HBC2011.dat"
+	dfn <- "../../ADMB/srcLSMR/HBC2011qtr.dat"
 	gr  <- c("HOOP", "GILL")
 	
-	C   <- tableLf(DF)        # Total number of captures C[year, length]
-	MR  <- tableMarks(DF)     # Total number of markes released and recaptured.
+	# Melt dataframe 
+	DFm <- melt(DF, id=c("YEAR","MONTH","QTR","TRIP_ID","RECAP","XI","GROUP"), na.rm=TRUE)
+	
+	# Cast DFm to extract Catch-at-length,  Marks-at-length
+	C   <- cast(DFm,YEAR + QTR~XI|GROUP,length,subset=variable=="TL", add.missing=TRUE)
+	M   <- cast(DFm[DFm$RECAP==FALSE, ], YEAR+QTR~XI|GROUP, length, subset=variable=="TL", add.missing=TRUE)
+	R   <- cast(DFm[DFm$RECAP==TRUE, ], YEAR+QTR~XI|GROUP, length, subset=variable=="TL", add.missing=TRUE)
+	E   <- cast(DFm, YEAR+QTR~GROUP, function(x) length(unique(x)),subset=variable=="START_DATETIME", add.missing=TRUE)
+	E   <- E[1:92, ]
+	# Plot the data to be used
+	plot.b <- function(X)
+	{
+		yr <- seq(1989, 2011.75, by=0.25)
+		plotBubbles(t(X[,-1:-2]),xval=yr,yval=colnames(X[,-1:-2]), prettyaxis=TRUE
+		           , hide0=T,size=0.15,frange=0.01,cpro=FALSE,powr=1
+		           , xlab="Year", ylab="Size class (Total Length mm)")
+	}
+	graphics.off()
+	quartz(width=9,height=6.5)
+	plot.b(C$HOOP); dev.copy2pdf(file="../../FIGS/LSMR/DATA/fig:Hoop_C.pdf", width=9, height=6.5)
+	plot.b(M$HOOP); dev.copy2pdf(file="../../FIGS/LSMR/DATA/fig:Hoop_M.pdf", width=9, height=6.5)
+	plot.b(R$HOOP); dev.copy2pdf(file="../../FIGS/LSMR/DATA/fig:Hoop_R.pdf", width=9, height=6.5)
+	
+	plot.b(C$GILL); dev.copy2pdf(file="../../FIGS/LSMR/DATA/fig:Gill_C.pdf", width=9, height=6.5)
+	plot.b(M$GILL); dev.copy2pdf(file="../../FIGS/LSMR/DATA/fig:Gill_M.pdf", width=9, height=6.5)
+	plot.b(R$GILL); dev.copy2pdf(file="../../FIGS/LSMR/DATA/fig:Gill_R.pdf", width=9, height=6.5)
+	
+	# Effort
+	barplot(rbind(E$HOOP,E$GILL),beside=T,names.arg=paste(yr)
+	       , xlab="Year", ylab="Effort (number of sets)",
+	       , legend.text=c("Hoop","Tramel net"), args.legend=list(x="top", bty="n") )
+	dev.copy2pdf(file="../../FIGS/LSMR/DATA/fig:Effort.pdf", width=9, height=6.5)
+	
+	# Get index for gears
 	ic  <- names(C) %in% gr
-	im  <- names(MR) %in% gr
+	im  <- names(M) %in% gr
+	ir  <- names(R) %in% gr
+	
+	# Ensure R matrix and M matrix have the same dimensions at C
+	ii  <- colnames(C$HOOP) %in% colnames(R$HOOP)
+	tmp <- C$HOOP; tmp[, ii] <- R$HOOP; tmp[, !ii] <- 0; R$HOOP <- tmp
+	ii  <- colnames(C$GILL) %in% colnames(R$GILL)
+	tmp <- C$GILL; tmp[, ii] <- R$GILL; tmp[, !ii] <- 0; R$GILL <- tmp
+	
+	
 	
 	write("#Data for HBC 1989:2011", file=dfn)
 	write("#syr, nyr, dt", file=dfn, append=TRUE)
-	write(c(1989, 2011, 1), file=dfn, append=TRUE)
+	write(c(1989, 2011, 1/4), file=dfn, append=TRUE)
 	write("#Number of gears",file=dfn, append=TRUE)
 	write(length(gr), file=dfn, append=TRUE)
-	xbin = seq(50, 500, by=10)/10
+	xbin = as.numeric(colnames(C$HOOP)[-1:-2])/10  #units cm
 	write("#nbin", file=dfn, append=TRUE)
 	write(length(xbin), file=dfn, append=TRUE)
 	write("#xbin", file=dfn, append=TRUE)
 	write(xbin, file=dfn, append=TRUE)
 	
-	write("#Array dimensions(C)", file=dfn, append=TRUE)
+	write("#Array dimensions (rows,  cols) for each gear in (C M R)", file=dfn, append=TRUE)
 	write.table(matrix(unlist(lapply(C[ic],dim)),nrow=2,byrow=TRUE),file=dfn,row.names=F, col.names=FALSE, append=TRUE)
-	write("#Array dimensions(MR)", file=dfn, append=TRUE)
-	write.table(matrix(unlist(lapply(MR[im],dim)),nrow=2,byrow=TRUE),file=dfn,row.names=F, col.names=FALSE,  append=TRUE)
-	
-	write("#Length Intervals for (C)", file=dfn, append=TRUE)
-	x = lapply(C[ic],colnames)
-	for(i in 1:length(x))
-	  write(as.numeric(x[[i]][-1])/10, file=dfn, append=TRUE)
-	write("#Length Intervals for (MR)", file=dfn, append=TRUE)
-	write(as.numeric(colnames(MR$GILL[,,1]))/10, file=dfn, append=TRUE)
-	write(as.numeric(colnames(MR$HOOP[,,1]))/10, file=dfn, append=TRUE)
-	
+
+	#order is GILL then HOOP		
 	write("#Captures by year (row) and length (col)", file=dfn, append=TRUE)
-	lapply(C[ic],write.table,file=dfn,row.names=F,col.names=F,append=T)
-	#order is GILL then HOOP
+	lapply(C[ic],write.table,file=dfn,row.names=F,col.names=F, quote=F,append=T)
+
 	write("#Marks by year (row) and length (col)", file=dfn, append=TRUE)
-	write.table(MR$GILL[,,1],file=dfn, col.names=F,quote=F, append=TRUE)
-	write.table(MR$HOOP[,,1],file=dfn, col.names=F,quote=F, append=TRUE)
-
+	lapply(M[im],write.table,file=dfn,row.names=F,col.names=F, quote=F,append=T)
+	
 	write("#Recaps by year (row) and length (col)", file=dfn, append=TRUE)
-	write.table(MR$GILL[,,2],file=dfn, col.names=F,quote=F, append=TRUE)
-	write.table(MR$HOOP[,,2],file=dfn, col.names=F,quote=F, append=TRUE)
-
+	lapply(R[ir],write.table,file=dfn,row.names=F,col.names=F, quote=F,append=T)
 	
 	write("#End of file", file=dfn, append=TRUE)
 	write(999, file=dfn, append=TRUE)
