@@ -529,7 +529,17 @@ FUNCTION calcNewMarksAndRecaptures
 	
 	cout<<"calcNewMarksAndRecaptures"<<endl;
 	//
-	//int i,j,k,t,im,ik,jj;
+	int i,j,k;
+	Chat.initialize();
+	Mhat.initialize();
+	Rhat.initialize();
+	T.initialize();
+	
+	for(k=1;k<=ngear;k++)
+	{
+		
+	}
+	
 	//ivector iyr(1,ngear);
 	//
 	///* Match index for size bins in the model with those in the data. */
@@ -540,10 +550,6 @@ FUNCTION calcNewMarksAndRecaptures
 	//}
 	//
 	//dvariable ftmp;
-	//Chat.initialize();
-	//Mhat.initialize();
-	//Rhat.initialize();
-	//T.initialize();
 	//dvar_vector zx(1,nx);
 	//dvar_vector ox(1,nx);
 	//dvar_vector newMarks(1,nx);
