@@ -379,6 +379,7 @@ write.LSMRdatafile <- function(DF, ...)
 	ic  <- names(C) %in% gr
 	im  <- names(M) %in% gr
 	ir  <- names(R) %in% gr
+	ie  <- names(E) %in% gr
 	
 	# Ensure R matrix and M matrix have the same dimensions at C
 	ii  <- colnames(C$HOOP) %in% colnames(R$HOOP)
@@ -401,6 +402,10 @@ write.LSMRdatafile <- function(DF, ...)
 	
 	write("#Array dimensions (rows,  cols) for each gear in (C M R)", file=dfn, append=TRUE)
 	write.table(matrix(unlist(lapply(C[ic],dim)),nrow=2,byrow=TRUE),file=dfn,row.names=F, col.names=FALSE, append=TRUE)
+
+	# effort data (# of sets)
+	write("#Number of sets by gear for each time step", file=dfn, append=TRUE)
+	lapply(E[ie], write, file=dfn, append=TRUE)
 
 	#order is GILL then HOOP		
 	write("#Captures by year (row) and length (col)", file=dfn, append=TRUE)

@@ -55,6 +55,7 @@ DATA_SECTION
 	END_CALCS
 	
 	!! ad_comm::change_datafile_name(data_file);
+	!! cout<<" TOP OF DATA_SECTION "<<endl;
 	
 	// Read input data from data file //
 	init_int syr;   	// first year
@@ -62,54 +63,66 @@ DATA_SECTION
 	init_number dt; 	// time-step
 	init_int ngear; 	// number of gears
 	init_int nbin;		// number of length intervals
-	
 	init_vector xbin(1,nbin);  //length-intervals (not mid-points)
 	
 	int nx;			//number of length bins (nbin-1)
 	int nr;			//number of rows in predicted arrays
 	!! nr = int((nyr-syr+1)/dt);
-	!! nx = nbin-1;
-	vector xmid(1,nx);
-	!! xmid = xbin(1,nbin-1)+0.5*first_difference(xbin);
+	!! nx = nbin;
+	vector xmid(1,nbin);
+	!! xmid = xbin + 0.5*(xbin(2)-xbin(1));
 		
 	// Array dimensions //
-	int fi_count;
-	init_imatrix C_dim(1,ngear,1,2);
-	init_imatrix MR_dim(1,ngear,1,3);
-	ivector irow_C(1,ngear);
-	ivector jcol_C(1,ngear);
-	ivector irow_MR(1,ngear);
-	ivector jcol_MR(1,ngear);
+	init_imatrix dim_array(1,ngear,1,2);
+	ivector irow(1,ngear);
+	ivector ncol(1,ngear);
+	ivector jcol(1,ngear);
 	LOC_CALCS
-		irow_C  = column(C_dim,1);
-		jcol_C  = column(C_dim,2);
-		irow_MR = column(MR_dim,1);
-		jcol_MR = column(MR_dim,2);
-		
-		/* number of capture probability deviates */
-		fi_count = sum(irow_C);
+		irow = column(dim_array,1);
+		ncol = column(dim_array,2);
+		jcol = ncol - 2;
 	END_CALCS
-
-	// Length Intervals for data //
-	init_imatrix x_C(1,ngear,1,jcol_MR);
-	init_imatrix x_MR(1,ngear,1,jcol_MR);
+	// Read in effort data (number of sets) //
+	init_matrix effort(1,ngear,1,irow);
 	
 	// Read in Capture, Mark, and Recapture arrays //
-	init_3darray i_C(1,ngear,1,irow_C,1,jcol_C);
-	init_3darray i_M(1,ngear,1,irow_C,1,jcol_C);
-	init_3darray i_R(1,ngear,1,irow_C,1,jcol_C);
-	
-	//init_matrix i_C(1,nrow,1,ncol); //Catch-at-length
-	//init_matrix i_M(1,nrow,1,ncol); //New Marks-at-length
-	//init_matrix i_R(1,nrow,1,ncol); //Recaptures-at-length
-	
-	
-	// colsums of Catch-at-length //
-	matrix ct(1,ngear,1,irow_C); 
+	init_3darray i_C(1,ngear,1,irow,1,ncol);
+	init_3darray i_M(1,ngear,1,irow,1,ncol);
+	init_3darray i_R(1,ngear,1,irow,1,ncol);	
+
+	3darray C(1,ngear,1,irow,1,jcol);
+	3darray M(1,ngear,1,irow,1,jcol);
+	3darray R(1,ngear,1,irow,1,jcol);	
+
 	
 	init_int eof;
 	!! if(eof!=999){cout<<"Error reading data\n eof = "<<eof<<endl; exit(1);}
-	!! cout<< "____ End of Data file! ____\n"<<endl;
+	
+	
+	
+	int fi_count;
+	// colsums of Catch-at-length //
+	matrix ct(1,ngear,1,irow); 
+	
+	LOC_CALCS
+		/* number of capture probability deviates */
+		int i,k;
+		fi_count=0;
+		for(k=1;k<=ngear;k++)
+		{
+			for(i=1;i<=irow(k);i++)
+			{
+				if( effort(k,i) > 0 ) fi_count++;
+				C(k)(i) = i_C(k)(i)(3,ncol(k)).shift(1);
+				M(k)(i) = i_M(k)(i)(3,ncol(k)).shift(1);
+				R(k)(i) = i_R(k)(i)(3,ncol(k)).shift(1);
+				ct(k,i) = sum( C(k)(i) );
+			}
+		}
+	END_CALCS
+	
+	
+	
 	
 	
 	!! ad_comm::change_datafile_name(control_file);
@@ -138,45 +151,45 @@ DATA_SECTION
 	
 	
 	// Pre-processing some of the data.
-	imatrix j_min(1,ngear,1,irow_MR);
-	3darray C(1,ngear,1,irow_C,1,jcol_MR);
-	3darray M(1,ngear,1,irow_MR,1,jcol_MR);
-	3darray R(1,ngear,1,irow_MR,1,jcol_MR);
-	LOC_CALCS
-		int i,j,k;
-		
-		for(k=1;k<=ngear;k++)
-		{
-			for(i=1;i<=irow_C(k);i++)
-			{
-				C(k)(i) = i_C(k)(i)(2,jcol_C(k)).shift(1);
-				ct(k,i) = sum(C(k)(i));
-			}
-			
-			for(i=1;i<=irow_MR(k);i++)
-			{
-				M(k)(i) = i_M(k)(i)(2,jcol_C(k)).shift(1);
-				R(k)(i) = i_R(k)(i)(2,jcol_C(k)).shift(1);
-				//set up index for minimum size for tagging fish.
-				for(j=1;j<=jcol_MR(k);j++)
-				{
-					if( M(k)(i,j)>0 || xbin(j) > flag(1) )
-					{
-						j_min(k)(i)=j;
-						break;
-					}
-				}
-			}
-		}
-	END_CALCS
+	imatrix j_min(1,ngear,1,irow);
+	//3darray C(1,ngear,1,irow_C,1,jcol_MR);
+	//3darray M(1,ngear,1,irow_MR,1,jcol_MR);
+	//3darray R(1,ngear,1,irow_MR,1,jcol_MR);
+	//LOC_CALCS
+	//	int i,j,k;
+	//	
+	//	for(k=1;k<=ngear;k++)
+	//	{
+	//		for(i=1;i<=irow_C(k);i++)
+	//		{
+	//			C(k)(i) = i_C(k)(i)(2,jcol_C(k)).shift(1);
+	//			ct(k,i) = sum(C(k)(i));
+	//		}
+	//		
+	//		for(i=1;i<=irow_MR(k);i++)
+	//		{
+	//			M(k)(i) = i_M(k)(i)(2,jcol_C(k)).shift(1);
+	//			R(k)(i) = i_R(k)(i)(2,jcol_C(k)).shift(1);
+	//			//set up index for minimum size for tagging fish.
+	//			for(j=1;j<=jcol_MR(k);j++)
+	//			{
+	//				if( M(k)(i,j)>0 || xbin(j) > flag(1) )
+	//				{
+	//					j_min(k)(i)=j;
+	//					break;
+	//				}
+	//			}
+	//		}
+	//	}
+	//END_CALCS
 	
 	// Variables for Simulated Data
 	vector true_Nt(syr,nyr);
 	vector true_Rt(syr,nyr);
 	vector true_Tt(syr,nyr);
-	matrix true_fi(1,ngear,1,irow_C);
+	matrix true_fi(1,ngear,1,irow);
 	
-	!! cout<<"**** END OF DATA SECTION ****"<<endl;
+	!! cout<< " END OF DATA_SECTION \n"<<endl;
 	
 	
 PARAMETER_SECTION
@@ -218,17 +231,17 @@ PARAMETER_SECTION
 	vector rx(1,nx);		// size pdf for new recruits
 	
 	vector log_rt(syr+1,nyr);
-	matrix fi(1,ngear,1,irow_C);// capture probability in period i.
-	matrix sx(1,ngear,1,jcol_MR);	// Selectivity at length xmid
+	matrix fi(1,ngear,1,irow);// capture probability in period i.
+	matrix sx(1,ngear,1,jcol);	// Selectivity at length xmid
 	matrix N(1,nr,1,nx);		// Numbers(time step, length bins)
 	matrix T(1,nr,1,nx);		// Marks-at-large (time step, length bins)
 	matrix P(1,nx,1,nx);		// Size-Transition Matrix
 	
 	// Predicted observations //
-	matrix hat_ct(1,ngear,1,irow_C);			// Predicted total catch
-	3darray Chat(1,ngear,1,irow_C,1,jcol_MR);	// Predicted catch-at-length
-	3darray Mhat(1,ngear,1,irow_C,1,jcol_MR);	// Predicted new marks-at-length
-	3darray Rhat(1,ngear,1,irow_C,1,jcol_MR);	// Predicted recaptures-at-length
+	matrix hat_ct(1,ngear,1,irow);			// Predicted total catch
+	3darray Chat(1,ngear,1,irow,1,jcol);	// Predicted catch-at-length
+	3darray Mhat(1,ngear,1,irow,1,jcol);	// Predicted new marks-at-length
+	3darray Rhat(1,ngear,1,irow,1,jcol);	// Predicted recaptures-at-length
 	
 	
 	
@@ -255,14 +268,16 @@ PRELIMINARY_CALCS_SECTION
 
 
 PROCEDURE_SECTION
-	cout<<"Top of Procedure Section"<<endl;
-	initParameters();
-	calcSurvivalAtLength();
-	calcSizeTransitionMatrix();
-	initializeModel();
+	cout<<"\n TOP OF PROCEDURE_SECTION "<<endl;
+	initParameters();  
+	calcSurvivalAtLength(); 
+	calcSizeTransitionMatrix(); 
+	initializeModel();cout<<"OK HERE"<<endl;
 	calcNumbersAtLength();
 	calcSelectivityAtLength();
 	calcNewMarksAndRecaptures();
+	
+	cout<<"\n END OF PROCEDURE_SECTION "<<endl;
 //		
 //	//calc_catch_at_length();
 //	calc_objective_function();
@@ -358,7 +373,7 @@ FUNCTION calcSizeTransitionMatrix
 	This function calls the necessary routines to compute the Size Transition Matrix (P)
 	*/
 	
-	P = calcLTM(xbin,l_infty,vbk,beta);
+	P = calcLTM(xmid,l_infty,vbk,beta);
   }
 //
 FUNCTION initializeModel
@@ -381,7 +396,6 @@ FUNCTION initializeModel
 		N(1) = elem_prod(N(1),mfexp(-mx)) * P + init_r;
 	}
 	
-	
 	/* Annual recruitment */
 	log_rt = log_bar_r + bar_r_devs;
 	
@@ -390,9 +404,12 @@ FUNCTION initializeModel
 	ik = 1;
 	for(k=1;k<=ngear;k++)
 	{
-		for(i=1;i<=irow_C(k);i++)
+		for(i=1;i<=irow(k);i++)
 		{
-			fi(k,i)  = mfexp(log_bar_f + bar_f_devs(ik++));
+			if( effort(k,i)>0 )
+			{
+				fi(k,i)  = mfexp(log_bar_f + bar_f_devs(ik++));
+			}
 		}
 	}
 
@@ -422,7 +439,7 @@ FUNCTION calcSelectivityAtLength
 	for(k=1;k<=ngear;k++)
 	{
 		//sx(k) = 1./(1+mfexp(-(xmid-lx(k))/gx(k)));
-		sx(k) = plogis(x_C(k),lx(k),gx(k));
+		sx(k) = plogis(xmid,lx(k),gx(k));
 	}
 	
 	//cout<<sx<<endl;
@@ -508,66 +525,69 @@ FUNCTION calcNewMarksAndRecaptures
 		-3) get corresponding col index for C, M, and R for gear k
 	
 	*/
+	
+	
 	cout<<"calcNewMarksAndRecaptures"<<endl;
-	int i,j,k,t,im,ik,jj;
-	ivector iyr(1,ngear);
-	
-	/* Match index for size bins in the model with those in the data. */
-	imatrix ix(1,ngear,1,jcol_MR);
-	for(k=1;k<=ngear;k++)
-	{
-		ix(k) = match(x_MR(k),xbin);
-	}
-	
-	dvariable ftmp;
-	Chat.initialize();
-	Mhat.initialize();
-	Rhat.initialize();
-	T.initialize();
-	dvar_vector zx(1,nx);
-	dvar_vector ox(1,nx);
-	dvar_vector newMarks(1,nx);
-	
-	i   = 0;
-	ik  = 0;
-	iyr = 1;
-	zx  = mx*dt;
-	ox  = 1.0-mfexp(-zx);
-	for(t=syr;t<=nyr;t++)
-	{
-		for(im=1;im<=int(1/dt);im++)
-		{
-			i++;	// index for row of N and T
-			newMarks = 0;
-			for(k=1;k<=ngear;k++)
-			{
-				if( i_C(k)(iyr(k))(1)==t && iyr(k)<=irow_C(k) )
-				{
-					ftmp = fi(k,iyr(k));
-					
-					dvar_vector t1 = elem_prod( ftmp*sx(k),ox(ix(k)) );
-					dvar_vector t2 = elem_div( N(i)(ix(k)),zx(ix(k)) );
-					dvar_vector t3 = elem_div( T(i)(ix(k)),zx(ix(k)) );
-					
-					Chat(k)(iyr(k)) = elem_prod(t1,t2);
-					Rhat(k)(iyr(k)) = elem_prod(t1,t3);
-					
-					//jx              = j_min(k,iyr(k));
-					//Mhat(k)(iyr(k))(jx,nx) = 
-					
-					//T(i) = 1.0;//T(i)(ix(k)) + Mhat(k)(iyr(k));
-					
-					//cout<<T(i)<<endl;
-					if(iyr(k) < irow_C(k)) iyr(k) ++;
-				}
-				
-			}
-			if( i<nr )
-			{
-				T(i+1) = elem_prod(T(i),mfexp(-zx)) * P + newMarks;
-			}
-		}
-	}
+	//
+	//int i,j,k,t,im,ik,jj;
+	//ivector iyr(1,ngear);
+	//
+	///* Match index for size bins in the model with those in the data. */
+	//imatrix ix(1,ngear,1,jcol_MR);
+	//for(k=1;k<=ngear;k++)
+	//{
+	//	ix(k) = match(x_MR(k),xbin);
+	//}
+	//
+	//dvariable ftmp;
+	//Chat.initialize();
+	//Mhat.initialize();
+	//Rhat.initialize();
+	//T.initialize();
+	//dvar_vector zx(1,nx);
+	//dvar_vector ox(1,nx);
+	//dvar_vector newMarks(1,nx);
+	//
+	//i   = 0;
+	//ik  = 0;
+	//iyr = 1;
+	//zx  = mx*dt;
+	//ox  = 1.0-mfexp(-zx);
+	//for(t=syr;t<=nyr;t++)
+	//{
+	//	for(im=1;im<=int(1/dt);im++)
+	//	{
+	//		i++;	// index for row of N and T
+	//		newMarks = 0;
+	//		for(k=1;k<=ngear;k++)
+	//		{
+	//			if( i_C(k)(iyr(k))(1)==t && iyr(k)<=irow_C(k) )
+	//			{
+	//				ftmp = fi(k,iyr(k));
+	//				
+	//				dvar_vector t1 = elem_prod( ftmp*sx(k),ox(ix(k)) );
+	//				dvar_vector t2 = elem_div( N(i)(ix(k)),zx(ix(k)) );
+	//				dvar_vector t3 = elem_div( T(i)(ix(k)),zx(ix(k)) );
+	//				
+	//				Chat(k)(iyr(k)) = elem_prod(t1,t2);
+	//				Rhat(k)(iyr(k)) = elem_prod(t1,t3);
+	//				
+	//				//jx              = j_min(k,iyr(k));
+	//				//Mhat(k)(iyr(k))(jx,nx) = 
+	//				
+	//				//T(i) = 1.0;//T(i)(ix(k)) + Mhat(k)(iyr(k));
+	//				
+	//				//cout<<T(i)<<endl;
+	//				if(iyr(k) < irow_C(k)) iyr(k) ++;
+	//			}
+	//			
+	//		}
+	//		if( i<nr )
+	//		{
+	//			T(i+1) = elem_prod(T(i),mfexp(-zx)) * P + newMarks;
+	//		}
+	//	}
+	//}
 	//cout<<Chat(1)<<endl;
 	/*for(i=1;i<=nrow;i++)
 		{
@@ -798,6 +818,8 @@ FUNCTION dvar_matrix calcLTM(dvector& x, const dvariable &linf, const dvariable 
   {
 	/*This function computes the length transition matrix.*/
 	/*
+	- x is the mid points of the length interval vector.
+	
 	- cumd_gamma(x,a) is the same as Igamma(a,x) in R.
 	- If length interval > linf, then assume now further growth.
 	- Note the use of posfun to ensure differentiable.
@@ -805,35 +827,31 @@ FUNCTION dvar_matrix calcLTM(dvector& x, const dvariable &linf, const dvariable 
 	RETURN_ARRAYS_INCREMENT();
 	int i,j;
 	double dx;
+	double bw = 0.5*(x(2)-x(1));
 	int n = size_count(x);     //number of length intervals
-	dvar_vector alpha(1,n-1);
-	dvar_matrix P(1,n-1,1,n-1);
+	dvar_vector alpha(1,n);
+	dvar_matrix P(1,n,1,n);
 	P.initialize();
 	
 	//Growth increment
-	dvariable pen;
-	dvar_vector xm(1,n-1);
-	dvar_vector dl(1,n-1);
-	xm = x(1,n-1)+0.5*first_difference(x);
-	for(j=1;j<=n-1;j++)
+	dvar_vector dl(1,n);
+	for(j=1;j<=n;j++)
 	{
-		//dvariable t2=posfun(linf-xm(j),1./n,pen);
-		//dl(j) = (t2)*(1.-exp(-k*dt));
-		dl(j) = log(mfexp( (linf-xm(j))*(1.-mfexp(-k*dt)) )+1.0);
+		dl(j) = log(mfexp( (linf-x(j))*(1.-mfexp(-k*dt)) )+1.0);
 	}
 	alpha = dl/beta;
 	
-	
-	for(i=1;i<=n-1;i++)
+	/* Size transition probability */
+	for(i=1;i<=n;i++)
 	{
 		dvar_vector t1(i,n);
 		for(j=i;j<=n;j++)
 		{
 			dx = x(j)-x(i);
-			//cout<<j<<" "<<x(i)<<" "<<x(j)<<" "<<cumd_gamma(dx,alpha(i))<<endl;
-			t1(j) = cumd_gamma(dx,alpha(i));
+			P(i)(j) = cumd_gamma(dx+bw,alpha(i)) - cumd_gamma(dx-bw,alpha(i));
+			//cout<<j<<" "<<x(i)<<" "<<x(j)<<" "<<P(i)(j)<<endl;
 		}
-		P(i)(i,n-1) = first_difference(t1);
+		//P(i)(i,n-1) = first_difference(t1);
 		P(i) /= sum(P(i));
 	}
 	RETURN_ARRAYS_DECREMENT();
