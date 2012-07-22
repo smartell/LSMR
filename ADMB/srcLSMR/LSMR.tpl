@@ -80,13 +80,13 @@ DATA_SECTION
 	LOC_CALCS
 		irow = column(dim_array,1);
 		ncol = column(dim_array,2);
-		jcol = ncol - 2;
+		jcol = ncol - 1;
 	END_CALCS
 	// Read in effort data (number of sets) //
 	init_matrix effort(1,ngear,1,irow);
 	vector mean_effort(1,ngear);
 	LOC_CALCS
-		/* Normalize effort to have a mean of 1.0*/
+		/* Calculate mean effort for each gear, ignore 0*/
 		int i,k,n;
 		for(k=1;k<=ngear;k++)
 		{
@@ -115,7 +115,7 @@ DATA_SECTION
 	
 	init_int eof;
 	!! if(eof!=999){cout<<"Error reading data\n eof = "<<eof<<endl; exit(1);}
-	
+	!! cout<<" - END OF READING DATA"<<endl;
 	
 	
 	int fi_count;
@@ -130,15 +130,13 @@ DATA_SECTION
 			for(i=1;i<=irow(k);i++)
 			{
 				if( effort(k,i) > 0 ) fi_count++;
-				C(k)(i) = i_C(k)(i)(3,ncol(k)).shift(1);
-				M(k)(i) = i_M(k)(i)(3,ncol(k)).shift(1);
-				R(k)(i) = i_R(k)(i)(3,ncol(k)).shift(1);
+				C(k)(i) = i_C(k)(i)(2,ncol(k)).shift(1);
+				M(k)(i) = i_M(k)(i)(2,ncol(k)).shift(1);
+				R(k)(i) = i_R(k)(i)(2,ncol(k)).shift(1);
 				ct(k,i) = sum( C(k)(i) );
 			}
 		}
 	END_CALCS
-	
-	
 	
 	
 	// OPEN CONTROL FILE //
@@ -216,8 +214,8 @@ PARAMETER_SECTION
 	//Mean fishing mortality rates
 	init_vector log_bar_f(1,ngear,2);
 	
-	//Catchability parameters
-	vector log_qk(1,ngear);
+	//Overdispersion
+	init_vector log_tau(1,ngear,5);
 	
 	//Selectivity parameters
 	init_vector log_lx(1,ngear,3);
@@ -239,7 +237,7 @@ PARAMETER_SECTION
 	
 	number m_linf;
 	number fpen;
-	
+	vector tau(1,ngear);	// over-dispersion parameters >1.0
 	vector lx(1,ngear);		// length at 50% selectivity
 	vector gx(1,ngear);		// std in length at 50% selectivity
 	vector qk(1,ngear);		// catchability of gear k
@@ -253,7 +251,7 @@ PARAMETER_SECTION
 	matrix N(syr,nyr,1,nx);		// Numbers(time step, length bins)
 	matrix T(syr,nyr,1,nx);		// Marks-at-large (time step, length bins)
 	matrix A(1,nx,1,nx);		// Size-transitin matrix (annual step)
-	matrix P(1,nx,1,nx);		// Size-Transition Matrix for step dt
+	//matrix P(1,nx,1,nx);		// Size-Transition Matrix for step dt
 	
 	// Predicted observations //
 	matrix hat_ct(1,ngear,1,irow);			// Predicted total catch
@@ -269,6 +267,7 @@ INITIALIZATION_SECTION
 	log_lx    2.3;
 	log_gx    0.2;
 	log_bar_f -2.3;
+	log_tau   1.1;
 
 RUNTIME_SECTION
     maximum_function_evaluations 500,1500,2500,25000,25000
@@ -289,14 +288,15 @@ PRELIMINARY_CALCS_SECTION
 
 PROCEDURE_SECTION
 	if( flag(1) ) cout<<"\n TOP OF PROCEDURE_SECTION "<<endl;
-	fpen = 0;
+	fpen.initialize();
 	initParameters();  
 	calcSurvivalAtLength(); 
 	calcSizeTransitionMatrix(); 
 	initializeModel();
+	calcCaptureProbability();
 	calcNumbersAtLength();
 	calcSelectivityAtLength();
-	calcTagObservations();
+	calcObservations();
 	calc_objective_function();
 	if( flag(1) ) cout<<"\n END OF PROCEDURE_SECTION "<<endl;
 
@@ -314,9 +314,9 @@ FUNCTION void runSimulationModel(const int& seed)
 	tmp_bar_r_devs.fill_randn(rng);
 	tmp_bar_f_devs.fill_randn(rng);
 	
-	ddot_r_devs = 0.0*tmp_ddot_r_devs;
-	bar_r_devs  = 0.0*tmp_bar_r_devs;
-	bar_f_devs  = 0.0*tmp_bar_f_devs;
+	ddot_r_devs = 0.6*tmp_ddot_r_devs;
+	bar_r_devs  = 0.6*tmp_bar_r_devs;
+	bar_f_devs  = 0.2*tmp_bar_f_devs;
 	/* Capture probabilities */
 	
 	
@@ -324,10 +324,10 @@ FUNCTION void runSimulationModel(const int& seed)
 	calcSurvivalAtLength();
 	calcSizeTransitionMatrix();
 	initializeModel();
+	calcCaptureProbability();
 	calcNumbersAtLength();
 	calcSelectivityAtLength();
 	calcObservations();
-	calcTagObservations();
 	
 	
 	/* Overwrite observations and draw from multinomial distribution */
@@ -339,14 +339,23 @@ FUNCTION void runSimulationModel(const int& seed)
 	{
 		for(i=1;i<=irow(k);i++)
 		{
-			ct(k,i) = sum(C(k)(i));
-			C(k)(i)  = rmultinom(rng,int(ct(k,i)),C(k)(i));
-			M(k)(i)  = rmultinom(rng,int(sum(M(k)(i))),M(k)(i));
-			R(k)(i)  = rmultinom(rng,int(sum(R(k)(i))),R(k)(i));
-				
-			i_C(k)(i)(3,ncol(k)) = C(k)(i)(1,nx).shift(3);
-			i_M(k)(i)(3,ncol(k)) = M(k)(i)(1,nx).shift(3);
-			i_R(k)(i)(3,ncol(k)) = R(k)(i)(1,nx).shift(3);
+			//ct(k,i) = sum(C(k)(i));
+			//C(k)(i)  = rmultinom(rng,int(ct(k,i)),C(k)(i));
+			//M(k)(i)  = rmultinom(rng,int(sum(M(k)(i))),M(k)(i));
+			//R(k)(i)  = rmultinom(rng,int(sum(R(k)(i))),R(k)(i));
+			if(effort(k,i)>0)
+			{
+				for(j=1;j<=nx;j++)
+				{
+					C(k)(i)(j) = randnegbinomial(1.e-5+C(k)(i)(j),2.0,rng);
+					M(k)(i)(j) = randnegbinomial(1.e-5+M(k)(i)(j),2.0,rng);
+					R(k)(i)(j) = randnegbinomial(1.e-5+R(k)(i)(j),2.0,rng);
+				}
+			}
+			
+			i_C(k)(i)(2,ncol(k)) = C(k)(i)(1,nx).shift(2);
+			i_M(k)(i)(2,ncol(k)) = M(k)(i)(1,nx).shift(2);
+			i_R(k)(i)(2,ncol(k)) = R(k)(i)(1,nx).shift(2);
 			
 		}		
 	}
@@ -380,7 +389,7 @@ FUNCTION initParameters
 	cv_r       = theta(8);
 	//for(k=1;k<=ngear;k++)
 	//{
-	//	bar_f(k)  = theta(8+k);
+	//	log_bar_f(k)  = theta(8+k);
 	//}
 	
 	
@@ -400,7 +409,7 @@ FUNCTION calcSizeTransitionMatrix
 	This function calls the necessary routines to compute the Size Transition Matrix (P)
 	*/
 	A = calcLTM(xmid,l_infty,vbk,beta);
-	P = calcLTM(xmid,l_infty,vbk,beta/dt);
+	//P = calcLTM(xmid,l_infty,vbk,beta/dt);
   }
 //
 FUNCTION initializeModel
@@ -437,8 +446,12 @@ FUNCTION initializeModel
 	
 	/* Annual recruitment */
 	log_rt = log_bar_r + bar_r_devs;
-		
-	/* Sampling effort at each time step. */
+  }
+//
+FUNCTION calcCaptureProbability		
+  {
+	/* Capture probability at each time step. */
+	int i,k,ik;
 	ik = 1;
 	fi.initialize();
 	for(k=1;k<=ngear;k++)
@@ -526,6 +539,7 @@ FUNCTION calcObservations
 	int t,its,k,i,lb;
 	dvar_vector Ntmp(1,nx);
 	dvar_vector Ttmp(1,nx);
+	dvar_vector Utmp(1,nx);
 	dvar_vector Mtmp(1,nx);
 	dvar_vector zx(1,nx);
 	dvar_vector ox(1,nx);
@@ -539,199 +553,31 @@ FUNCTION calcObservations
 	{
 		Ntmp = N(t);
 		Ttmp = T(t);
-		
-		for(its=1;its<=int(1/dt);its++)
-		{
-			i++;
-			Mtmp.initialize();
-			for(k=1;k<=ngear;k++)
-			{
-				if(effort(k,i)>0)
-				{
-					ux                = 1.0 - mfexp(-fi(k,i)*sx(k));
-					Chat(k)(i)        = elem_prod(ux,elem_prod(Ntmp,ox));
-					Rhat(k)(i)        = elem_prod(ux,elem_prod(Ttmp,ox));
-					lb                = min_tag_j(k)(i);
-					Mhat(k)(i)(lb,nx) = (Chat(k)(i) - R(k)(i))(lb,nx);
-					//Ttmp(lb,nx)       = Ttmp(lb,nx) + Mhat(k)(i)(lb,nx);
-					Mtmp(lb,nx)         = Mtmp(lb,nx) + Mhat(k)(i)(lb,nx);
-				}
-			}
-			Ntmp = elem_prod(Ntmp,mfexp(-zx))*P;
-			Ttmp = elem_prod(Ttmp,mfexp(-zx))*P + Mtmp;
-			cout<<"its "<<its<<" Nt "<<sum(Ntmp)<<endl;
-			T(t)+= Mtmp;
-			if( its == int(1/dt) && t!=nyr )
-			{
-				T(t+1) = elem_prod(T(t),mfexp(-mx))*A;
-			}
-		}
-		
-	}
-	
-	cout<<Rhat(1)<<endl;
-	exit(1);
-  }
-
-FUNCTION calcTagObservations
-  {
-	/*	This function uses the numbers at length each year and
-		predicts the total number of fish captured, how many
-		new marks are applied, and at any given time step (tau).
-		
-		ALGORITHM:
-		The algorithm works as follows.  For each row in the observed
-		catch data series (where there is a non-zero fishing effort),
-		the year is determined (iyr) and the total number of fish both
-		tagged and untagged is set to Ntmp.
-		
-		i = index for row of data
-		j = index for length interval
-		k = index for gear.
-		iyr = index for year in N and T matrixes
-		its = index for time step 
-	*/
-	int i,j,k,iyr,oyr,its,jts,lb;
-	dvar_vector Ntmp(1,nx);
-	dvar_vector Ttmp(1,nx);
-	dvar_vector Utmp(1,nx);  // number of untagged fish at large.
-	dvar_vector zx(1,nx);
-	dvar_vector ox(1,nx);
-	dvar_vector t1(1,nx);
-	dvar_vector t2(1,nx);
-	dvar_vector t3(1,nx);
-	dvar_vector t4(1,nx);
-	
-	zx  = mx * dt;
-	ox  = (1.0-mfexp(-zx));
-	
-	for(i=1;i<=nr;i++)
-	{
+		Utmp = posfun(Ntmp - Ttmp,0.01,fpen);
+		Mtmp.initialize();
+		i++;
 		for(k=1;k<=ngear;k++)
 		{
-			iyr = i_C(k)(i)(1);
-			if( iyr != oyr)
+			if( effort(k,i)>0 )
 			{
-				Ntmp = N(iyr);
-				Ttmp = T(iyr);
-				oyr  = iyr;
-				jts  = 1;
-				
+				lb           = min_tag_j(k,i);
+				ux           = 1.0 - mfexp(-fi(k,i)*sx(k));
+				Chat(k)(i)   = elem_prod(ux,elem_prod(Ntmp,ox));
+				Mhat(k)(i)   = elem_prod(ux,elem_prod(Utmp,ox));
+				Rhat(k)(i)   = elem_prod(ux,elem_prod(Ttmp,ox));
+				Mtmp(lb,nx) += Mhat(k)(i)(lb,nx);
 			}
-			
-			/* Survive and grow Ntmp by each time step */
-			its = i_C(k)(i)(2);
-			for(j=jts;j<=its-1;j++)
-			{
-				Ntmp = elem_prod(Ntmp,mfexp(-mx*dt))*P;
-				Ttmp = elem_prod(Ttmp,mfexp(-mx*dt))*P;
-				if( j==its-1 && iyr!=nyr )
-				{
-					T(iyr+1) = Ttmp;
-				}
-				jts++;
-			}
-			
-			/* Total Captures and New marks released */
-			
-			/*FIXME Issue here with More tags at large than total number of marked and unmarked fish*/
-			lb = min_tag_j(k)(i);
-			t1 = elem_prod(fi(k,i)*sx(k),ox);
-			t2 = elem_div(Ntmp,zx);
-			Utmp = posfun(Ntmp-Ttmp,0.1,fpen);
-			t4 = elem_div(Utmp,zx);
-						
-			Chat(k)(i)        = elem_prod(t1,t2);
-			hat_ct(k,i)       = sum(Chat(k)(i));
-			Mhat(k)(i)(lb,nx) = elem_prod(t1,t4)(lb,nx);
-			Ttmp             += Mhat(k)(i);
-			t3                = elem_div(Ttmp,zx);
-			Rhat(k)(i)        = elem_prod(t1,t3);
-			//cout<<setw(2)<<setprecision(4)<<iyr<<" "<<T(iyr)(10,20)<<endl;
 		}
 		
-	} // end of loop over gear
-	delta = ct - hat_ct;
+		/* Survive and grow tags-at-large and add new tags */
+		if( t < nyr )
+		{
+			T(t+1) = elem_prod(T(t),mfexp(-mx*dt))*A + Mtmp;
+		}
+	}
+	
 	if( flag(1)==2 ) cout<<"Tt\n"<<rowsum(T)<<endl;
   }
-
-
-FUNCTION calcNewMarksAndRecaptures
-  {
-	/*
-	The accounting of the Tagged and Untagged populations where
-	the predicted number of new marks released is based on the number of 
-	untagged fish (N-T) captured at each sampling event. The precited 
-	number of recaptures is based on the number of marks at large (T)
-	
-	j_min = index for minimum size of fish tagged (based on M data and flag(1))
-	
-	PSUEDOCODE:
-		-1) Loop over years
-		-2) If a effort in quarter > 0 the compute predicted catch-at-length
-		-3) If unmarked captured fish is greater than min_j, then tag and add to T matrix
-		-4) Compute Recapture matrix, based on average number of tagged fish at large.
-	
-	*/
-	
-	int i,j,k,lb;
-	dvariable ftmp;
-	
-	Chat.initialize();
-	Mhat.initialize();
-	Rhat.initialize();
-	T.initialize();
-	dvar_vector zx(1,nx);
-	dvar_vector ox(1,nx);
-	
-	
-	zx = mx*dt;
-	ox = 1.0-mfexp(-zx);
-	
-	for(i=1;i<=nr;i++)	
-	{
-		/* Captures and application of new marks */
-		for(k=1;k<=ngear;k++)
-		{
-			if( effort(k,i)>0 )
-			{
-				ftmp              = fi(k,i);
-				dvar_vector t1    = elem_prod(ftmp*sx(k),ox);
-				dvar_vector t2    = elem_div(N(i),zx);
-				dvar_vector t4    = elem_div(N(i)-T(i),zx);
-			
-				Chat(k)(i)        = elem_prod(t1,t2);
-				lb                = min_tag_j(k,i);
-				Mhat(k)(i)(lb,nx) = elem_prod(t1,t4)(lb,nx);
-				hat_ct(k,i)       = sum(Chat(k)(i));
-				
-				T(i)             += Mhat(k)(i);
-			}
-		}
-		
-		/* Recaptures within the same trip/year */
-		for(k=1;k<=ngear;k++)
-		{
-			if( effort(k,i)>0 )
-			{
-				dvar_vector t1 = elem_prod(ftmp*sx(k),ox);
-				dvar_vector t3 = elem_div(T(i),zx);
-			
-				Rhat(k)(i)     = elem_prod(t1,t3);
-			}
-		}
-		
-		/* Update marks at large (survive and growth) */
-		if( i<nr )
-		{
-			T(i+1) = elem_prod(T(i),mfexp(-zx)) * P;
-		}
-	}
-	
-	delta = ct - hat_ct;
-	
-  }
-
 //
 FUNCTION calc_objective_function;
   {
@@ -741,7 +587,7 @@ FUNCTION calc_objective_function;
 	pvec.initialize();
 	if(!last_phase())
 	{
-		pvec(1) = dnorm(ddot_r_devs,0,0.4);
+		pvec(1) = dnorm(first_difference(ddot_r_devs),0,0.4);
 		pvec(2) = dnorm(bar_r_devs,0,0.4);
 		pvec(3) = dnorm(log_bar_f,log(0.1108032),0.05);
 		//pvec(3) = 1.e5 * square(log_bar_f - log(0.110));
@@ -754,65 +600,68 @@ FUNCTION calc_objective_function;
 	}
 	if( flag(1) ) cout<<"Average fi = "<<mfexp(log_bar_f)<<endl;
 	/* LIKELIHOODS */
+	/*
+		fvec(1) = likelihood of the total catch-at-length.
+		fvec(2) = likelihood of the total marks-at-length.
+		fvec(3) = likelihood of the total recap-at-length.
+	*/
+	
 	dvar_vector fvec(1,4);
 	fvec.initialize();
-	/*
-		fvec(1) = likelihood of the total catch (ct) in each time step.
-	*/
+	double tiny = 1.e-10;
+	tau = mfexp(log_tau)+1.01;
+	
 	for(k=1;k<=ngear;k++)
 	{
-		if( !last_phase() )
+		for(i=1;i<=irow(k);i++)
 		{
-			fvec(1) += dnorm(delta(k),0,flag(3));
-		}
-		else
-		{
-			fvec(1) += dnorm(delta(k),0,flag(4));
-		}
-	}
-	
-	/*
-		fvec(2) = likelihood of the total catch-at-length.
-		fvec(3) = likelihood of the total marks-at-length.
-		fvec(4) = likelihood of the total recap-at-length.
-	*/
-	double tau;
-	if(flag(5))
-	{
-		for(k=1;k<=ngear;k++)
-		{
-			fvec(2) += 10.* norm2(C(k)-Chat(k));
-			fvec(3) += 10.* norm2(M(k)-Mhat(k));
-			fvec(4) += 10.* norm2(R(k)-Rhat(k));
-		}
-	}
-	else
-	{
-		for(k=1;k<=ngear;k++)
-		{
-			for(i=1;i<=irow(k);i++)
+			if( effort(k,i)>0 )
 			{
-				if(effort(k,i)>0)
+				for(j=1;j<=nx;j++)
 				{
-					tau = 400;
-					if( tau >0 )
-					{
-						fvec(2) += dmultifan( C(k)(i),Chat(k)(i),tau );
-					}
-			
-					if( tau>0 )
-					{
-						fvec(3) += dmultifan( M(k)(i),Mhat(k)(i),tau );
-					}
-			
-					if( tau>0 )
-					{
-						fvec(4) += dmultifan( R(k)(i),Rhat(k)(i),tau );
-					}
+					fvec(1) -= log_negbinomial_density(C(k)(i)(j),Chat(k)(i)(j)+tiny,tau(k));
+					fvec(2) -= log_negbinomial_density(M(k)(i)(j),Mhat(k)(i)(j)+tiny,tau(k));
+					fvec(3) -= log_negbinomial_density(R(k)(i)(j),Rhat(k)(i)(j)+tiny,tau(k));
 				}
 			}
 		}
 	}
+	//if(flag(5))
+	//{
+	//	for(k=1;k<=ngear;k++)
+	//	{
+	//		fvec(2) += 10.* norm2(sqrt(C(k))-sqrt(Chat(k)));
+	//		fvec(3) += 10.* norm2(sqrt(M(k))-sqrt(Mhat(k)));
+	//		fvec(4) += 10.* norm2(R(k)-Rhat(k));
+	//	}
+	//}
+	/*else
+		{
+			for(k=1;k<=ngear;k++)
+			{
+				for(i=1;i<=irow(k);i++)
+				{
+					if(effort(k,i)>0)
+					{
+						tau = 400;
+						if( tau >0 )
+						{
+							fvec(2) += dmultifan( C(k)(i),Chat(k)(i),tau );
+						}
+				
+						if( tau>0 )
+						{
+							fvec(3) += dmultifan( M(k)(i),Mhat(k)(i),tau );
+						}
+				
+						if( tau>0 )
+						{
+							fvec(4) += dmultifan( R(k)(i),Rhat(k)(i),tau );
+						}
+					}
+				}
+			}
+		}*/
 	
 	/*
 	PRIORS for estimated model parameters from the control file.
@@ -856,7 +705,7 @@ FUNCTION calc_objective_function;
 	
 	if( flag(1) ) cout<<"Fvec\t"<<setprecision(4)<<fvec<<endl;
 	if(fpen > 0) cout<<"Fpen = "<<fpen<<endl;
-	f = sum(fvec) + sum(pvec) + sum(priors) + 1000.*fpen;
+	f = sum(fvec) + sum(pvec) + sum(priors) + 1.e5*fpen;
   }
 //
 FUNCTION dvar_vector dgamma(const dvector& x, const dvariable& a, const dvariable& b)
@@ -974,6 +823,7 @@ REPORT_SECTION
 	REPORT(mu_r       );
 	REPORT(cv_r       );
 	REPORT(log_bar_f  );
+	REPORT(tau        );
 	
 	ivector yr(syr,nyr);
 	yr.fill_seqadd(syr,1);

@@ -18,12 +18,16 @@ source("read.admb.R", echo=FALSE)
 .FILENAME		<- "../ADMB/srcLSMR/lsmr"
 .FIGDIR			<- "../FIGS/LSMR/"
 
-obj				<- read.admb(.FILENAME)
-class(obj)		<- c(class(obj), "lsmr")
 
 
+getObj <- function(fn=.FILENAME)
+{
+	obj				<- read.admb(.FILENAME)
+	class(obj)		<- c(class(obj), "lsmr")
+	return(obj)
+}
 
-
+obj <- getObj()
 
 # --------------------------------------------------------------------------- #
 # S3 Method for class 'lsmr'                                                  #
@@ -38,7 +42,7 @@ plot.lsmr <- function(obj, ..1000.)
 	opar <- par(no.readonly=TRUE)
 	
 	with(obj, {
-		par(mfcol=c(2, 2), las=1, mar=c(5.1, 4.1, 4.1, 2.1))
+		par(mfcol=c(2, 2), las=1, mar=c(5.1, 4.1, 4.1, 2.1), oma=c(1, 1, 1, 1))
 		plot(yr, Nt, type="l", ylim=c(0, max(Nt))
 		, xlab="Year", ylab="Abundance (numbers > 30 mm)")
 		if(exists("true_Nt")) lines(yr, true_Nt, col=2, lwd=2)
@@ -67,6 +71,7 @@ plot.lsmr <- function(obj, ..1000.)
 		for(i in 1:ngear)
 		{
 			ir = 1:irow[i] + max(ir)
+			
 			.plotLF(xmid, i_C[ir, ], Chat[ir, ])
 		
 			.plotLF(xmid, i_M[ir, ], Mhat[ir, ])
@@ -94,23 +99,24 @@ plot.lsmr <- function(obj, ..1000.)
 	# This funciton plots the observed (O) and predicted (P) 
 	# length frequency distributions.
 	opar <- par(no.readonly=TRUE)
-	ir   <- which(rowSums(P)>0,arr.ind=T)
+	ir   <- which(rowSums(P)!=0,arr.ind=TRUE)
+	
 	O    <- O[ir, ]
 	P    <- P[ir, ]
 	n    <- dim(O)[1]
-	nr   <- round(sqrt(n))
-	nc   <- round(n/nr)
+	nr   <- ceiling(sqrt(n))
+	nc   <- ceiling(n/nr)
 	
 	par(mfcol=c(nr, nc), mar=c(0, 0, 0, 0))
 	par(oma=c(5, 5, 3, 4), font.main=1)
 	ymax = max(O[, -1:-2], P)
 	for(i in 1:n)
 	{
-		plot(x, O[i, -1:-2], type="n", xlab="", ylab="", xaxt="n", yaxt="n", ylim=c(0, ymax))
-		.staircase(x, O[i, -1:-2], border=NA)
+		plot(x, O[i, -1], type="n", xlab="", ylab="", xaxt="n", yaxt="n", ylim=c(0, ymax))
+		.staircase(x, O[i, -1], border=NA)
 		lines(x, P[i, ], col=1)
 		title(main=O[i, 1], line=-1)
-		mfg <- par(no.readonly=T)$mfg
+		mfg <- par(no.readonly=TRUE)$mfg
 		if(mfg[2]==1 && mfg[1]%%2) axis(2)
 		if(mfg[2]==nc && !mfg[1]%%2) axis(4)
 		if(mfg[1]==nr && mfg[2]%%2) axis(1)

@@ -337,7 +337,7 @@ tableMarks <- function(DF)
 # ------------------------------------------------------------------------------- #
 # Create LSMR datafile VPA type
 # ------------------------------------------------------------------------------- #
-write.LSRMdatafileVPA <- function(DF, ...)
+write.LSMRdatafileVPA <- function(DF, ...)
 {
 	# In this case write annual data of marks-at-large,  recaptures
 	# in the following calendar year. It will be necessary to remove
@@ -364,10 +364,10 @@ write.LSRMdatafileVPA <- function(DF, ...)
 	E   <- cast(DFm[DFm$YEAR!=2012,],YEAR~GROUP,fn, subset=variable=="START_DATETIME", add.missing=TRUE)
 	
 	# Ensure R matrix and M matrix have the same dimensions at C
-	ii  <- colnames(C$HOOP) %in% colnames(R$HOOP)
-	tmp <- C$HOOP; tmp[, ii] <- R$HOOP; tmp[, !ii] <- 0; R$HOOP <- tmp
-	ii  <- colnames(C$GILL) %in% colnames(R$GILL)
-	tmp <- C$GILL; tmp[, ii] <- R$GILL; tmp[, !ii] <- 0; R$GILL <- tmp
+	#ii  <- colnames(C$HOOP) %in% colnames(R$HOOP)
+	#tmp <- C$HOOP; tmp[, ii] <- R$HOOP; tmp[, !ii] <- 0; R$HOOP <- tmp
+	#ii  <- colnames(C$GILL) %in% colnames(R$GILL)
+	#tmp <- C$GILL; tmp[, ii] <- R$GILL; tmp[, !ii] <- 0; R$GILL <- tmp
 	
 	
 	# Plot the data to be used
@@ -396,7 +396,7 @@ write.LSRMdatafileVPA <- function(DF, ...)
 	ie  <- names(E) %in% gr
 	write("#Data for HBC 1989:2011", file=dfn)
 	write("#syr, nyr, dt", file=dfn, append=TRUE)
-	write(c(1989, 2011, 1/4), file=dfn, append=TRUE)
+	write(c(1989, 2011, 1), file=dfn, append=TRUE)
 	write("#Number of gears",file=dfn, append=TRUE)
 	write(length(gr), file=dfn, append=TRUE)
 	xbin = as.numeric(colnames(C$HOOP)[-1])/10  #units cm
@@ -417,10 +417,14 @@ write.LSRMdatafileVPA <- function(DF, ...)
 	lapply(C[ic],write.table,file=dfn,row.names=FALSE,col.names=FALSE, quote=FALSE,append=TRUE)
 	
 	write("#New Marks by year (row) and length (col)", file=dfn, append=TRUE)
-	lapply(T[ic][, , 1],write.table,file=dfn,row.names=FALSE,col.names=FALSE, quote=FALSE,append=TRUE)
+	write.table(T$GILL[, , 1], file=dfn, append=TRUE, quote=FALSE, row.names=TRUE, col.names=FALSE)
+	write.table(T$HOOP[, , 1], file=dfn, append=TRUE, quote=FALSE, row.names=TRUE, col.names=FALSE)
+	#lapply(T[ic],write.table,file=dfn,row.names=FALSE,col.names=FALSE, quote=FALSE,append=TRUE)
 	
 	write("#Recaps by year (row) and length (col)", file=dfn, append=TRUE)
-	lapply(T[ic][, , 2],write.table,file=dfn,row.names=FALSE,col.names=FALSE, quote=FALSE,append=TRUE)
+	write.table(T$GILL[, , 2], file=dfn, append=TRUE, quote=FALSE, row.names=TRUE, col.names=FALSE)
+	write.table(T$HOOP[, , 2], file=dfn, append=TRUE, quote=FALSE, row.names=TRUE, col.names=FALSE)
+	#lapply(T[ic][, , 2],write.table,file=dfn,row.names=FALSE,col.names=FALSE, quote=FALSE,append=TRUE)
 	
 	write("#End of file", file=dfn, append=TRUE)
 	write(999, file=dfn, append=TRUE)
