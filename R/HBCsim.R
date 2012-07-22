@@ -156,7 +156,7 @@ R   <- matrix(0,nrow=length(sample.yrs), ncol=length(xbin))
                 # -2. Selectivity at time of sampling
                 len <- (lj[1:length(jj)])[fyr]
                 iyr <- iyr[fyr]
-                # TODO Add annual effort to sj capture probability
+                # Add annual effort to sj capture probability
                 eyr <- findInterval(iyr, sample.yrs)
                 #print(cbind(sample.yrs[eyr],Et[eyr]))
                 sj  <- Et[eyr]*plogis(len, lh, gamma)

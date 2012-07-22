@@ -38,7 +38,7 @@ plot.lsmr <- function(obj, ..1000.)
 	opar <- par(no.readonly=TRUE)
 	
 	with(obj, {
-		par(mfcol=c(2, 2), las=1)
+		par(mfcol=c(2, 2), las=1, mar=c(5.1, 4.1, 4.1, 2.1))
 		plot(yr, Nt, type="l", ylim=c(0, max(Nt))
 		, xlab="Year", ylab="Abundance (numbers > 30 mm)")
 		if(exists("true_Nt")) lines(yr, true_Nt, col=2, lwd=2)
@@ -49,10 +49,11 @@ plot.lsmr <- function(obj, ..1000.)
 		if(exists("true_Rt"))points(yr, true_Rt, pch=20, col=2)
 		gletter(2)
 		
-		
-		plot(yr, fi, type="o", ylim=c(0, max(fi))
-		, xlab="Year", ylab="Capture probability")
-		if(exists("true_fi"))lines(yr, true_fi, type="o", pch=2, col=2)
+		f_yr = seq(min(yr), max(yr), length=dim(fi)[2])
+		matplot(f_yr, t(fi), type="l", ylim=c(0, max(fi))
+		, xlab="Year", ylab="Capture probability", col=1)
+		if(exists("true_fi"))
+			matlines(f_yr, t(true_fi), type="l", col=2)
 		gletter(3)
 		
 		plot(xmid, mx, type="o", ylim=c(0, max(mx))
@@ -61,34 +62,59 @@ plot.lsmr <- function(obj, ..1000.)
 		gletter(4)
 		par(opar)
 		
-		.plotLF(xmid, i_C, Chat)
 		
-		.plotLF(xmid, i_M, Mhat)
+		ir = 0
+		for(i in 1:ngear)
+		{
+			ir = 1:irow[i] + max(ir)
+			.plotLF(xmid, i_C[ir, ], Chat[ir, ])
 		
-		.plotLF(xmid, i_R, Rhat)
+			.plotLF(xmid, i_M[ir, ], Mhat[ir, ])
+		
+			.plotLF(xmid, i_R[ir, ], Rhat[ir, ])
+		}
 	})
 	par(opar)
 }
+
+.staircase <- function(x, y, ...)
+{
+	# Add a shaded staircase polygon to a plot.
+	dx <- 0.5*(x[2]-x[1])
+	xp <- as.vector(rbind(x-dx, x+dx))
+	yp <- as.vector(rbind(y, y))
+	xp <- c(min(xp), xp, max(xp))
+	yp <- c(0, yp, 0)
+	polygon(xp, yp, col=colr(1, 0.25), ...)
+}
+
 
 .plotLF <- function(x, O, P, ...)
 {
 	# This funciton plots the observed (O) and predicted (P) 
 	# length frequency distributions.
 	opar <- par(no.readonly=TRUE)
-	n  <- dim(O)[1]
-	nr <- round(sqrt(n))
-	nc <- round(n/nr)
+	ir   <- which(rowSums(P)>0,arr.ind=T)
+	O    <- O[ir, ]
+	P    <- P[ir, ]
+	n    <- dim(O)[1]
+	nr   <- round(sqrt(n))
+	nc   <- round(n/nr)
+	
 	par(mfcol=c(nr, nc), mar=c(0, 0, 0, 0))
-	par(oma=c(5, 5, 3, 1), font.main=1)
+	par(oma=c(5, 5, 3, 4), font.main=1)
 	ymax = max(O[, -1:-2], P)
 	for(i in 1:n)
 	{
-		plot(x, O[i, -1:-2], type="h", xlab="", ylab="", xaxt="n", yaxt="n", ylim=c(0, ymax))
-		lines(x, P[i, ], col=4)
+		plot(x, O[i, -1:-2], type="n", xlab="", ylab="", xaxt="n", yaxt="n", ylim=c(0, ymax))
+		.staircase(x, O[i, -1:-2], border=NA)
+		lines(x, P[i, ], col=1)
 		title(main=O[i, 1], line=-1)
 		mfg <- par(no.readonly=T)$mfg
-		if(mfg[2]==1) axis(2)
-		if(mfg[1]==nr) axis(1)
+		if(mfg[2]==1 && mfg[1]%%2) axis(2)
+		if(mfg[2]==nc && !mfg[1]%%2) axis(4)
+		if(mfg[1]==nr && mfg[2]%%2) axis(1)
+		if(mfg[1]==1 && !mfg[2]%%2) axis(3)
 	}
 	mtext(c("Size class (cm)", "Frequency"), side=c(1, 2), outer=TRUE, line=2.5, las=0)
 	par(opar)

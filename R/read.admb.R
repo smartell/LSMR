@@ -115,3 +115,10 @@ function(col.pal=1,a=1)
     col.rgb<-col2rgb(col.pal)/255
     rgb(t(col.rgb),alpha=a)
 }
+
+gletter <-
+function(i=1)
+{
+	usr=par("usr"); inset.x=0.05*(usr[2]-usr[1]); inset.y=0.05*(usr[4]-usr[3])
+	text(usr[1]+inset.x,usr[4]-inset.y,paste("(",letters[i],")",sep=""),cex=1.,font=1)
+}

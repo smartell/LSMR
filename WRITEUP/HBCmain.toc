@@ -13,11 +13,11 @@
 \contentsline {section}{\numberline {3}Results}{6}
 \contentsline {subsection}{\numberline {3.1}Sampling effort}{6}
 \contentsline {subsection}{\numberline {3.2}Length composition}{6}
-\contentsline {subsection}{\numberline {3.3}Annual growth rates from capture-recapture information}{10}
+\contentsline {subsection}{\numberline {3.3}Annual growth rates from capture-recapture information}{9}
 \contentsline {section}{\numberline {A}Work plan}{18}
 \contentsline {section}{\numberline {B}Individual based model for simulating the dynamics and sampling of humpback chub in the Grand Canyon}{23}
 \contentsline {subsection}{\numberline {B.1}Introduction}{23}
 \contentsline {subsection}{\numberline {B.2}R-code}{23}
 \contentsline {section}{\numberline {C}Processing mark-recapture by length information}{30}
 \contentsline {subsection}{\numberline {C.1}R-Code for Database manipulation}{30}
-\contentsline {section}{\numberline {D}Size Transition Matrix from Mark-Recapture data}{44}
+\contentsline {section}{\numberline {D}Size Transition Matrix from Mark-Recapture data}{46}
