@@ -44,7 +44,7 @@ plot.lsmr <- function(obj, ..1000.)
 	with(obj, {
 		par(mfcol=c(2, 2), las=1, mar=c(5.1, 4.1, 4.1, 2.1), oma=c(1, 1, 1, 1))
 		plot(yr, Nt, type="l", ylim=c(0, max(Nt))
-		, xlab="Year", ylab="Abundance (numbers > 30 mm)")
+		, xlab="Year", ylab="Abundance (numbers > 50 mm)")
 		if(exists("true_Nt")) lines(yr, true_Nt, col=2, lwd=2)
 		gletter(1)
 		

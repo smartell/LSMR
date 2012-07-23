@@ -40,7 +40,7 @@ DATA_SECTION
 		//cout<<iyr<<endl;
 	END_CALCS
 	int nbins;
-	!! nbins = 50;
+	!! nbins = 46;
 	vector lbins(1,nbins);
 	!! lbins.fill_seqadd(50,10);
 	!! cout<<lbins<<endl;

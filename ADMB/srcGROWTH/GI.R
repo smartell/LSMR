@@ -70,21 +70,26 @@ plot.TransitionMatrix <- function(A, ... )
 		zz = t(zz)
 		colnames(zz) = xx
 		rownames(zz) = yy
-		plotBubbles(zz,hide0=TRUE,cpro=T, rpro=F,prettyaxis=F,size=0.05,frange=0.01,dnam=T,
+		plotBubbles(zz,hide0=TRUE,cpro=TRUE, rpro=FALSE,prettyaxis=FALSE,size=0.05,frange=0.01,dnam=TRUE,
 			 clrs=4, xlab="", ylab="", yaxt="n", xaxt="n")
 		title(main=iyr[jj], line=-1)
 		abline(a=0, b=1, col=colr(1, 0.5), lty=1)
 		points(linf[jj], linf[jj], pch=19, col=colr(2, 0.5))
 		grid()
 		jj <<- jj+1
-		mfg <- par(no.readonly=T)$mfg
-		if(mfg[2]==1) axis(2)
-		if(mfg[1]==6) axis(1)
+		mfg <- par(no.readonly=TRUE)$mfg
+		if(mfg[2]==1 && mfg[1]%%2) axis(2)
+		if(mfg[2]==nc && !mfg[1]%%2) axis(4)
+		if(mfg[1]==nr && mfg[2]%%2) axis(1)
+		if(mfg[1]==1 && !mfg[2]%%2) axis(3)
+		
 	}
-	par(mfcol=c(6,4),mar=c(0,0,0,0),oma=c(4,5,1,1), cex.lab=0.5, mfg=c(1, 1, 6, 4), las=1)
+	nc<-4
+	nr<-6
+	par(mfcol=c(nr,nc),mar=c(0,0,0,0),oma=c(4,4,4,4), cex.lab=0.5, mfg=c(1, 1, 6, 4), las=1)
 	lapply(L[-1], fn)
-	mtext("Total length (mm) in year t", 1, outer=T, line=2.5)
-	mtext("Total length (mm) in year t+1", 2, outer=T, line=2.5, las=0)
+	mtext("Total length (mm) in year t", 1, outer=TRUE, line=2.5)
+	mtext("Total length (mm) in year t+1", 2, outer=TRUE, line=2.5, las=0)
 	dev.copy2pdf(file="../../FIGS/LSMR/fig:TransitionMatrix.pdf")	
 }
 
