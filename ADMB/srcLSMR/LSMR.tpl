@@ -171,6 +171,36 @@ DATA_SECTION
 		theta_prior = ivector(trans_theta_control(5));
 	END_CALCS
 	
+	// SELECTIVITY PARAMS //
+	init_ivector sel_type(1,ngear);
+	init_ivector sel_phz(1,ngear);
+	init_vector lx_ival(1,ngear);
+	init_vector gx_ival(1,ngear);
+	init_ivector x_nodes(1,ngear);
+	init_vector sel_pen1(1,ngear);
+	init_vector sel_pen2(1,ngear);
+	
+	ivector isel_npar(1,ngear);
+	
+	LOC_CALCS
+		/* Determine the number of selectivity parameters to estimate */
+		for(k=1;k<=ngear;k++)
+		{
+			switch(sel_type(k))
+			{
+				case 1:  // logistic
+					isel_npar(k) = 2;
+				break;
+				case 2:  // eplogis
+					isel_npar(k) = 3;
+				break;
+				case 3:  // linapprox
+					isel_npar(k) = x_nodes(k);
+				break;
+			}
+		}
+	END_CALCS
+	
 	init_int nflags;
 	init_vector flag(1,nflags);
 	// 1) verbose 
@@ -232,8 +262,24 @@ PARAMETER_SECTION
 	init_vector log_tau(1,ngear,5);
 	
 	//Selectivity parameters
-	init_vector log_lx(1,ngear,3);
-	init_vector log_gx(1,ngear,3);
+	init_bounded_vector_vector sel_par(1,ngear,1,isel_npar,-5.,5.,sel_phz);
+	LOC_CALCS
+		int k;
+		for(k=1;k<=ngear;k++)
+		{
+			if( sel_type(k)==1 )
+			{
+				sel_par(k,1) = log(lx_ival(k));
+				sel_par(k,2) = log(gx_ival(k));
+			}
+			if( sel_type(k)==2 )
+			{
+				sel_par(k,1) = log(lx_ival(k));
+				sel_par(k,2) = log(gx_ival(k));
+				sel_par(k,3) = -4.0;
+			}
+		}
+	END_CALCS
 	
 	init_bounded_dev_vector ddot_r_devs(1,nx,-15,15,2);
 	init_bounded_dev_vector bar_r_devs(syr+1,nyr,-15,15,2);
@@ -255,8 +301,6 @@ PARAMETER_SECTION
 	number m_linf;
 	number fpen;
 	vector tau(1,ngear);	// over-dispersion parameters >1.0
-	vector lx(1,ngear);		// length at 50% selectivity
-	vector gx(1,ngear);		// std in length at 50% selectivity
 	vector qk(1,ngear);		// catchability of gear k
 	vector mx(1,nx);		// Mortality rate at length xmid
 	vector rx(1,nx);		// size pdf for new recruits
@@ -282,8 +326,6 @@ PARAMETER_SECTION
 	
 INITIALIZATION_SECTION
 	theta     theta_ival;
-	log_lx    2.3;
-	log_gx    0.2;
 	log_bar_f -2.3;
 	log_tau   1.1;
 
@@ -407,9 +449,6 @@ FUNCTION initParameters
 	mu_r       = theta(7);
 	cv_r       = theta(8);
 	
-	/* Selex parameters */
-	lx         = mfexp(log_lx);
-	gx         = mfexp(log_gx);
 	
 	/* Catchability */
 	qk         = elem_div(mfexp(log_bar_f),mean_effort);
@@ -541,8 +580,14 @@ FUNCTION calcSelectivityAtLength
 	The parametric option is a logistic curve (plogis(x,lx,gx))
 	*/
 	int k;
+	double dx;
+	dvariable p1,p2,p3;
 	sx.initialize();
 	Selex cSelex;
+	dmatrix xi(1,ngear,1,x_nodes);
+	dvar_matrix yi(1,ngear,1,x_nodes);
+	
+	/*
 	dvariable gamma = 0.1;
 	dvariable x1 = 30.0;
 	dvariable x2 = 49.0;
@@ -551,14 +596,32 @@ FUNCTION calcSelectivityAtLength
 	dvar_vector y = ("{0.03, 0.16, 0.50, 0.84, 0.97, 0.99, 1.00, 1.00, 1.00, 1.00}");
 	cout<<"Linear interpolation"<<endl;	
 	cout<<cSelex.linapprox(x,y,xmid)<<endl;
+	*/
 	
 	for(k=1;k<=ngear;k++)
 	{
-		//sx(k) = 1./(1+mfexp(-(xmid-lx(k))/gx(k)));
-		//sx(k) = plogis(xmid,lx(k),gx(k));
-		sx(k) = cSelex.logistic(xmid,lx(k),gx(k));
+		switch(sel_type(k))
+		{
+			case 1:  //logistic
+				p1 = mfexp(sel_par(k,1));
+				p2 = mfexp(sel_par(k,2));
+				sx(k) = log( cSelex.logistic(xmid,p1,p2) );
+			break;
+			case 2: //eplogis
+				p1 = mfexp(sel_par(k,1));
+				p2 = mfexp(sel_par(k,2));
+				p3 = mfexp(sel_par(k,3))/(1.+mfexp(sel_par(k,3)));
+				sx(k) = log( cSelex.eplogis(xmid,p1,p2,p3) );
+			break;
+			case 3: //linapprox
+				dx = (double(nbin)-1.)/(double(x_nodes(k)-1.));
+				xi(k).fill_seqadd( min(xmid),dx );
+				yi(k)= sel_par(k);
+				sx(k) = cSelex.linapprox(xi(k),yi(k),xmid);
+			break;
+		}
+		sx(k) = mfexp( sx(k) - log( mean( mfexp(sx(k))+1.e-30 ) ) );
 	}
-	exit(1);
   }
 //
 FUNCTION calcNumbersAtLength
@@ -671,7 +734,7 @@ FUNCTION calc_objective_function;
 	{
 		pvec(1) = dnorm(first_difference(ddot_r_devs),0,0.4);
 		pvec(1)+= norm2(ddot_r_devs);
-		pvec(2) = dnorm(bar_r_devs,0,2.5);
+		pvec(2) = dnorm(bar_r_devs,0,0.6);
 		for(k=1;k<=ngear;k++)
 		{
 			dvariable mean_f = mean(fi(k));
@@ -689,7 +752,6 @@ FUNCTION calc_objective_function;
 	{
 		dvariable s = mean(bar_f_devs(k)); 
 		dev_pen(k)  = 1.e6 * s*s;
-		
 	}
 	
 	/* LIKELIHOODS */
@@ -763,9 +825,27 @@ FUNCTION calc_objective_function;
 		}
 	}
 	
+	/*
+	PENALTIES FOR SELECTIVITY COEFFICIENTS
+	*/
+	dvar_vector sel_pen(1,ngear);
+	sel_pen.initialize();
+	for(k=1;k<=ngear;k++)
+	{
+		if( sel_type(k)==3 )
+		{
+			sel_pen(k) = sel_pen1(k)/nx * norm2(first_difference(first_difference(sx(k))));
+			for(j=1;j<nx;j++)
+			{
+				if(sx(k,j+1)<sx(k,j))
+					sel_pen(k) += sel_pen2(k) * square(sx(k,j+1)-sx(k,j));
+			}
+		}
+	}
+	
 	if( flag(1) ) cout<<"Fvec\t"<<setprecision(4)<<fvec<<endl;
 	if(fpen > 0) cout<<"Fpen = "<<fpen<<endl;
-	f = sum(fvec) + sum(pvec) + sum(priors) + sum(dev_pen) + 1.e5*fpen;
+	f = sum(fvec) + sum(pvec) + sum(priors) + sum(dev_pen) + sum(sel_pen) + 1.e5*fpen;
   }
 //
 FUNCTION dvar_vector dgamma(const dvector& x, const dvariable& a, const dvariable& b)

@@ -45,16 +45,16 @@ plot.lsmr <- function(obj, ..1000.)
 		par(mfcol=c(2, 2), las=1, mar=c(5.1, 4.1, 4.1, 2.1), oma=c(1, 1, 1, 1))
 		jmin  <- min(which(xmid>=15))
 		nx    <- dim(N)[2]
-		Nt100 <- rowSums(N[, jmin:nx])
+		Nt100 <- rowSums(N[, jmin:nx])/1000
 		print(Nt100)
-		plot(yr, Nt, type="l", ylim=c(0, max(Nt))
-		, xlab="Year", ylab="Abundance (numbers > 50 mm)")
-		lines(yr, Nt100, col=4, lty=2)
+		plot(yr, Nt100, type="l", ylim=c(0, max(Nt100))
+		, xlab="Year", ylab="Abundance (1000s > 100 mm)")
+		#lines(yr, Nt100, col=4, lty=2)
 		if(exists("true_Nt")) lines(yr, true_Nt, col=2, lwd=2)
 		gletter(1)
 		
-		plot(yr, Rt, type="h", ylim=c(0, max(Rt)) 
-		, xlab="Year", ylab="Annual recruits ")
+		plot(yr, Rt/1000, type="h", ylim=c(0, max(Rt)/1000) 
+		, xlab="Year", ylab="Annual recruits (1000s)")
 		if(exists("true_Rt"))points(yr, true_Rt, pch=20, col=2)
 		gletter(2)
 		
