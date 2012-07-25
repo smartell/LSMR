@@ -8,7 +8,7 @@ ARG=
 all: $(EXEC) $(EXEC).rep
 
 $(EXEC): $(TPL)
-	admb -s -g $(EXEC)
+	admb $(EXEC)
 
 $(EXEC).rep: $(TPL) $(DAT) $(CTL)
 	./$(EXEC) -ind $(DAT) $(ARG)

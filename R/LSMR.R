@@ -43,8 +43,13 @@ plot.lsmr <- function(obj, ..1000.)
 	
 	with(obj, {
 		par(mfcol=c(2, 2), las=1, mar=c(5.1, 4.1, 4.1, 2.1), oma=c(1, 1, 1, 1))
+		jmin  <- min(which(xmid>=15))
+		nx    <- dim(N)[2]
+		Nt100 <- rowSums(N[, jmin:nx])
+		print(Nt100)
 		plot(yr, Nt, type="l", ylim=c(0, max(Nt))
 		, xlab="Year", ylab="Abundance (numbers > 50 mm)")
+		lines(yr, Nt100, col=4, lty=2)
 		if(exists("true_Nt")) lines(yr, true_Nt, col=2, lwd=2)
 		gletter(1)
 		
@@ -115,6 +120,7 @@ plot.lsmr <- function(obj, ..1000.)
 		plot(x, O[i, -1], type="n", xlab="", ylab="", xaxt="n", yaxt="n", ylim=c(0, ymax))
 		.staircase(x, O[i, -1], border=NA)
 		lines(x, P[i, ], col=1)
+		abline(v=c(10, 15), lty=3)
 		title(main=O[i, 1], line=-1)
 		mfg <- par(no.readonly=TRUE)$mfg
 		if(mfg[2]==1 && mfg[1]%%2) axis(2)

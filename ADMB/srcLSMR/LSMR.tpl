@@ -189,8 +189,8 @@ DATA_SECTION
 			{
 				for(j=1;j<=jcol(k);j++)
 				{
-					//if( M(k)(i,j)>0 || xbin(j)>flag(2) )
-					if( xbin(j)>flag(2) )
+					if( M(k)(i,j)>0 || xbin(j)>flag(2) )
+					//if( xbin(j)>flag(2) )
 					{
 						min_tag_j(k,i) = j;
 						break;
@@ -514,7 +514,7 @@ FUNCTION calcCaptureProbability
 		{
 			if( effort(k,i)>0 )
 			{
-				fi(k,i) = 1.0-mfexp(-qk(k)*effort(k,i)*mfexp(bar_f_devs(k)(ik(k)++)));
+				fi(k,i) = qk(k)*effort(k,i)*mfexp(bar_f_devs(k)(ik(k)++));
 			}
 		}
 	}
@@ -542,12 +542,23 @@ FUNCTION calcSelectivityAtLength
 	*/
 	int k;
 	sx.initialize();
+	Selex cSelex;
+	dvariable gamma = 0.1;
+	dvariable x1 = 30.0;
+	dvariable x2 = 49.0;
+	cout<<cSelex.eplogis(xmid,x1,x2,gamma)<<endl;
+	dvector x = ("{5, 10, 15, 20, 25, 30, 35, 40, 45, 50}");
+	dvar_vector y = ("{0.03, 0.16, 0.50, 0.84, 0.97, 0.99, 1.00, 1.00, 1.00, 1.00}");
+	cout<<"Linear interpolation"<<endl;	
+	cout<<cSelex.linapprox(x,y,xmid)<<endl;
+	
 	for(k=1;k<=ngear;k++)
 	{
 		//sx(k) = 1./(1+mfexp(-(xmid-lx(k))/gx(k)));
-		sx(k) = plogis(xmid,lx(k),gx(k));
+		//sx(k) = plogis(xmid,lx(k),gx(k));
+		sx(k) = cSelex.logistic(xmid,lx(k),gx(k));
 	}
-	
+	exit(1);
   }
 //
 FUNCTION calcNumbersAtLength
@@ -619,9 +630,9 @@ FUNCTION calcObservations
 			if( effort(k,i)>0 )
 			{
 				lb           = min_tag_j(k,i);
-				ux           = fi(k,i);//1.0 - mfexp(-fi(k,i)*sx(k));
+				ux           = 1.0 - mfexp(-fi(k,i)*sx(k));
 				Chat(k)(i)   = elem_prod(ux,elem_prod(Ntmp,ox));
-				Mhat(k)(i)   = elem_prod(ux,elem_prod(Utmp,ox));
+				Mhat(k)(i)(lb,nx)   = elem_prod(ux,elem_prod(Utmp,ox))(lb,nx);
 				Rhat(k)(i)   = elem_prod(ux,elem_prod(Ttmp,ox));
 				Mtmp(lb,nx) += Mhat(k)(i)(lb,nx);
 			}
@@ -646,6 +657,7 @@ FUNCTION calc_objective_function;
 	if(!last_phase())
 	{
 		pvec(1) = dnorm(first_difference(ddot_r_devs),0,0.2);
+		pvec(1)+= norm2(ddot_r_devs);
 		pvec(2) = dnorm(bar_r_devs,0,0.4);
 		for(k=1;k<=ngear;k++)
 		{
@@ -657,7 +669,8 @@ FUNCTION calc_objective_function;
 	}
 	else
 	{
-		pvec(1) = dnorm(first_difference(ddot_r_devs),0,1.0);
+		pvec(1) = dnorm(first_difference(ddot_r_devs),0,0.4);
+		pvec(1)+= norm2(ddot_r_devs);
 		pvec(2) = dnorm(bar_r_devs,0,2.5);
 		for(k=1;k<=ngear;k++)
 		{
@@ -937,11 +950,13 @@ GLOBALS_SECTION
 	#include <admodel.h>
 	#include <time.h>
 	#include <contrib.h>
-	//#include <stats.cxx>
-	//#include <martool.cxx>
+	#include <selex.cpp>
+
 	time_t start,finish;
 	long hour,minute,second;
 	double elapsed_time;
+	
+	
 	
 	dvariable dpois(const dvector& k, const dvar_vector& lambda)
 	{
