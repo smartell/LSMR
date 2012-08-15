@@ -570,7 +570,7 @@ FUNCTION calcSurvivalAtLength
 	mortality rate at length x  mx=m.linf*linf/xbin
 	note that m_linf is an annual rate.
 	*/
-	mx = m_infty*l_infty/xmid;
+	mx = m_infty * l_infty/xmid;
   }
 //
 FUNCTION calcSelectivityAtLength
@@ -715,7 +715,7 @@ FUNCTION calc_objective_function;
   {
 	int i,j,k;
 	/* PENALTIES TO ENSURE REGULAR SOLUTION */
-	dvar_vector pvec(1,3);
+	dvar_vector pvec(1,4);
 	pvec.initialize();
 	if(!last_phase())
 	{
@@ -726,7 +726,9 @@ FUNCTION calc_objective_function;
 		{
 			dvariable mean_f = mean(fi(k));
 			pvec(3) += dnorm(mean_f,0.1,0.01);
+			pvec(4) += dnorm(bar_f_devs(k),0,1.0);
 		}
+		
 		//pvec(3) = dnorm(log_bar_f,log(0.1108032),0.05);
 		//pvec(3) = 1.e5 * square(log_bar_f - log(0.110));
 	}
@@ -739,6 +741,7 @@ FUNCTION calc_objective_function;
 		{
 			dvariable mean_f = mean(fi(k));
 			pvec(3) += dnorm(mean_f,0.1,0.5);
+			pvec(4) += dnorm(bar_f_devs(k),0,1.0);
 		}
 		
 		//pvec(3) = dnorm(log_bar_f,log(0.1108032),2.5);
@@ -751,7 +754,7 @@ FUNCTION calc_objective_function;
 	for(k=1;k<=ngear;k++)
 	{
 		dvariable s = mean(bar_f_devs(k)); 
-		dev_pen(k)  = 1.e6 * s*s;
+		dev_pen(k)  = 1.e15 * s*s;
 	}
 	
 	/* LIKELIHOODS */
@@ -991,6 +994,8 @@ REPORT_SECTION
 	
 	REPORT(log_rt);
 	REPORT(fi);
+	REPORT(effort);
+	REPORT(bar_f_devs);
 	
 	REPORT(N);
 	REPORT(T);

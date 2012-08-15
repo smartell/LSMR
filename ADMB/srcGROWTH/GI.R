@@ -1,3 +1,4 @@
+require(PBSmodelling)
 source("../../R/Read.admb.R")
 A <- read.admb("GI")
 class(A) <- c("list", "GI")
@@ -70,8 +71,8 @@ plot.TransitionMatrix <- function(A, ... )
 		zz = t(zz)
 		colnames(zz) = xx
 		rownames(zz) = yy
-		plotBubbles(zz,hide0=TRUE,cpro=TRUE, rpro=FALSE,prettyaxis=FALSE,size=0.05,frange=0.01,dnam=TRUE,
-			 clrs=4, xlab="", ylab="", yaxt="n", xaxt="n")
+		plotBubbles(zz,hide0=TRUE,cpro=FALSE, rpro=FALSE,prettyaxis=FALSE,size=0.05,frange=0.01,dnam=TRUE,
+			 clrs=colr(4, 0.5), xlab="", ylab="", yaxt="n", xaxt="n", powr=0.5)
 		title(main=iyr[jj], line=-1)
 		abline(a=0, b=1, col=colr(1, 0.5), lty=1)
 		points(linf[jj], linf[jj], pch=19, col=colr(2, 0.5))
@@ -86,7 +87,7 @@ plot.TransitionMatrix <- function(A, ... )
 	}
 	nc<-4
 	nr<-6
-	par(mfcol=c(nr,nc),mar=c(0,0,0,0),oma=c(4,4,4,4), cex.lab=0.5, mfg=c(1, 1, 6, 4), las=1)
+	par(mfcol=c(nr,nc),mar=c(0,0,0,0),oma=c(4,4,4,4), cex.lab=0.5, mfg=c(1, 1, 6, 4), las=1, bg="white")
 	lapply(L[-1], fn)
 	mtext("Total length (mm) in year t", 1, outer=TRUE, line=2.5)
 	mtext("Total length (mm) in year t+1", 2, outer=TRUE, line=2.5, las=0)

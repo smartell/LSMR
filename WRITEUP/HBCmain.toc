@@ -20,4 +20,4 @@
 \contentsline {subsection}{\numberline {B.2}R-code}{23}
 \contentsline {section}{\numberline {C}Processing mark-recapture by length information}{30}
 \contentsline {subsection}{\numberline {C.1}R-Code for Database manipulation}{30}
-\contentsline {section}{\numberline {D}Size Transition Matrix from Mark-Recapture data}{46}
+\contentsline {section}{\numberline {D}Size Transition Matrix from Mark-Recapture data}{52}

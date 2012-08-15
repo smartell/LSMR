@@ -69,7 +69,9 @@ plot.lsmr <- function(obj, ..1000.)
 		, xlab="Size class (cm)", ylab="Natural mortality")
 		abline(h=m_infty, col=2)
 		gletter(4)
-		par(opar)
+		
+		.plotSelex(xmid, t(sx))
+		
 		
 		
 		ir = 0
@@ -77,14 +79,20 @@ plot.lsmr <- function(obj, ..1000.)
 		{
 			ir = 1:irow[i] + max(ir)
 			
-			.plotLF(xmid, i_C[ir, ], Chat[ir, ])
+			.plotLF(xmid, i_C[ir, ], Chat[ir, ], "Total Catch")
 		
-			.plotLF(xmid, i_M[ir, ], Mhat[ir, ])
+			.plotLF(xmid, i_M[ir, ], Mhat[ir, ], "New Marks")
 		
-			.plotLF(xmid, i_R[ir, ], Rhat[ir, ])
+			.plotLF(xmid, i_R[ir, ], Rhat[ir, ], "Recaptures")
 		}
 	})
 	par(opar)
+}
+
+.plotSelex <- function(x, y, ...)
+{
+	#Plot seletivities
+	matplot(x, y, xlab="Length (cm)", ylab="Selectivity", type="l", col=1)
 }
 
 .staircase <- function(x, y, ...)
@@ -99,7 +107,7 @@ plot.lsmr <- function(obj, ..1000.)
 }
 
 
-.plotLF <- function(x, O, P, ...)
+.plotLF <- function(x, O, P, main="", ...)
 {
 	# This funciton plots the observed (O) and predicted (P) 
 	# length frequency distributions.
@@ -113,7 +121,7 @@ plot.lsmr <- function(obj, ..1000.)
 	nc   <- ceiling(n/nr)
 	
 	par(mfcol=c(nr, nc), mar=c(0, 0, 0, 0))
-	par(oma=c(5, 5, 3, 4), font.main=1)
+	par(oma=c(5, 5, 5, 4), font.main=1)
 	ymax = max(O[, -1:-2], P)
 	for(i in 1:n)
 	{
@@ -129,6 +137,7 @@ plot.lsmr <- function(obj, ..1000.)
 		if(mfg[1]==1 && !mfg[2]%%2) axis(3)
 	}
 	mtext(c("Size class (cm)", "Frequency"), side=c(1, 2), outer=TRUE, line=2.5, las=0)
+	mtext(main, side=3, outer=TRUE, line=2.5)
 	par(opar)
 }
 
