@@ -1,0 +1,134 @@
+#if !defined(_sca_)
+#  define _sca_
+
+class model_data : public ad_comm{
+  data_number cntrl;
+  data_int yrs;
+  data_int ages;
+  data_number math;
+  data_number mats;
+  data_number vblinf;
+  data_number vbk;
+  data_number vbto;
+  data_number lwa;
+  data_number lwb;
+  data_number iselh;
+  data_number isels;
+  data_number iRo;
+  data_number ih;
+  data_number pM;
+  data_number psdM;
+  data_vector ocpue;
+  data_vector olandings;
+  data_matrix ocat;
+  data_int eof;
+  dmatrix opat;
+  dvector len;
+  dvector wgt;
+  dvector mat;
+  dvector age;
+  dvector fec;
+  int iter;
+  ~model_data();
+  model_data(int argc,char * argv[]);
+  friend class model_parameters;
+};
+
+class model_parameters : public model_data ,
+  public function_minimizer
+{
+public:
+  ~model_parameters();
+  void preliminary_calculations(void);
+  void set_runtime(void);
+  virtual void * mycast(void) {return (void*)this;}
+  static int mc_phase(void)
+  {
+    return initial_params::mc_phase;
+  }
+  static int mceval_phase(void)
+  {
+    return initial_params::mceval_phase;
+  }
+  static int sd_phase(void)
+  {
+    return initial_params::sd_phase;
+  }
+  static int current_phase(void)
+  {
+    return initial_params::current_phase;
+  }
+  static int last_phase(void)
+  {
+    return (initial_params::current_phase
+      >=initial_params::max_number_phases);
+  }
+  static prevariable current_feval(void)
+  {
+    return *objective_function_value::pobjfun;
+  }
+private:
+  ivector integer_control_flags;
+  dvector double_control_flags;
+  param_init_bounded_number log_Ro;
+  param_init_bounded_number h;
+  param_init_bounded_number log_avg_rec;
+  param_init_bounded_vector log_rec_dev;
+  param_init_number log_M;
+  param_init_number log_selh;
+  param_init_number log_sels;
+  param_init_bounded_vector init_log_rec_dev;
+  param_init_bounded_number log_Fbar;
+  param_init_bounded_vector log_F_dev;
+  param_init_bounded_number rho;
+  param_init_bounded_number varphi;
+  param_number Ro;
+  param_vector Ft;
+  param_number M;
+  param_number selh;
+  param_number sels;
+  param_number rsig;
+  param_number zsig;
+  param_number csig;
+  param_vector sel;
+  param_vector Mage;
+  param_vector lxo;
+  param_number ralpha;
+  param_number rbeta;
+  param_number phie;
+  param_matrix Nt;
+  param_vector log_Rt;
+  param_vector Rt_bar;
+  param_vector rdelta;
+  param_vector Bt;
+  param_vector Zt;
+  param_vector plandings;
+  param_vector SSBt;
+  param_matrix Fat;
+  param_matrix Zat;
+  param_matrix pcat;
+  param_matrix ppat;
+  param_vector cdev;
+  param_vector zdev;
+  param_matrix pdev;
+  param_number tau;
+  param_number sig;
+  param_number fpen;
+  param_number prior_function_value;
+  param_number likelihood_function_value;
+  objective_function_value f;
+public:
+  virtual void userfunction(void);
+  virtual void report(void);
+  virtual void final_calcs(void);
+  model_parameters(int sz,int argc, char * argv[]);
+  virtual void initializationfunction(void){}
+  void initial_calculations(void);
+  void recursive_calculations(void);
+  void recruitment_calculations(void);
+  void observation_model(void);
+  void calc_objective_function(void);
+  void mcmc_stuff(void);
+
+};
+#endif

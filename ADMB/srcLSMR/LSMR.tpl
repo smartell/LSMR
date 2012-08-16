@@ -394,7 +394,8 @@ FUNCTION void runSimulationModel(const int& seed)
 	calcNumbersAtLength();
 	calcSelectivityAtLength();
 	calcObservations();
-	
+	cout<<fi<<endl;
+	exit(1);
 	
 	/* Overwrite observations and draw from multinomial distribution */
 	C=value(Chat);
@@ -748,13 +749,10 @@ FUNCTION calc_objective_function;
 		pvec(2) = dnorm(bar_r_devs,0,0.4);
 		for(k=1;k<=ngear;k++)
 		{
-			dvariable mean_f = mean(fi(k));
+			dvariable mean_f = sum(fi(k))/fi_count(k);
 			pvec(3) += dnorm(mean_f,0.1,0.01);
 			pvec(4) += dnorm(bar_f_devs(k),0,1.0);
 		}
-		
-		//pvec(3) = dnorm(log_bar_f,log(0.1108032),0.05);
-		//pvec(3) = 1.e5 * square(log_bar_f - log(0.110));
 	}
 	else
 	{
@@ -763,7 +761,7 @@ FUNCTION calc_objective_function;
 		pvec(2) = dnorm(bar_r_devs,0,0.6);
 		for(k=1;k<=ngear;k++)
 		{
-			dvariable mean_f = mean(fi(k));
+			dvariable mean_f = sum(fi(k))/fi_count(k);
 			pvec(3) += dnorm(mean_f,0.1,2.5);
 			pvec(4) += dnorm(bar_f_devs(k),0,1.0);
 		}
