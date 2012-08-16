@@ -14,5 +14,5 @@ $(EXEC).rep: $(TPL) $(DAT) $(CTL)
 	./$(EXEC) -ind $(DAT) $(ARG)
 
 clean:
-	rm -f $(EXEC) *.eva *.log *.rpt *.htp *.cor *.par *.r*
+	rm -f $(EXEC) *.eva *.log *.rpt *.htp *.cor *.par *.r* *.[pbhem]* 
 	rm -f *.rep *.bar *.psv *.std $(EXEC).cpp admodel.* variance

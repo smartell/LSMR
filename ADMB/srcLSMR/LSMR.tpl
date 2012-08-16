@@ -375,15 +375,16 @@ FUNCTION void runSimulationModel(const int& seed)
 	tmp_bar_r_devs.fill_randn(rng);
 	tmp_bar_f_devs.fill_randn(rng);
 	
-	ddot_r_devs = 0.6*tmp_ddot_r_devs;
-	bar_r_devs  = 0.6*tmp_bar_r_devs;
-	for(k=1;k<=ngear;k++)
-	{
-		bar_f_devs(k) = 0.2*tmp_bar_f_devs(k);
-	}
+	double sig_r = flag(6);
+	ddot_r_devs = sig_r*tmp_ddot_r_devs;
+	bar_r_devs  = sig_r*tmp_bar_r_devs;
 	
 	/* Capture probabilities */
-	
+	double sig_f = flag(7);
+	for(k=1;k<=ngear;k++)
+	{
+		bar_f_devs(k) = sig_f*tmp_bar_f_devs(k);
+	}
 	
 	initParameters();
 	calcSurvivalAtLength();
@@ -708,20 +709,27 @@ FUNCTION calcObservations
 		{
 			if( effort(k,i)>0 )
 			{
-				lb           = min_tag_j(k,i);
 				ux           = 1.0 - mfexp(-fi(k,i)*sx(k));
-				Chat(k)(i)   = elem_prod(ux,elem_prod(Ntmp,ox));
-				Mhat(k)(i)(lb,nx)   = elem_prod(ux,elem_prod(Utmp,ox))(lb,nx);
-				Rhat(k)(i)   = elem_prod(ux,elem_prod(Ttmp,ox));
-				Mtmp(lb,nx) += Mhat(k)(i)(lb,nx);
+				Chat(k)(i)   = elem_prod(ux,Ntmp);
+				Mhat(k)(i)   = elem_prod(ux,Utmp);
+				Rhat(k)(i)   = elem_prod(ux,Ttmp);
 			}
+			//if( effort(k,i)>0 )
+			//{
+			//	lb           = min_tag_j(k,i);
+			//	ux           = 1.0 - mfexp(-fi(k,i)*sx(k));
+			//	Chat(k)(i)   = elem_prod(ux,elem_prod(Ntmp,ox));
+			//	Mhat(k)(i)(lb,nx)   = elem_prod(ux,elem_prod(Utmp,ox))(lb,nx);
+			//	Rhat(k)(i)   = elem_prod(ux,elem_prod(Ttmp,ox));
+			//	Mtmp(lb,nx) += Mhat(k)(i)(lb,nx);
+			//}
 		}
 		
 		/* Survive and grow tags-at-large and add new tags */
-		if( t < nyr )
-		{
-			T(t+1) = elem_prod(T(t),mfexp(-mx*dt))*iP(t) + Mtmp;
-		}
+		//if( t < nyr )
+		//{
+		//	T(t+1) = elem_prod(T(t),mfexp(-mx*dt))*iP(t) + Mtmp;
+		//}
 	}
 	
 	if( flag(1)==2 ) cout<<"Tt\n"<<rowsum(T)<<endl;
@@ -756,7 +764,7 @@ FUNCTION calc_objective_function;
 		for(k=1;k<=ngear;k++)
 		{
 			dvariable mean_f = mean(fi(k));
-			pvec(3) += dnorm(mean_f,0.1,0.5);
+			pvec(3) += dnorm(mean_f,0.1,2.5);
 			pvec(4) += dnorm(bar_f_devs(k),0,1.0);
 		}
 		
@@ -770,7 +778,7 @@ FUNCTION calc_objective_function;
 	for(k=1;k<=ngear;k++)
 	{
 		dvariable s = mean(bar_f_devs(k)); 
-		dev_pen(k)  = 1.e15 * s*s;
+		dev_pen(k)  = 1.e7 * s*s;
 	}
 	
 	/* LIKELIHOODS */
@@ -793,9 +801,18 @@ FUNCTION calc_objective_function;
 			{
 				for(j=1;j<=nx;j++)
 				{
-					fvec(1) -= log_negbinomial_density(C(k)(i)(j),Chat(k)(i)(j)+tiny,tau(k));
-					fvec(2) -= log_negbinomial_density(M(k)(i)(j),Mhat(k)(i)(j)+tiny,tau(k));
-					fvec(3) -= log_negbinomial_density(R(k)(i)(j),Rhat(k)(i)(j)+tiny,tau(k));
+					if(active(log_tau))
+					{
+						fvec(1) -= log_negbinomial_density(C(k)(i)(j),Chat(k)(i)(j)+tiny,tau(k));
+						fvec(2) -= log_negbinomial_density(M(k)(i)(j),Mhat(k)(i)(j)+tiny,tau(k));
+						fvec(3) -= log_negbinomial_density(R(k)(i)(j),Rhat(k)(i)(j)+tiny,tau(k));
+					} 
+					else
+					{
+						fvec(1) += square(C(k)(i)(j)-Chat(k)(i)(j));
+						fvec(2) += square(M(k)(i)(j)-Mhat(k)(i)(j));
+						fvec(3) += square(R(k)(i)(j)-Rhat(k)(i)(j));
+					}
 				}
 			}
 		}
