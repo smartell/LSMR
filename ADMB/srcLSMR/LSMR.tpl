@@ -640,14 +640,28 @@ FUNCTION calcNumbersAtLength
 		
 		t = index for year
 	*/
-	int t;
+	int i,k,t;
+	i = 0;
 	dvariable rt;
+	dvector mt(1,nx);
 	for(t=syr;t<nyr;t++)
 	{
+		/* TOTAL NUMBERS AT LARGE */
 		rt     = mfexp(log_rt(t+1));
 		N(t+1) = elem_prod(N(t),mfexp(-mx)) * iP(t) + rt*rx;
+		
+		/* MARKED NUMBERS AT LARGE */
+		i++;
+		mt = 0;
+		for(k=1;k<=ngear;k++)
+		{
+			mt += M(k)(i);
+		}
+		T(t+1) = elem_prod(T(t) + mt,mfexp(-mx)) * iP(t);
 	}
+	
 	if( flag(1)==2 ) cout<<"Nt\n"<<rowsum(N)<<endl;
+	if( flag(1)==2 ) cout<<"Tt\n"<<rowsum(T)<<endl;
   }
 //
 FUNCTION calcObservations
@@ -661,6 +675,8 @@ FUNCTION calcObservations
 		t   = index for year
 		its = index for time step
 		k   = index for gear
+		
+		TRYING A SIMPLE DISCRETE MODEL FOR OBSERVATIONS.
 	*/
 	
 	int t,its,k,i,lb;
