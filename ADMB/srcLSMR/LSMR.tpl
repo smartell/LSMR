@@ -127,6 +127,7 @@ DATA_SECTION
 	
 	// colsums of Catch-at-length //
 	matrix ct(1,ngear,1,irow); 
+	matrix iyr(1,ngear,1,irow);
 	
 	LOC_CALCS
 		for(k=1;k<=ngear;k++)
@@ -137,6 +138,8 @@ DATA_SECTION
 				M(k)(i) = i_M(k)(i)(2,ncol(k)).shift(1);
 				R(k)(i) = i_R(k)(i)(2,ncol(k)).shift(1);
 				ct(k,i) = sum( C(k)(i) );
+				
+				iyr = int(i_C(k)(i)(1));
 			}
 		}
 	END_CALCS
@@ -307,10 +310,12 @@ PARAMETER_SECTION
 	
 	
 	vector log_rt(syr+1,nyr);
-	matrix fi(1,ngear,1,irow);// capture probability in period i.
+	matrix fi(1,ngear,1,irow);  // capture probability in period i.
 	matrix sx(1,ngear,1,jcol);	// Selectivity at length xmid
 	matrix N(syr,nyr,1,nx);		// Numbers(time step, length bins)
+	matrix U(syr,nyr,1,nx);		// Un-marked number(time, length)
 	matrix T(syr,nyr,1,nx);		// Marks-at-large (time step, length bins)
+	matrix Z(syr,nyr,1,nx);		// Total mortality rate for unmarked fish (deaths + loss due to tagging)
 	matrix A(1,nx,1,nx);		// Size-transitin matrix (annual step)
 	//matrix P(1,nx,1,nx);		// Size-Transition Matrix for step dt
 	
@@ -350,12 +355,15 @@ PROCEDURE_SECTION
 	if( flag(1) ) cout<<"\n TOP OF PROCEDURE_SECTION "<<endl;
 	fpen.initialize();
 	initParameters();  
+	calcSelectivityAtLength();
 	calcSurvivalAtLength(); 
+	calcCaptureProbability();
+	
 	calcSizeTransitionMatrix(); 
 	initializeModel();
-	calcCaptureProbability();
+	
 	calcNumbersAtLength();
-	calcSelectivityAtLength();
+	
 	calcObservations();
 	calc_objective_function();
 	sd_l_infty = l_infty;
@@ -506,6 +514,7 @@ FUNCTION initializeModel
 	int i,ii,k,ik;
 	//Set up the initial states.
 	N.initialize();
+	U.initialize();
 	T.initialize();
 	
 	
@@ -531,7 +540,7 @@ FUNCTION initializeModel
 	
 	/* Initial numbers at length */
 	init_r = mfexp(log_ddot_r + ddot_r_devs);
-	N(syr)   = init_r * phi_X;
+	U(syr)   = init_r * phi_X;
 	
 	/* Annual recruitment */
 	log_rt = log_bar_r + bar_r_devs;
@@ -570,8 +579,23 @@ FUNCTION calcSurvivalAtLength
 	
 	mortality rate at length x  mx=m.linf*linf/xbin
 	note that m_linf is an annual rate.
+	
+	This function also calcluates the total mortality rate
+	of untagged fish where total mortality is defined as the 
+	loss due to natural causes, plus loss due to tagging.
+	
 	*/
 	mx = m_infty * l_infty/xmid;
+	
+	int i,k;
+	for(i=syr;i<=nyr;i++)
+	{
+		Z(i) = mx;
+		for(k=1;k<=ngear;k++)
+		{
+			Z(i) += fi(k)(i)
+		}
+	}
   }
 //
 FUNCTION calcSelectivityAtLength
@@ -627,17 +651,18 @@ FUNCTION calcSelectivityAtLength
 //
 FUNCTION calcNumbersAtLength
   {
-	/*	This function updates the numbers at length
+	/*	This function updates the unmarked numbers at length (U)
 		at the start of each year as a function of the 
 		numbers at length times the survival rate * size transition
 		and add new recuits-at-length.
 		
-	  	N_{t+1} = elem_prod(N_{t},mfexp(-mx*dt)) * P + rt*rx
+	  	U_{t+1} = elem_prod(U_{t},mfexp(-zx)) * P + rt*rx
+		
+		zx = mx + sum_k (fi_k sx_k)
 	
-	  	These are the total number of fish (tagged + untagged)
-		at large in the population.  N is used in the observation
-		models to determine number of captures and recaptures is
-		based on T.
+	  	These are the total number of fish umarked fish
+		at large in the population.  U is used in the observation
+		models to predict the number of unmarked fish captured.
 		
 		The function also does the accounting for the predicted number
 		of marked individuals at large (T).
