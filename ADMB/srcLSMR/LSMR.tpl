@@ -256,10 +256,10 @@ PARAMETER_SECTION
 	number cv_r
 	
 	//Mean fishing mortality rates
-	init_vector log_bar_f(1,ngear,2);
+	init_vector log_bar_f(1,ngear,-2);
 	
 	//Overdispersion
-	init_vector log_tau(1,ngear,5);
+	init_vector log_tau(1,ngear,-5);
 	
 	//Selectivity parameters
 	init_bounded_vector_vector sel_par(1,ngear,1,isel_npar,-5.,5.,sel_phz);
@@ -281,15 +281,15 @@ PARAMETER_SECTION
 		}
 	END_CALCS
 	
-	init_bounded_dev_vector ddot_r_devs(1,nx,-15,15,2);
-	init_bounded_dev_vector bar_r_devs(syr+1,nyr,-15,15,2);
+	init_bounded_dev_vector ddot_r_devs(1,nx,-15,15,-2);
+	init_bounded_dev_vector bar_r_devs(syr+1,nyr,-15,15,-2);
 	!! int phz;
 	!! if(flag(5)==1) phz=3; else phz=-3;
 	init_bounded_dev_vector l_infty_devs(syr,nyr-1,-5,5,phz);
 	
 	
 	//TODO Fix this so there is a dev vector for each gear, otherwise biased estimates of log_bar_f
-	init_bounded_matrix bar_f_devs(1,ngear,1,fi_count,-5.0,5.0,2);
+	init_bounded_matrix bar_f_devs(1,ngear,1,fi_count,-5.0,5.0,-2);
 	
 	sdreport_number sd_l_infty;
 	
@@ -326,7 +326,7 @@ PARAMETER_SECTION
 	
 INITIALIZATION_SECTION
 	theta     theta_ival;
-	log_bar_f -2.3;
+	log_bar_f -3.5;
 	log_tau   1.1;
 
 RUNTIME_SECTION
@@ -394,8 +394,7 @@ FUNCTION void runSimulationModel(const int& seed)
 	calcNumbersAtLength();
 	calcSelectivityAtLength();
 	calcObservations();
-	cout<<fi<<endl;
-	exit(1);
+	
 	
 	/* Overwrite observations and draw from multinomial distribution */
 	C=value(Chat);
@@ -410,9 +409,12 @@ FUNCTION void runSimulationModel(const int& seed)
 			{
 				for(j=1;j<=nx;j++)
 				{
-					C(k)(i)(j) = randnegbinomial(1.e-5+C(k)(i)(j),2.0,rng);
-					M(k)(i)(j) = randnegbinomial(1.e-5+M(k)(i)(j),2.0,rng);
-					R(k)(i)(j) = randnegbinomial(1.e-5+R(k)(i)(j),2.0,rng);
+					if(flag(7))
+					{
+						C(k)(i)(j) = randnegbinomial(1.e-5+C(k)(i)(j),2.0,rng);
+						M(k)(i)(j) = randnegbinomial(1.e-5+M(k)(i)(j),2.0,rng);
+						R(k)(i)(j) = randnegbinomial(1.e-5+R(k)(i)(j),2.0,rng);
+					}
 				}
 			}
 			
@@ -440,7 +442,6 @@ FUNCTION void runSimulationModel(const int& seed)
 //
 FUNCTION initParameters
   {
-	int k;
 	/* Leading parameters */
 	log_ddot_r = theta(1);
 	log_bar_r  = theta(2);	
@@ -450,12 +451,6 @@ FUNCTION initParameters
 	beta       = theta(6);
 	mu_r       = theta(7);
 	cv_r       = theta(8);
-	
-	
-	/* Catchability */
-	qk         = elem_div(mfexp(log_bar_f),mean_effort);
-	
-	
   }
 //
 FUNCTION calcSizeTransitionMatrix
@@ -544,11 +539,15 @@ FUNCTION initializeModel
 //
 FUNCTION calcCaptureProbability		
   {
+	/* Catchability */
+	qk         = elem_div(mfexp(log_bar_f),mean_effort);
+	
 	/* Capture probability at each time step. */
 	int i,k;
 	ivector ik(1,ngear);
 	ik = 1;
 	fi.initialize();
+	
 	for(k=1;k<=ngear;k++)
 	{
 		for(i=1;i<=irow(k);i++)
@@ -640,8 +639,13 @@ FUNCTION calcNumbersAtLength
 		models to determine number of captures and recaptures is
 		based on T.
 		
+		The function also does the accounting for the predicted number
+		of marked individuals at large (T).
+		
 		t = index for year
 	*/
+	
+	
 	int i,k,t;
 	i = 0;
 	dvariable rt;
@@ -672,7 +676,6 @@ FUNCTION calcObservations
 		Calculate the predicted total catch-at-length (Chat)
 		Calculate the predicted total recaptures-at-length (Rhat)
 		Calculate the predicted total new markes released-at-length (Mhat)
-		Calculate and update the number of marks at large.
 		
 		t   = index for year
 		its = index for time step
@@ -685,7 +688,7 @@ FUNCTION calcObservations
 	Chat.initialize();
 	Mhat.initialize();
 	Rhat.initialize();
-	T.initialize();
+	
 	
 	dvar_vector Ntmp(1,nx);
 	dvar_vector Ttmp(1,nx);
@@ -703,11 +706,12 @@ FUNCTION calcObservations
 	{
 		Ntmp = N(t);
 		Ttmp = T(t);
-		Utmp = posfun(Ntmp - Ttmp,0.01,fpen);
+		Utmp = Ntmp-Ttmp;//posfun(Ntmp - Ttmp,0.01,fpen);
 		Mtmp.initialize();
 		i++;
 		for(k=1;k<=ngear;k++)
 		{
+			
 			if( effort(k,i)>0 )
 			{
 				ux           = 1.0 - mfexp(-fi(k,i)*sx(k));
@@ -879,7 +883,12 @@ FUNCTION calc_objective_function;
 	
 	if( flag(1) ) cout<<"Fvec\t"<<setprecision(4)<<fvec<<endl;
 	if(fpen > 0) cout<<"Fpen = "<<fpen<<endl;
-	f = sum(fvec) + sum(pvec) + sum(priors) + sum(dev_pen) + sum(sel_pen) + 1.e5*fpen;
+	f  = sum(fvec); 
+	//f += sum(pvec); 
+	//f += sum(priors); 
+	//f += sum(dev_pen); 
+	//f += sum(sel_pen); 
+	f += 1.e5*fpen;
   }
 //
 FUNCTION dvar_vector dgamma(const dvector& x, const dvariable& a, const dvariable& b)

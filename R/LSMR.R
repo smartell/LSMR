@@ -45,12 +45,8 @@ plot.lsmr <- function(obj, ..1000.)
 		par(mfcol=c(2, 2), las=1, mar=c(5.1, 4.1, 4.1, 2.1), oma=c(1, 1, 1, 1))
 		jmin  <- min(which(xmid>=15))
 		nx    <- dim(N)[2]
-		Nt100 <- rowSums(N[, jmin:nx])/1000
-		print(Nt100)
-		plot(yr, Nt100, type="l", ylim=c(0, max(Nt100))
-		, xlab="Year", ylab="Abundance (1000s > 100 mm)")
-		#lines(yr, Nt100, col=4, lty=2)
-		if(exists("true_Nt")) lines(yr, true_Nt, col=2, lwd=2)
+		
+		.plotNt(obj)
 		gletter(1)
 		
 		plot(yr, Rt/1000, type="h", ylim=c(0, max(Rt)/1000) 
@@ -87,6 +83,19 @@ plot.lsmr <- function(obj, ..1000.)
 		}
 	})
 	par(opar)
+}
+
+.plotNt <- function(obj, ...)
+{
+	# plot Numbers greater than 50 mm 
+	with(obj, {
+		yl <- c(0, max(Nt, true_Nt))
+		
+		plot(yr, Nt, type="l", ylim=yl
+		, xlab="Year", ylab="Abundance (> 50 mm)")
+	
+		if(exists("true_Nt")) lines(yr, true_Nt, col=2, lwd=2)
+	})	
 }
 
 .plotSelex <- function(x, y, ...)
