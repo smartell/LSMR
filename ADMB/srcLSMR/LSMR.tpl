@@ -139,7 +139,7 @@ DATA_SECTION
 				R(k)(i) = i_R(k)(i)(2,ncol(k)).shift(1);
 				ct(k,i) = sum( C(k)(i) );
 				
-				iyr = int(i_C(k)(i)(1));
+				iyr(k,i) = int(i_C(k)(i)(1));
 			}
 		}
 	END_CALCS
@@ -322,6 +322,7 @@ PARAMETER_SECTION
 	// Predicted observations //
 	matrix hat_ct(1,ngear,1,irow);			// Predicted total catch
 	matrix delta(1,ngear,1,irow);			// residuals in total catch
+	3darray Farr(1,ngear,syr,nyr,1,nx);		// Array of size specific capture probabilities.
 	3darray Chat(1,ngear,1,irow,1,jcol);	// Predicted catch-at-length
 	3darray Mhat(1,ngear,1,irow,1,jcol);	// Predicted new marks-at-length
 	3darray Rhat(1,ngear,1,irow,1,jcol);	// Predicted recaptures-at-length
@@ -354,17 +355,15 @@ PRELIMINARY_CALCS_SECTION
 PROCEDURE_SECTION
 	if( flag(1) ) cout<<"\n TOP OF PROCEDURE_SECTION "<<endl;
 	fpen.initialize();
-	initParameters();  
-	calcSelectivityAtLength();
-	calcSurvivalAtLength(); 
+	initParameters(); 
+	calcSizeTransitionMatrix();
+	calcSelectivityAtLength();	
 	calcCaptureProbability();
-	
-	calcSizeTransitionMatrix(); 
-	initializeModel();
-	
+	calcSurvivalAtLength(); 
+	initializeModel();	
 	calcNumbersAtLength();
-	
 	calcObservations();
+	
 	calc_objective_function();
 	sd_l_infty = l_infty;
 	if( flag(1) ) cout<<"\n END OF PROCEDURE_SECTION "<<endl;
@@ -393,14 +392,14 @@ FUNCTION void runSimulationModel(const int& seed)
 	{
 		bar_f_devs(k) = sig_f*tmp_bar_f_devs(k);
 	}
-	
-	initParameters();
-	calcSurvivalAtLength();
+
+	initParameters(); 
 	calcSizeTransitionMatrix();
-	initializeModel();
+	calcSelectivityAtLength();	
 	calcCaptureProbability();
+	calcSurvivalAtLength(); 
+	initializeModel();	
 	calcNumbersAtLength();
-	calcSelectivityAtLength();
 	calcObservations();
 	
 	
@@ -517,6 +516,12 @@ FUNCTION initializeModel
 	U.initialize();
 	T.initialize();
 	
+	// Initialize predicted observations
+	Mhat.initialize();
+	Chat.initialize();
+	Rhat.initialize();
+	
+	
 	
 	/* Initialize numbers at length at the first time step. */
 	dvar_vector init_r(1,nx);
@@ -552,22 +557,24 @@ FUNCTION calcCaptureProbability
 	qk         = elem_div(mfexp(log_bar_f),mean_effort);
 	
 	/* Capture probability at each time step. */
-	int i,k;
+	int i,k,jyr;
 	ivector ik(1,ngear);
 	ik = 1;
 	fi.initialize();
+	Farr.initialize();
 	
 	for(k=1;k<=ngear;k++)
 	{
 		for(i=1;i<=irow(k);i++)
 		{
+			jyr = iyr(k,i);
 			if( effort(k,i)>0 )
 			{
-				fi(k,i) = qk(k)*effort(k,i)*mfexp(bar_f_devs(k)(ik(k)++));
+				fi(k,i)      = qk(k)*effort(k,i)*mfexp(bar_f_devs(k)(ik(k)++));
+				Farr(k)(jyr) = fi(k,i) * sx(k);
 			}
 		}
 	}
-	
   }
 //
 FUNCTION calcSurvivalAtLength
@@ -587,15 +594,16 @@ FUNCTION calcSurvivalAtLength
 	*/
 	mx = m_infty * l_infty/xmid;
 	
-	int i,k;
+	int i,j,k;
 	for(i=syr;i<=nyr;i++)
 	{
 		Z(i) = mx;
 		for(k=1;k<=ngear;k++)
 		{
-			Z(i) += fi(k)(i)
+			Z(i) += Farr(k)(i);
 		}
 	}
+	//cout<<Z<<endl;
   }
 //
 FUNCTION calcSelectivityAtLength
@@ -674,22 +682,31 @@ FUNCTION calcNumbersAtLength
 	int i,k,t;
 	i = 0;
 	dvariable rt;
-	dvector mt(1,nx);
-	for(t=syr;t<nyr;t++)
+	dvar_vector mt(1,nx);
+	dvector pt(1,nx);
+	for(t=syr;t<=nyr;t++)
 	{
 		/* TOTAL NUMBERS AT LARGE */
 		rt     = mfexp(log_rt(t+1));
-		N(t+1) = elem_prod(N(t),mfexp(-mx)) * iP(t) + rt*rx;
+		//N(t+1) = elem_prod(N(t),mfexp(-mx)) * iP(t) + rt*rx;
+		if(t<nyr)
+		U(t+1) = elem_prod(U(t),mfexp(-Z(t))) * iP(t) + rt*rx;
 		
 		/* MARKED NUMBERS AT LARGE */
 		i++;
-		mt = 0;
+		mt = 0;		// new marks = captures of U > minsize tag
+		pt = 0;
 		for(k=1;k<=ngear;k++)
 		{
-			mt += M(k)(i);
+			pt(min_tag_j(k,i),nx) = 1;
+			Mhat(k)(i)            = elem_prod(U(t),(1.-exp(-elem_prod(Farr(k)(t),pt))));
+			mt                   += Mhat(k)(i);
 		}
+		
+		if(t<nyr)
 		T(t+1) = elem_prod(T(t) + mt,mfexp(-mx)) * iP(t);
 	}
+	N = U + T;
 	
 	if( flag(1)==2 ) cout<<"Nt\n"<<rowsum(N)<<endl;
 	if( flag(1)==2 ) cout<<"Tt\n"<<rowsum(T)<<endl;
@@ -700,7 +717,7 @@ FUNCTION calcObservations
 	/*
 		Calculate the predicted total catch-at-length (Chat)
 		Calculate the predicted total recaptures-at-length (Rhat)
-		Calculate the predicted total new markes released-at-length (Mhat)
+		Mhat is calculated in calcNumbersAtLength
 		
 		t   = index for year
 		its = index for time step
@@ -710,9 +727,6 @@ FUNCTION calcObservations
 	*/
 	
 	int t,its,k,i,lb;
-	Chat.initialize();
-	Mhat.initialize();
-	Rhat.initialize();
 	
 	
 	dvar_vector Ntmp(1,nx);
@@ -729,19 +743,18 @@ FUNCTION calcObservations
 	
 	for(t=syr;t<=nyr;t++)
 	{
-		Ntmp = N(t);
+		Utmp = U(t);
 		Ttmp = T(t);
-		Utmp = Ntmp-Ttmp;//posfun(Ntmp - Ttmp,0.01,fpen);
-		Mtmp.initialize();
+		Ntmp = Utmp+Ttmp;
+		
 		i++;
 		for(k=1;k<=ngear;k++)
 		{
-			
 			if( effort(k,i)>0 )
 			{
-				ux           = 1.0 - mfexp(-fi(k,i)*sx(k));
+				ux           = 1.0 - mfexp(-Farr(k,t));
 				Chat(k)(i)   = elem_prod(ux,Ntmp);
-				Mhat(k)(i)   = elem_prod(ux,Utmp);
+				//Mhat(k)(i)   = elem_prod(ux,Utmp);
 				Rhat(k)(i)   = elem_prod(ux,Ttmp);
 			}
 			//if( effort(k,i)>0 )

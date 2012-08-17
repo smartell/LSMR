@@ -89,7 +89,9 @@ plot.lsmr <- function(obj, ..1000.)
 {
 	# plot Numbers greater than 50 mm 
 	with(obj, {
-		yl <- c(0, max(Nt, true_Nt))
+		yl <- c(0, max(Nt))
+		if(exists("true_Nt"))
+			yl <- c(0, max(Nt, true_Nt))
 		
 		plot(yr, Nt, type="l", ylim=yl
 		, xlab="Year", ylab="Abundance (> 50 mm)")
