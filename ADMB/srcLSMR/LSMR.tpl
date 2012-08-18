@@ -259,10 +259,12 @@ PARAMETER_SECTION
 	number cv_r
 	
 	//Mean fishing mortality rates
-	init_vector log_bar_f(1,ngear,-2);
+	init_vector log_bar_f(1,ngear,2);
 	
 	//Overdispersion
-	init_vector log_tau(1,ngear,-5);
+	!! int tau_phz;
+	!! if( flag(8)>0 ) tau_phz=int(flag(8)); else tau_phz=-1;
+	init_vector log_tau(1,ngear,tau_phz);
 	
 	//Selectivity parameters
 	init_bounded_vector_vector sel_par(1,ngear,1,isel_npar,-5.,5.,sel_phz);
@@ -284,15 +286,15 @@ PARAMETER_SECTION
 		}
 	END_CALCS
 	
-	init_bounded_dev_vector ddot_r_devs(1,nx,-15,15,-2);
-	init_bounded_dev_vector bar_r_devs(syr+1,nyr,-15,15,-2);
+	init_bounded_dev_vector ddot_r_devs(1,nx,-15,15,2);
+	init_bounded_dev_vector bar_r_devs(syr+1,nyr,-15,15,2);
 	!! int phz;
 	!! if(flag(5)==1) phz=3; else phz=-3;
 	init_bounded_dev_vector l_infty_devs(syr,nyr-1,-5,5,phz);
 	
 	
 	//TODO Fix this so there is a dev vector for each gear, otherwise biased estimates of log_bar_f
-	init_bounded_matrix bar_f_devs(1,ngear,1,fi_count,-5.0,5.0,-2);
+	init_bounded_matrix bar_f_devs(1,ngear,1,fi_count,-5.0,5.0,3);
 	
 	sdreport_number sd_l_infty;
 	
@@ -754,25 +756,9 @@ FUNCTION calcObservations
 			{
 				ux           = 1.0 - mfexp(-Farr(k,t));
 				Chat(k)(i)   = elem_prod(ux,Ntmp);
-				//Mhat(k)(i)   = elem_prod(ux,Utmp);
 				Rhat(k)(i)   = elem_prod(ux,Ttmp);
 			}
-			//if( effort(k,i)>0 )
-			//{
-			//	lb           = min_tag_j(k,i);
-			//	ux           = 1.0 - mfexp(-fi(k,i)*sx(k));
-			//	Chat(k)(i)   = elem_prod(ux,elem_prod(Ntmp,ox));
-			//	Mhat(k)(i)(lb,nx)   = elem_prod(ux,elem_prod(Utmp,ox))(lb,nx);
-			//	Rhat(k)(i)   = elem_prod(ux,elem_prod(Ttmp,ox));
-			//	Mtmp(lb,nx) += Mhat(k)(i)(lb,nx);
-			//}
 		}
-		
-		/* Survive and grow tags-at-large and add new tags */
-		//if( t < nyr )
-		//{
-		//	T(t+1) = elem_prod(T(t),mfexp(-mx*dt))*iP(t) + Mtmp;
-		//}
 	}
 	
 	if( flag(1)==2 ) cout<<"Tt\n"<<rowsum(T)<<endl;
@@ -924,7 +910,7 @@ FUNCTION calc_objective_function;
 	f  = sum(fvec); 
 	//f += sum(pvec); 
 	//f += sum(priors); 
-	//f += sum(dev_pen); 
+	f += sum(dev_pen); 
 	//f += sum(sel_pen); 
 	f += 1.e5*fpen;
   }
