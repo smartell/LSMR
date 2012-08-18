@@ -12,6 +12,8 @@
 
 # --------------------------------------------------------------------------- #
 source("read.admb.R", echo=FALSE)
+source("plotTrace.R", echo=FALSE)
+source("plotMarginals.R", echo=FALSE)
 
 .SAVEFIGS		<- TRUE
 .PRESENTATION	<- FALSE
@@ -24,6 +26,7 @@ source("read.admb.R", echo=FALSE)
 getObj <- function(fn=.FILENAME)
 {
 	obj				<- read.admb(.FILENAME)
+	obj$mcmc		<- read.table(paste(.FILENAME, ".post", sep=""), header=TRUE)
 	class(obj)		<- c(class(obj), "lsmr")
 	return(obj)
 }
@@ -40,7 +43,7 @@ main <- function()
 	{
 		gfn <- paste(.FIGDIR, "fig:LSRM%d.png", sep="")
 		png(gfn, width=960, height=960, res=100)
-		par(cex.lab = 2.2* .CEXLAB, cex.axis=2, mar=c(6.1, 5.1, 5.1, 3.1) )
+		par(cex.lab = .CEXLAB, cex.axis=0.9*.CEXLAB, mar=c(6.1, 5.1, 5.1, 3.1) )
 		plot(obj)
 		dev.off()
 	}
@@ -57,9 +60,6 @@ print.lsmr <- function(obj, ...)
 plot.lsmr <- function(obj, ...)
 {
 	with(obj, {		
-		jmin  <- min(which(xmid>=15))
-		nx    <- dim(N)[2]
-		
 		.plotNt(obj)
 		gletter(1)
 		
@@ -73,7 +73,6 @@ plot.lsmr <- function(obj, ...)
 		gletter(4)
 		
 		
-		#par(mfcol=c(1, 1))
 		.plotSelex(xmid, t(sx))
 		
 		
@@ -90,8 +89,21 @@ plot.lsmr <- function(obj, ...)
 			.plotLF(xmid, i_R[ir, ], Rhat[ir, ], "Recaptures")
 		}
 		
+		# Posterior samples
+		.plotTrace(obj)
+		.plotMarginalPosteriors(obj)
+		
 	})
 
+}
+
+.plotTrace <- function(obj, ...)
+{
+	with(obj, {
+		if(exists("post.samp"))
+		.mcmcTrace(obj)
+	})
+	
 }
 
 .plotMx <- function(obj, ...)
