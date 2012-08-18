@@ -24,16 +24,26 @@
 \headcommand {\sectionentry {3}{LSRM Model}{12}{LSRM Model}{0}}
 \headcommand {\beamer@sectionpages {5}{11}}
 \headcommand {\beamer@subsectionpages {9}{11}}
-\headcommand {\slideentry {3}{0}{4}{12/13}{}{0}}
-\headcommand {\beamer@framepages {12}{13}}
-\headcommand {\slideentry {3}{0}{5}{14/14}{}{0}}
-\headcommand {\beamer@framepages {14}{14}}
-\headcommand {\slideentry {3}{0}{6}{15/15}{}{0}}
+\headcommand {\slideentry {3}{0}{4}{12/14}{}{0}}
+\headcommand {\beamer@framepages {12}{14}}
+\headcommand {\sectionentry {4}{Simulation testing}{15}{Simulation testing}{0}}
+\headcommand {\beamer@sectionpages {12}{14}}
+\headcommand {\beamer@subsectionpages {12}{14}}
+\headcommand {\slideentry {4}{0}{5}{15/15}{}{0}}
 \headcommand {\beamer@framepages {15}{15}}
-\headcommand {\slideentry {3}{0}{7}{16/16}{}{0}}
+\headcommand {\slideentry {4}{0}{6}{16/16}{}{0}}
 \headcommand {\beamer@framepages {16}{16}}
-\headcommand {\beamer@partpages {1}{16}}
-\headcommand {\beamer@subsectionpages {12}{16}}
-\headcommand {\beamer@sectionpages {12}{16}}
-\headcommand {\beamer@documentpages {16}}
-\headcommand {\def \inserttotalframenumber {11}}
+\headcommand {\slideentry {4}{0}{7}{17/17}{}{0}}
+\headcommand {\beamer@framepages {17}{17}}
+\headcommand {\sectionentry {5}{Resources}{18}{Resources}{0}}
+\headcommand {\beamer@sectionpages {15}{17}}
+\headcommand {\beamer@subsectionpages {15}{17}}
+\headcommand {\slideentry {5}{0}{8}{18/18}{}{0}}
+\headcommand {\beamer@framepages {18}{18}}
+\headcommand {\slideentry {5}{0}{9}{19/19}{}{0}}
+\headcommand {\beamer@framepages {19}{19}}
+\headcommand {\beamer@partpages {1}{19}}
+\headcommand {\beamer@subsectionpages {18}{19}}
+\headcommand {\beamer@sectionpages {18}{19}}
+\headcommand {\beamer@documentpages {19}}
+\headcommand {\def \inserttotalframenumber {13}}

@@ -4,3 +4,5 @@
 \beamer@subsectionintoc {2}{1}{Size Transition}{5}{0}{2}
 \beamer@subsectionintoc {2}{2}{Catch-at-length}{9}{0}{2}
 \beamer@sectionintoc {3}{LSRM Model}{12}{0}{3}
+\beamer@sectionintoc {4}{Simulation testing}{15}{0}{4}
+\beamer@sectionintoc {5}{Resources}{18}{0}{5}

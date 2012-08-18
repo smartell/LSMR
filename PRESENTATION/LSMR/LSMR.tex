@@ -210,8 +210,20 @@ University of British Columbia \\
 \label{sec:lsrm_model}
 \begin{frame}
 	\frametitle{Length-structured mark-recapture model}
-	
 	\only<1>
+	{
+		\begin{block}{Objective}
+			Fit a length-based model to capture and recapture-at-length data, while jointly estimating abundance, growth and survival rates.
+		\end{block}
+		
+		\begin{block}{Difference between LSMR and ASMR}
+			\begin{itemize}
+				\item Forward reconstruction of unmarked individuals.
+				\item Estimate size-based capture probabilities.
+			\end{itemize}
+		\end{block}
+	}
+	\only<2>
 	{
 		\begin{block} {Dynamics of numbers-at-length}
 			\begin{itemize}
@@ -225,7 +237,7 @@ University of British Columbia \\
 			
 		\end{block}
 	}
-	\only<2>
+	\only<3>
 	{
 		\begin{block} {Predicted catch-at-length}
 			\begin{itemize}
@@ -243,25 +255,65 @@ University of British Columbia \\
 	
 \end{frame}
 
+\section{Simulation testing} % (fold)
+\label{sec:simulation_testing}
+
+
+\begin{frame}
+	\frametitle{Simulation testing}
+	\begin{block} {Objective}
+		Use simulated data to demonstrate estimability of model parameters.
+	\end{block}
+	\begin{block}{Scenarios}
+		\begin{enumerate}
+			\item Perfect information (no observation errors).
+			\item Mixed error: error in size-specific capture probabilities.
+		\end{enumerate}
+	\end{block}
+\end{frame}
+
+\begin{frame}{Simulation}
+	\begin{figure}[htbp]
+		\centering
+			\includegraphics[height=1.4in]{../../FIGS/LSMR/SIMa/fig:LSRM1.png}
+			\includegraphics[height=1.4in]{../../FIGS/LSMR/SIMa/fig:LSRM2.png}\\
+			\includegraphics[height=1.4in]{../../FIGS/LSMR/SIMa/fig:LSRM3.png}
+			\includegraphics[height=1.4in]{../../FIGS/LSMR/SIMa/fig:LSRM4.png}
+		\caption{MLE results with perfect information.}
+		\label{fig:FIGS_LSMR_fig:LSRM1}
+	\end{figure}	
+\end{frame}
+
+\begin{frame}{Simulation}
+	\begin{figure}[htbp]
+		\centering
+			\includegraphics[height=1.4in]{../../FIGS/LSMR/SIMb/fig:LSRM1.png}
+			\includegraphics[height=1.4in]{../../FIGS/LSMR/SIMb/fig:LSRM2.png}\\
+			\includegraphics[height=1.4in]{../../FIGS/LSMR/SIMb/fig:LSRM3.png}
+			\includegraphics[height=1.4in]{../../FIGS/LSMR/SIMb/fig:LSRM4.png}
+		\caption{MLE results with $\sigma_\delta = 0.2$.}
+		\label{fig:FIGS_LSMR_fig:LSRM1}
+	\end{figure}	
+\end{frame}
+% section simulation_testing (end)
+
 % section lsrm_model (end)
 
 % 
-\begin{frame}[fragile]  % notice the fragile option, since the body
-			% contains a verbatim command
-Example of the \verb|\cite| command to give a reference is below:
-Example of citation using \cite{key1} follows on.
-\end{frame}
- 
+\section{Resources} % (fold)
+\label{sec:resources}
+
+
 \begin{frame}
-\frametitle{References}
-\footnotesize{
-\begin{thebibliography}{99}
- \bibitem[Label1, 2010]{key1} Author's name (1987)
- \newblock Title of the paper.
- \newblock \emph{Journal Name} 55(4), 765 -- 799.
-\end{thebibliography}
-}
+	\frametitle{More details ...}
+	
+	Code @:
+	\url{https://github.com/smartell/LSMR}
 \end{frame}
+% section resources (end) 
+
+
+
  
 \begin{frame}
 \centerline{The End}

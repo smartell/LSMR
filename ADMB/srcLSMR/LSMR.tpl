@@ -238,6 +238,7 @@ DATA_SECTION
 	vector true_Nt(syr,nyr);
 	vector true_Rt(syr,nyr);
 	vector true_Tt(syr,nyr);
+	vector true_mx(1,nx);
 	matrix true_fi(1,ngear,1,irow);
 	
 	!! cout<< " END OF DATA_SECTION \n"<<endl;
@@ -304,7 +305,7 @@ PARAMETER_SECTION
 
 	
 	number m_linf;
-	number fpen;
+
 	vector tau(1,ngear);	// over-dispersion parameters >1.0
 	vector qk(1,ngear);		// catchability of gear k
 	vector mx(1,nx);		// Mortality rate at length xmid
@@ -334,7 +335,7 @@ PARAMETER_SECTION
 	
 INITIALIZATION_SECTION
 	theta     theta_ival;
-	log_bar_f -3.5;
+	log_bar_f -2.3;
 	log_tau   1.1;
 
 RUNTIME_SECTION
@@ -356,7 +357,7 @@ PRELIMINARY_CALCS_SECTION
 
 PROCEDURE_SECTION
 	if( flag(1) ) cout<<"\n TOP OF PROCEDURE_SECTION "<<endl;
-	fpen.initialize();
+	
 	initParameters(); 
 	calcSizeTransitionMatrix();
 	calcSelectivityAtLength();	
@@ -441,12 +442,18 @@ FUNCTION void runSimulationModel(const int& seed)
 	true_fi = value(fi);
 	true_Nt = value(rowsum(N));
 	true_Tt = value(rowsum(T));
+	true_mx = value(mx);
 	for(i=syr;i<=nyr;i++)
 	{
-		if(i==syr) true_Rt(i) = value(mfexp(log_ddot_r+ddot_r_devs(nx)));
-		else       true_Rt(i) = value(mfexp(log_rt(i)));
+		if(i==syr) 
+		{
+			true_Rt(i) = value(mfexp(log_ddot_r+ddot_r_devs(nx)));
+		}
+		else
+		{
+			true_Rt(i) = value(mfexp(log_rt(i)));	
+		}   
 	}
-	
   }
 //
 FUNCTION initParameters
@@ -656,6 +663,7 @@ FUNCTION calcSelectivityAtLength
 			break;
 		}
 		sx(k) = mfexp( sx(k) - log( mean( mfexp(sx(k))+1.e-30 ) ) );
+		//sx(k) = mfexp( sx(k) - log( max( mfexp(sx(k))+1.e-30 ) ) );
 	}
   }
 //
@@ -804,7 +812,7 @@ FUNCTION calc_objective_function;
 	for(k=1;k<=ngear;k++)
 	{
 		dvariable s = mean(bar_f_devs(k)); 
-		dev_pen(k)  = 1.e7 * s*s;
+		dev_pen(k)  = 1.e5 * s*s;
 	}
 	
 	/* LIKELIHOODS */
@@ -906,13 +914,13 @@ FUNCTION calc_objective_function;
 	}
 	
 	if( flag(1) ) cout<<"Fvec\t"<<setprecision(4)<<fvec<<endl;
-	if(fpen > 0) cout<<"Fpen = "<<fpen<<endl;
+	
 	f  = sum(fvec); 
-	//f += sum(pvec); 
-	//f += sum(priors); 
+	f += sum(pvec); 
+	f += sum(priors); 
 	f += sum(dev_pen); 
-	//f += sum(sel_pen); 
-	f += 1.e5*fpen;
+	f += sum(sel_pen); 
+	
   }
 //
 FUNCTION dvar_vector dgamma(const dvector& x, const dvariable& a, const dvariable& b)
@@ -1075,6 +1083,7 @@ REPORT_SECTION
 		REPORT(true_Nt);
 		REPORT(true_Rt);
 		REPORT(true_Tt);
+		REPORT(true_mx);
 		REPORT(true_fi);
 	}
 

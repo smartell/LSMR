@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=pdflatex 2011.7.3)  17 AUG 2012 07:55
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=pdflatex 2011.7.3)  17 AUG 2012 17:02
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -704,6 +704,9 @@ Package: beamerouterthemesidebar 2010/06/17  (rcs-revision d02a7cf4d8ae)
 
 LaTeX Warning: Label `fig:FIGS_LSMR_fig:MarksAtLengthHOOP' multiply defined.
 
+
+LaTeX Warning: Label `fig:FIGS_LSMR_fig:LSRM1' multiply defined.
+
 )
 \openout1 = `LSMR.aux'.
 
@@ -897,7 +900,7 @@ File: umsb.fd 2009/06/22 v3.00 AMS symbols B
 ] [5
 
 ]
-<../../FIGS/LSMR/fig:AnnualGrowthIncrements.pdf, id=101, 504.88625pt x 504.8862
+<../../FIGS/LSMR/fig:AnnualGrowthIncrements.pdf, id=121, 504.88625pt x 504.8862
 5pt>
 File: ../../FIGS/LSMR/fig:AnnualGrowthIncrements.pdf Graphic file (type pdf)
  <use ../../FIGS/LSMR/fig:AnnualGrowthIncrements.pdf>
@@ -911,7 +914,7 @@ Overfull \vbox (9.5831pt too high) detected at line 170
 [6
 
  <../../FIGS/LSMR/fig:AnnualGrowthIncrements.pdf>]
-<../../FIGS/LSMR/fig:LinfPosteriors.pdf, id=124, 722.7pt x 361.35pt>
+<../../FIGS/LSMR/fig:LinfPosteriors.pdf, id=147, 722.7pt x 361.35pt>
 File: ../../FIGS/LSMR/fig:LinfPosteriors.pdf Graphic file (type pdf)
 
 <use ../../FIGS/LSMR/fig:LinfPosteriors.pdf>
@@ -919,7 +922,7 @@ Package pdftex.def Info: ../../FIGS/LSMR/fig:LinfPosteriors.pdf used on input l
 ine 170.
 (pdftex.def)             Requested size: 202.35622pt x 101.1773pt.
 
-<../../FIGS/LSMR/fig:kPosteriors.pdf, id=125, 722.7pt x 361.35pt>
+<../../FIGS/LSMR/fig:kPosteriors.pdf, id=148, 722.7pt x 361.35pt>
 File: ../../FIGS/LSMR/fig:kPosteriors.pdf Graphic file (type pdf)
 
 <use ../../FIGS/LSMR/fig:kPosteriors.pdf>
@@ -934,7 +937,7 @@ Overfull \vbox (8.0815pt too high) detected at line 170
 
  <../../FIGS/LSMR/fig:LinfPosteriors.pdf> <../../FIGS/LSMR/fig:kPosteriors.pdf>
 ]
-<../../FIGS/LSMR/fig:TransitionMatrix.pdf, id=150, 504.88625pt x 504.88625pt>
+<../../FIGS/LSMR/fig:TransitionMatrix.pdf, id=174, 504.88625pt x 504.88625pt>
 File: ../../FIGS/LSMR/fig:TransitionMatrix.pdf Graphic file (type pdf)
 
 <use ../../FIGS/LSMR/fig:TransitionMatrix.pdf>
@@ -948,7 +951,7 @@ Overfull \vbox (21.53688pt too high) detected at line 170
 [8
 
  <../../FIGS/LSMR/fig:TransitionMatrix.pdf>]
-<../../FIGS/LSMR/fig:CaptureLFbubbles.pdf, id=172, 504.88625pt x 504.88625pt>
+<../../FIGS/LSMR/fig:CaptureLFbubbles.pdf, id=198, 504.88625pt x 504.88625pt>
 File: ../../FIGS/LSMR/fig:CaptureLFbubbles.pdf Graphic file (type pdf)
 
 <use ../../FIGS/LSMR/fig:CaptureLFbubbles.pdf>
@@ -962,7 +965,7 @@ Overfull \vbox (6.57376pt too high) detected at line 183
 [9
 
  <../../FIGS/LSMR/fig:CaptureLFbubbles.pdf>]
-<../../FIGS/LSMR/fig:MarksAtLengthHOOP.pdf, id=192, 504.88625pt x 504.88625pt>
+<../../FIGS/LSMR/fig:MarksAtLengthHOOP.pdf, id=220, 504.88625pt x 504.88625pt>
 File: ../../FIGS/LSMR/fig:MarksAtLengthHOOP.pdf Graphic file (type pdf)
 
 <use ../../FIGS/LSMR/fig:MarksAtLengthHOOP.pdf>
@@ -972,7 +975,7 @@ t line 194.
  [10
 
  <../../FIGS/LSMR/fig:MarksAtLengthHOOP.pdf>]
-<../../FIGS/LSMR/fig:MarksAtLengthGILL.pdf, id=211, 504.88625pt x 504.88625pt>
+<../../FIGS/LSMR/fig:MarksAtLengthGILL.pdf, id=241, 504.88625pt x 504.88625pt>
 File: ../../FIGS/LSMR/fig:MarksAtLengthGILL.pdf Graphic file (type pdf)
 
 <use ../../FIGS/LSMR/fig:MarksAtLengthGILL.pdf>
@@ -991,15 +994,87 @@ l.203 \end{frame}
 ]
 [13
 
-]
-\openout4 = `LSMR.vrb'.
-
- (./LSMR.vrb) [14
+] [14
 
 ] [15
 
- </usr/local/texlive/2011/texmf-dist/tex/latex/beamer/art/beamericonarticle.pdf
->] [16
+] <../../FIGS/LSMR/SIMa/fig:LSRM1.png, id=318, 481.8pt x 481.8pt>
+File: ../../FIGS/LSMR/SIMa/fig:LSRM1.png Graphic file (type png)
+
+<use ../../FIGS/LSMR/SIMa/fig:LSRM1.png>
+Package pdftex.def Info: ../../FIGS/LSMR/SIMa/fig:LSRM1.png used on input line 
+285.
+(pdftex.def)             Requested size: 101.17363pt x 101.17755pt.
+
+<../../FIGS/LSMR/SIMa/fig:LSRM2.png, id=320, 481.8pt x 481.8pt>
+File: ../../FIGS/LSMR/SIMa/fig:LSRM2.png Graphic file (type png)
+
+<use ../../FIGS/LSMR/SIMa/fig:LSRM2.png>
+Package pdftex.def Info: ../../FIGS/LSMR/SIMa/fig:LSRM2.png used on input line 
+285.
+(pdftex.def)             Requested size: 101.17363pt x 101.17755pt.
+
+<../../FIGS/LSMR/SIMa/fig:LSRM3.png, id=321, 481.8pt x 481.8pt>
+File: ../../FIGS/LSMR/SIMa/fig:LSRM3.png Graphic file (type png)
+
+<use ../../FIGS/LSMR/SIMa/fig:LSRM3.png>
+Package pdftex.def Info: ../../FIGS/LSMR/SIMa/fig:LSRM3.png used on input line 
+285.
+(pdftex.def)             Requested size: 101.17363pt x 101.17755pt.
+
+<../../FIGS/LSMR/SIMa/fig:LSRM4.png, id=322, 481.8pt x 481.8pt>
+File: ../../FIGS/LSMR/SIMa/fig:LSRM4.png Graphic file (type png)
+
+<use ../../FIGS/LSMR/SIMa/fig:LSRM4.png>
+Package pdftex.def Info: ../../FIGS/LSMR/SIMa/fig:LSRM4.png used on input line 
+285.
+(pdftex.def)             Requested size: 101.17363pt x 101.17755pt.
+ [16
+
+ <../../FIGS/LSMR/SIMa/fig:LSRM1.png> <../../FIGS/LSMR/SIMa/fig:LSRM2.png> <../
+../FIGS/LSMR/SIMa/fig:LSRM3.png> <../../FIGS/LSMR/SIMa/fig:LSRM4.png>]
+<../../FIGS/LSMR/SIMb/fig:LSRM1.png, id=341, 481.8pt x 481.8pt>
+File: ../../FIGS/LSMR/SIMb/fig:LSRM1.png Graphic file (type png)
+
+<use ../../FIGS/LSMR/SIMb/fig:LSRM1.png>
+Package pdftex.def Info: ../../FIGS/LSMR/SIMb/fig:LSRM1.png used on input line 
+297.
+(pdftex.def)             Requested size: 101.17363pt x 101.17755pt.
+
+<../../FIGS/LSMR/SIMb/fig:LSRM2.png, id=342, 481.8pt x 481.8pt>
+File: ../../FIGS/LSMR/SIMb/fig:LSRM2.png Graphic file (type png)
+
+<use ../../FIGS/LSMR/SIMb/fig:LSRM2.png>
+Package pdftex.def Info: ../../FIGS/LSMR/SIMb/fig:LSRM2.png used on input line 
+297.
+(pdftex.def)             Requested size: 101.17363pt x 101.17755pt.
+
+<../../FIGS/LSMR/SIMb/fig:LSRM3.png, id=343, 481.8pt x 481.8pt>
+File: ../../FIGS/LSMR/SIMb/fig:LSRM3.png Graphic file (type png)
+
+<use ../../FIGS/LSMR/SIMb/fig:LSRM3.png>
+Package pdftex.def Info: ../../FIGS/LSMR/SIMb/fig:LSRM3.png used on input line 
+297.
+(pdftex.def)             Requested size: 101.17363pt x 101.17755pt.
+
+<../../FIGS/LSMR/SIMb/fig:LSRM4.png, id=344, 481.8pt x 481.8pt>
+File: ../../FIGS/LSMR/SIMb/fig:LSRM4.png Graphic file (type png)
+
+<use ../../FIGS/LSMR/SIMb/fig:LSRM4.png>
+Package pdftex.def Info: ../../FIGS/LSMR/SIMb/fig:LSRM4.png used on input line 
+297.
+(pdftex.def)             Requested size: 101.17363pt x 101.17755pt.
+pdfTeX warning (ext4): destination with the same identifier (name{fig:FIGS_LSMR
+_fig:LSRM1}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.297 \end{frame}
+                  [17
+
+ <../../FIGS/LSMR/SIMb/fig:LSRM1.png> <../../FIGS/LSMR/SIMb/fig:LSRM2.png> <../
+../FIGS/LSMR/SIMb/fig:LSRM3.png> <../../FIGS/LSMR/SIMb/fig:LSRM4.png>] [18
+
+] [19
 
 ]
 \tf@nav=\write6
@@ -1011,13 +1086,13 @@ l.203 \end{frame}
 \tf@snm=\write8
 \openout8 = `LSMR.snm'.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 270.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 270.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 322.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 322.
  (./LSMR.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 270.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 270.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 322.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 322.
 Package rerunfilecheck Info: File `LSMR.out' has not changed.
-(rerunfilecheck)             Checksum: 508EB4CBC6AB5CDFA5C2B3F4632F6CF1;265.
+(rerunfilecheck)             Checksum: 2703C7A709502E3E2D8725854BD56739;362.
 
 
 LaTeX Font Warning: Size substitutions with differences
@@ -1026,34 +1101,33 @@ LaTeX Font Warning: Size substitutions with differences
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 270.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 322.
  ) 
 Here is how much of TeX's memory you used:
- 15657 strings out of 493633
- 296502 string characters out of 3143378
- 362871 words of memory out of 3000000
- 18534 multiletter control sequences out of 15000+200000
- 14758 words of font info for 55 fonts, out of 3000000 for 9000
+ 15673 strings out of 493633
+ 296579 string characters out of 3143378
+ 363960 words of memory out of 3000000
+ 18538 multiletter control sequences out of 15000+200000
+ 14095 words of font info for 53 fonts, out of 3000000 for 9000
  831 hyphenation exceptions out of 8191
- 49i,15n,63p,414b,543s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 49i,15n,61p,414b,543s stack positions out of 5000i,500n,10000p,200000b,50000s
 </usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb
-></usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb><
-/usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb></
-usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></u
-sr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></usr
-/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmss9.pfb></usr/l
+></usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb><
+/usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></u
+sr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb></us
+r/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr
+/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></usr/l
 ocal/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi10.pfb></usr/l
 ocal/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi8.pfb></usr/lo
-cal/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi9.pfb></usr/loc
-al/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local
-/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/t
-exlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/tex
-live/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texl
-ive/2011/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb>
-Output written on LSMR.pdf (16 pages, 1003968 bytes).
+cal/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/loca
+l/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/
+texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/te
+xlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/tex
+live/2011/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb>
+Output written on LSMR.pdf (19 pages, 1169939 bytes).
 PDF statistics:
- 359 PDF objects out of 1000 (max. 8388607)
- 301 compressed objects within 4 object streams
- 46 named destinations out of 1000 (max. 500000)
- 114 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 449 PDF objects out of 1000 (max. 8388607)
+ 376 compressed objects within 4 object streams
+ 56 named destinations out of 1000 (max. 500000)
+ 170 words of extra memory for PDF output out of 10000 (max. 10000000)
 
