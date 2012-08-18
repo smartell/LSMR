@@ -211,6 +211,9 @@ DATA_SECTION
 	// 3) std of catch residuals in 1st phase
 	// 4) std of catch residuals in last phase
 	// 5) case switch for type of size transition matrix (0=A, 1=annual, 2=empirical)
+	// 6) Std deviation in simulated recruitment variation.
+	// 7) Std deviation in simulated deviations in capture probabilities.
+	// 8) Phase for estimating tau (>0 then negbinomlikelihood, else normal likelihood)
 	
 	// index for minimum size of tagged fish //
 	imatrix min_tag_j(1,ngear,1,irow);
@@ -245,6 +248,17 @@ DATA_SECTION
 	
 	
 PARAMETER_SECTION
+	LOC_CALCS
+		// Turn of linf & k if using empirical size transition matrix
+		if(flag(5)==2)
+		{
+			theta_phz(4) = -1;
+			theta_phz(5) = -1;
+			theta_phz(6) = -1;
+		}
+	END_CALCS
+
+
 	init_bounded_number_vector theta(1,npar,theta_lbnd,theta_ubnd,theta_phz);
 	number log_ddot_r;
 	number log_bar_r;
@@ -369,7 +383,71 @@ PROCEDURE_SECTION
 	
 	calc_objective_function();
 	sd_l_infty = l_infty;
+	
+	if( mceval_phase() )
+	{
+		writePosteriorSamples();
+	}
+	
 	if( flag(1) ) cout<<"\n END OF PROCEDURE_SECTION "<<endl;
+
+//
+FUNCTION writePosteriorSamples
+  {
+	/*This routine writes posterior samples to files*/
+	int i;
+	static int nf = 0;
+	nf++;
+	if(nf==1)
+	{
+		ofstream ofs0("LSMR.post");
+		ofstream ofs1("Nt.post"  );
+		ofstream ofs2("N100.post");
+		ofstream ofs3("N150.post");
+		ofstream ofs4("Rt.post"  );
+		ofs0<<"log_ddot_r       ";
+		ofs0<<" log_bar_r       ";
+		ofs0<<" m_infty         ";
+		ofs0<<" l_infty         ";
+		ofs0<<" vbk             ";
+		ofs0<<" beta            ";
+		ofs0<<" mu_r            ";
+		ofs0<<" cv_r            ";
+		ofs0<<endl;
+		
+		
+		
+		
+	}
+	ofstream ofs0("LSMR.post",ios::app);
+	ofstream ofs1("Nt.post"  ,ios::app);
+	ofstream ofs2("N100.post",ios::app);
+	ofstream ofs3("N150.post",ios::app);
+	ofstream ofs4("Rt.post"  ,ios::app);
+	
+	
+	
+	
+	dvector Nt = value(rowsum(N));
+	dvector N100 = value( rowsum(trans(trans(N).sub(6,nbin))) );
+	dvector N150 = value( rowsum(trans(trans(N).sub(11,nbin))) );
+	
+	dvector Rt(syr,nyr);
+	for(i=syr;i<=nyr;i++)
+	{
+		if(i==syr) Rt(i) = value(mfexp(log_ddot_r+ddot_r_devs(nx)));
+		else       Rt(i) = value(mfexp(log_rt(i)));
+	}
+	
+	
+	/*Write files*/
+	ofs0<< theta <<endl;
+	ofs1<< Nt    <<endl;
+	ofs2<< N100  <<endl;
+	ofs3<< N150  <<endl;
+	ofs4<< Rt    <<endl;
+	
+  }
 
 //	
 FUNCTION void runSimulationModel(const int& seed)
@@ -1052,8 +1130,10 @@ REPORT_SECTION
 	
 	REPORT(delta);
 	
-	dvector Nt = value(rowsum(N));
 	dvector Tt = value(rowsum(T));
+	REPORT(Tt);
+	
+	dvector Nt = value(rowsum(N));
 	dvector Rt(syr,nyr);
 	for(i=syr;i<=nyr;i++)
 	{
@@ -1061,8 +1141,16 @@ REPORT_SECTION
 		else       Rt(i) = value(mfexp(log_rt(i)));
 	}
 	REPORT(Nt);
-	REPORT(Tt);
 	REPORT(Rt);
+	
+	/*Abundance of other size classes*/
+	dvector N100(syr,nyr);
+	dvector N150(syr,nyr);
+	N100 = value( rowsum(trans(trans(N).sub(6,nbin))) );
+	N150 = value( rowsum(trans(trans(N).sub(11,nbin))) );
+	REPORT(N100);
+	REPORT(N150);
+	
 	
 	REPORT(log_rt);
 	REPORT(fi);
@@ -1078,6 +1166,11 @@ REPORT_SECTION
 	REPORT(Mhat);
 	REPORT(Rhat);
 	REPORT(A);
+	
+	REPORT(npar);
+	dmatrix ctrl = theta_control;
+	REPORT(ctrl);
+	
 	if(SimFlag)
 	{
 		REPORT(true_Nt);
