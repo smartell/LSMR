@@ -14,11 +14,11 @@ Obtaining a copy of ILSMR:
 This software is maintained using a Distributed Version Control System (DVCS)
 called Git.  The Git repository can be cloned from google at the following URL
 
-https://code.google.com/p/lsmr-project/
-# Deprecated https://github.com/smartell/HBC-LSMR
+# Deprecated https://code.google.com/p/lsmr-project/
+https://github.com/smartell/LSMR
 
 To obtain a clone of the repository use:
-git clone https://code.google.com/p/lsmr-project/
+git clone git://github.com/smartell/LSMR.git
 
 To gain write access to the repository contact martell.steve@gmail.com
 
