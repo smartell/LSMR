@@ -14,8 +14,8 @@
 source("read.admb.R", echo=FALSE)
 
 .SAVEFIGS		<- TRUE
-.PRESENTATION	<- TRUE
-.CEXLAB			<- 1.5
+.PRESENTATION	<- FALSE
+.CEXLAB			<- 1.0
 .FILENAME		<- "../ADMB/srcLSMR/lsmr"
 .FIGDIR			<- "../FIGS/LSMR/SIMb/"
 
@@ -33,7 +33,17 @@ obj <- getObj()
 main <- function()
 {
 	obj <- getObj()
+	par(las = 1)
+	par(cex.lab = .CEXLAB)
 	plot(obj);
+	if(.SAVEFIGS) 
+	{
+		gfn <- paste(.FIGDIR, "fig:LSRM%d.png", sep="")
+		png(gfn, width=960, height=960, res=100)
+		par(cex.lab = 2.2* .CEXLAB, cex.axis=2, mar=c(6.1, 5.1, 5.1, 3.1) )
+		plot(obj)
+		dev.off()
+	}
 }
 
 # --------------------------------------------------------------------------- #
@@ -46,19 +56,7 @@ print.lsmr <- function(obj, ...)
 
 plot.lsmr <- function(obj, ...)
 {
-	opar <- par(no.readonly=TRUE)
-	
-	
 	with(obj, {		
-		par(mfcol=c(2, 2), las=1, mar=c(5.1, 4.1, 4.1, 2.1), oma=c(1, 1, 1, 1))
-		
-		if(.SAVEFIGS) 
-		{
-			gfn <- paste(.FIGDIR, "fig:LSRM%d.png", sep="")
-			png(gfn)
-		}
-		par(cex.lab = .CEXLAB)
-		
 		jmin  <- min(which(xmid>=15))
 		nx    <- dim(N)[2]
 		
@@ -75,7 +73,7 @@ plot.lsmr <- function(obj, ...)
 		gletter(4)
 		
 		
-		par(mfcol=c(1, 1))
+		#par(mfcol=c(1, 1))
 		.plotSelex(xmid, t(sx))
 		
 		
@@ -92,9 +90,8 @@ plot.lsmr <- function(obj, ...)
 			.plotLF(xmid, i_R[ir, ], Rhat[ir, ], "Recaptures")
 		}
 		
-		dev.off()
 	})
-	par(opar)
+
 }
 
 .plotMx <- function(obj, ...)
@@ -130,7 +127,8 @@ plot.lsmr <- function(obj, ...)
 		{
 			matlines(f_yr, t(true_fi), type="l",lwd=2, col=colr(2, 0.5))	
 		}
-		legend("top", c("Tramel", "Hoop"), lty=1:2, bty="n")
+		cx = par()$cex.axis
+		legend("top", c("Tramel", "Hoop"), lty=1:2, bty="n", cex=cx)
 	})
 }
 
@@ -185,7 +183,7 @@ plot.lsmr <- function(obj, ...)
 }
 
 
-.plotLF <- function(x, O, P, main="", ...)
+.plotLF <- function(x, O, P, main="", gap=0, ...)
 {
 	# This funciton plots the observed (O) and predicted (P) 
 	# length frequency distributions.
@@ -198,8 +196,8 @@ plot.lsmr <- function(obj, ...)
 	nr   <- ceiling(sqrt(n))
 	nc   <- ceiling(n/nr)
 	
-	par(mfcol=c(nr, nc), mar=c(0, 0, 0, 0))
-	par(oma=c(5, 5, 5, 4), font.main=1)
+	par(mfcol=c(nr, nc), mar=c(1, 1, 1, 1)*gap)
+	par(oma=c(1, 1, 1, 1)*5.5, font.main=1)
 	ymax = max(O[, -1:-2], P)
 	for(i in 1:n)
 	{
@@ -214,7 +212,8 @@ plot.lsmr <- function(obj, ...)
 		if(mfg[1]==nr && mfg[2]%%2) axis(1)
 		if(mfg[1]==1 && !mfg[2]%%2) axis(3)
 	}
-	mtext(c("Size class (cm)", "Frequency"), side=c(1, 2), outer=TRUE, line=2.5, las=0)
+	cx = par()$cex.lab
+	mtext(c("Size class (cm)", "Frequency"), side=c(1, 2), outer=TRUE, line=2.5, las=0, cex=cx)
 	mtext(main, side=3, outer=TRUE, line=2.5)
 	par(opar)
 }

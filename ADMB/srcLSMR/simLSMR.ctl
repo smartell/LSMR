@@ -47,5 +47,5 @@
 0.050		# 4) Std deviation in total catch in last phase.
 0			# 5) Case value of Size Transition (0=Estimate single P, 1=Estimate time varying linf, 2=use Size transitions)
 0.6			# 6) Std deviation in simulated recruitment variation.
-0.2			# 7) Std deviation in simulation deviations in capture probabilities.
+0.2			# 7) Std deviation in simulated deviations in capture probabilities.
 0			# 8) Phase for estimating tau (>0 then negbinomlikelihood, else normal likelihood)
