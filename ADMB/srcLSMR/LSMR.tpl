@@ -211,6 +211,7 @@ DATA_SECTION
 				break;
 			}
 		}
+		cout<<"OK after getting dimension of sel_par"<<endl;
 	END_CALCS
 	
 	init_int nflags;
@@ -291,21 +292,22 @@ PARAMETER_SECTION
 	init_vector log_tau(1,ngear,tau_phz);
 	
 	//Selectivity parameters
-	init_bounded_vector_vector sel_par(1,ngear,1,isel_npar,-15.,15.,sel_phz);
+	//init_bounded_vector_vector sel_par(1,ngear,1,isel_npar,-15.,15.,sel_phz);
+	init_bounded_matrix_vector sel_par(1,ngear,1,jsel_npar,1,isel_npar,-20.,20.,sel_phz);
 	LOC_CALCS
 		int k;
 		for(k=1;k<=ngear;k++)
 		{
 			if( sel_type(k)==1 )
 			{
-				sel_par(k,1) = log(lx_ival(k));
-				sel_par(k,2) = log(gx_ival(k));
+				sel_par(k,1,1) = log(lx_ival(k));
+				sel_par(k,1,2) = log(gx_ival(k));
 			}
 			if( sel_type(k)==2 )
 			{
-				sel_par(k,1) = log(lx_ival(k));
-				sel_par(k,2) = log(gx_ival(k));
-				sel_par(k,3) = -4.0;
+				sel_par(k,1,1) = log(lx_ival(k));
+				sel_par(k,1,2) = log(gx_ival(k));
+				sel_par(k,1,3) = -4.0;
 			}
 		}
 	END_CALCS
@@ -338,6 +340,7 @@ PARAMETER_SECTION
 	vector log_rt(syr+1,nyr);
 	matrix fi(1,ngear,1,irow);  // capture probability in period i.
 	matrix sx(1,ngear,1,jcol);	// Selectivity at length xmid
+	3darray six(1,ngear,syr,nyr,1,jcol);  //time-varying selectivity.
 	matrix N(syr,nyr,1,nx);		// Numbers(time step, length bins)
 	matrix U(syr,nyr,1,nx);		// Un-marked number(time, length)
 	matrix T(syr,nyr,1,nx);		// Marks-at-large (time step, length bins)
@@ -382,8 +385,8 @@ PROCEDURE_SECTION
 	if( flag(1) ) cout<<"\n TOP OF PROCEDURE_SECTION "<<endl;
 	
 	initParameters(); 
-	calcSizeTransitionMatrix();
-	calcSelectivityAtLength();	
+	calcSizeTransitionMatrix();  
+	calcSelectivityAtLength();
 	calcCaptureProbability();
 	calcSurvivalAtLength(); 
 	initializeModel();	
@@ -671,7 +674,8 @@ FUNCTION calcCaptureProbability
 			if( effort(k,i)>0 )
 			{
 				fi(k,i)      = qk(k)*effort(k,i)*mfexp(fdev(k)(ik(k)++));
-				Farr(k)(jyr) = fi(k,i) * sx(k);
+				//Farr(k)(jyr) = fi(k,i) * sx(k);
+				Farr(k)(jyr) = fi(k,i) * six(k)(jyr);
 			}
 		}
 	}
@@ -712,14 +716,16 @@ FUNCTION calcSelectivityAtLength
 	This function calculates the length-specific selectivity.
 	The parametric option is a logistic curve (plogis(x,lx,gx))
 	*/
-	int k;
+	int i,j,k;
 	double dx;
 	dvariable p1,p2,p3;
 	sx.initialize();
+	six.initialize();
 	Selex cSelex;
 	dmatrix xi(1,ngear,1,x_nodes);
 	dvar_matrix yi(1,ngear,1,x_nodes);
-	
+	int n = nyr-syr+1;
+	dvar_matrix tmp_sel(1,n,1,nx);
 	/*
 	dvariable gamma = 0.1;
 	dvariable x1 = 30.0;
@@ -730,40 +736,64 @@ FUNCTION calcSelectivityAtLength
 	cout<<"Linear interpolation"<<endl;	
 	cout<<cSelex.linapprox(x,y,xmid)<<endl;
 	*/
-	 
 	for(k=1;k<=ngear;k++)
 	{
 		dvector x(1,x_nodes(k));
 		dvector fx(1,nx);
+		dvar_matrix selcoff(1,n,1,x_nodes(k));
 		x.fill_seqadd(0,1.0/(x_nodes(k)-1));
 		fx.fill_seqadd(0,1.0/(nx-1));
 		
 		switch(sel_type(k))
 		{
-			case 1:  //logistic
-				p1 = mfexp(sel_par(k,1));
-				p2 = mfexp(sel_par(k,2));
+			case 1:  // logistic
+				p1 = mfexp(sel_par(k,1,1));
+				p2 = mfexp(sel_par(k,1,2));
 				sx(k) = log( cSelex.logistic(xmid,p1,p2) );
 			break;
-			case 2: //eplogis
-				p1 = mfexp(sel_par(k,1));
-				p2 = mfexp(sel_par(k,2));
-				p3 = mfexp(sel_par(k,3))/(1.+mfexp(sel_par(k,3)));
+			case 2: // eplogis
+				p1 = mfexp(sel_par(k,1,1));
+				p2 = mfexp(sel_par(k,1,2));
+				p3 = mfexp(sel_par(k,1,3))/(1.+mfexp(sel_par(k,1,3)));
 				sx(k) = log( cSelex.eplogis(xmid,p1,p2,p3) );
 			break;
-			case 3: //linapprox
+			case 3: // linapprox
 				dx = (double(nbin)-1.)/(double(x_nodes(k)-1.));
 				xi(k).fill_seqadd( min(xmid),dx );
-				yi(k)= dev_vector(sel_par(k),pen);
+				yi(k)= dev_vector(sel_par(k)(1),pen);
 				sx(k) = cSelex.linapprox(xi(k),yi(k),xmid);
 			break;
-			case 4: //cubic spline
-				yi(k) = dev_vector(sel_par(k),pen);
+			case 4: // cubic spline
+				yi(k) = dev_vector(sel_par(k)(1),pen);
 				vcubic_spline_function ffa(x,yi(k));
 				sx(k) = ffa(fx);
 			break;
 		}
-		sx(k) = mfexp( sx(k) - log( mean( mfexp(sx(k))+1.e-30 ) ) );
+		for(i=syr;i<=nyr;i++)
+		{
+			six(k)(i) = mfexp( sx(k) - log( mean( mfexp(sx(k))+1.e-30 ) ) );
+		}
+		
+		
+		
+		if(sel_type(k)==5)      // cubic spline array (must be outside of switch)
+		{
+			for(i=1;i<=n;i++)
+			{
+				selcoff(i) = dev_vector(sel_par(k)(i),pen);
+			}
+			vcubic_spline_function_array fna(1,n,x,selcoff);
+			tmp_sel = fna(fx);
+			sx(k) = tmp_sel(1);
+			j=0;
+			for(i=syr;i<=nyr;i++)
+			{
+				j++;
+				six(k)(i) = mfexp( tmp_sel(j) - log(mean(mfexp(tmp_sel(j)))+1.e-30) );
+			}
+		}
+		
+		//sx(k) = mfexp( sx(k) - log( mean( mfexp(sx(k))+1.e-30 ) ) );
 		//sx(k) = mfexp( sx(k) - log( max( mfexp(sx(k))+1.e-30 ) ) );
 	}
   }
@@ -1001,18 +1031,21 @@ FUNCTION calc_objective_function;
 	*/
 	dvar_vector sel_pen(1,ngear);
 	sel_pen.initialize();
+	int n=(nyr-syr)+1;
 	for(k=1;k<=ngear;k++)
 	{
 		if( sel_type(k)==3 || sel_type(k)==4 )
 		{
-			sel_pen(k) = sel_pen1(k)/nx * norm2(first_difference(first_difference(sx(k))));
-			for(j=1;j<nx;j++)
+			for(i=syr;i<=nyr;i++)
 			{
-				if(sx(k,j+1)<sx(k,j))
-					sel_pen(k) += sel_pen2(k) * square(sx(k,j+1)-sx(k,j));
+				sel_pen(k) += sel_pen1(k)/(nx+n) * norm2(first_difference(first_difference(six(k)(i))));
+				for(j=1;j<nx;j++)
+				{
+					if(six(k,i,j+1)<six(k,i,j))
+						sel_pen(k) += sel_pen2(k)/n * square(six(k,i,j+1)-six(k,i,j));
+				}
+				sel_pen(k) += 0.1*norm2(six(k)(i));
 			}
-			//dvariable s = mean(sel_par(k));
-			//sel_pen(k) += 1.e9*s*s;
 		}
 	}
 	
