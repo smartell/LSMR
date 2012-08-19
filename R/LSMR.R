@@ -20,9 +20,9 @@ source("plotMarginals.R", echo=FALSE)
 .CEXLAB			<- 2.0
 #.FILENAME		<- "../ADMB/srcLSMR/lsmr"
 #.FILENAME		<- "../SCENARIOS/SIMb/lsmr"
-.FILENAME		<- "../SCENARIOS/RUN5/lsmr"
+.FILENAME		<- "../SCENARIOS/RUN3/lsmr"
 
-.FIGDIR			<- "../FIGS/LSMR/RUN5/"
+.FIGDIR			<- "../FIGS/LSMR/RUN3/"
 
 
 

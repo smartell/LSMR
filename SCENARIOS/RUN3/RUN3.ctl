@@ -32,9 +32,9 @@
    2              2            ## estimation phase                           ##
    15             10           ## length-at-50% vulnerability                ##
    3              30           ## std in length-at-50% vulnerabilty          ##
-   15             15           ## number of nodes for linear interpolation   ##
-   50.0           50.0         ## penalty for 2nd derivatives in linapprox   ##
-   200.           200.         ## penalty for dome-shape                     ##
+   15             11           ## number of nodes for linear interpolation   ##
+   50.0           12.5         ## penalty for 2nd derivatives in linapprox   ##
+   200.           50.0         ## penalty for dome-shape                     ##
 ## ------------------------------------------------------------------------- ##
 
 ## _________________________________________________________________________ ##

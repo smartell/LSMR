@@ -894,7 +894,7 @@ FUNCTION calc_objective_function;
 		{
 			dvariable mean_f = sum(fi(k))/fi_count(k);
 			pvec(3) += dnorm(mean_f,0.1,2.5);
-			pvec(4) += dnorm(bar_f_devs(k),0,flag(7)+1.e-10);
+			pvec(4) += dnorm(bar_f_devs(k),0,flag(7)+1.e-3);
 		}
 		
 		//pvec(3) = dnorm(log_bar_f,log(0.1108032),2.5);

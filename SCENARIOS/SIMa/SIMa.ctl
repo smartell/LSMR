@@ -18,8 +18,8 @@
    36.46	20.0	60.0	 3		1			36.46	38.58	#l_infty
    0.18		0.01	0.90	 3		1			0.243	0.23	#vbk
    0.75		0.00	2.00	 4		0			0.00	2.00	#beta
-   10.0		3.00	20.0	 2		2			2.30258	0.20	#mu_r
-   0.20		0.00	1.00	 2		3			20.0	80.0    #cv_r
+   10.0		3.00	20.0	 3		2			2.30258	0.20	#mu_r
+   0.20		0.00	1.00	 3		3			20.0	80.0    #cv_r
 ## ------------------------------------------------------------------------- ##
 
 ## _________________________________________________________________________ ##
@@ -45,7 +45,7 @@
 15.0		# 2) Minimum size (cm) of individual fish that can be tagged.
 0.100		# 3) Std deviation in total catch in first phase.
 0.050		# 4) Std deviation in total catch in last phase.
-2			# 5) Case value of Size Transition (0=Estimate single P, 1=Estimate time varying linf, 2=use Size transitions)
+0			# 5) Case value of Size Transition (0=Estimate single P, 1=Estimate time varying linf, 2=use Size transitions)
 0.6			# 6) Std deviation in simulated recruitment variation.
-0.0		# 7) Std deviation in simulated deviations in capture probabilities.
+0.0			# 7) Std deviation in simulated deviations in capture probabilities.
 -4			# 8) Phase for estimating tau (>0 then negbinomlikelihood, else normal likelihood)
