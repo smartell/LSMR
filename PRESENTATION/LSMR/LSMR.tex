@@ -198,7 +198,7 @@ University of British Columbia \\
 		\centering
 			\includegraphics[height=2.6in]{../../FIGS/LSMR/fig:MarksAtLengthGILL.pdf}
 		\caption{New marks (dark bars) and recapture marks (light bars) of HBC using tramel nets (all sizes \& bait) in the LCR and COR.}
-		\label{fig:FIGS_LSMR_fig:MarksAtLengthHOOP}
+		\label{fig:FIGS_LSMR_fig:MarksAtLengthGILL}
 	\end{figure}
 \end{frame}
 % subsection catch_at_length (end)
@@ -273,7 +273,7 @@ University of British Columbia \\
 	\end{block}
 \end{frame}
 
-\begin{frame}{Simulation}
+\begin{frame}{Simulation (Scenario 1)}
 	\begin{figure}[htbp]
 		\centering
 			\includegraphics[height=1.4in]{../../FIGS/LSMR/SIMa/fig:LSRM1.png}
@@ -281,11 +281,35 @@ University of British Columbia \\
 			\includegraphics[height=1.4in]{../../FIGS/LSMR/SIMa/fig:LSRM3.png}
 			\includegraphics[height=1.4in]{../../FIGS/LSMR/SIMa/fig:LSRM4.png}
 		\caption{MLE results with perfect information.}
-		\label{fig:FIGS_LSMR_fig:LSRM1}
-	\end{figure}	
+		\label{fig:FIGS_LSMR_SIMa_fig:LSRM1}
+	\end{figure}
 \end{frame}
 
-\begin{frame}{Simulation}
+\begin{frame}{Size composition (Tramel net, Scenario 1)}
+	\only<1>
+	{
+		\begin{figure}[htbp]
+			\centering
+				\includegraphics[height=2.8in]{../../FIGS/LSMR/SIMa/fig:LSRM8.png}
+			\caption{Simulated (shaded) and estimated predicted total catch.}
+			\label{fig:FIGS_LSMR_SIMa_fig:LSRM8}
+		\end{figure}
+	}
+	\only<2>
+	{
+	\frametitle{Size composition (Hoop net, Scenario 1)}
+		\begin{figure}[htbp]
+			\centering
+				\includegraphics[height=2.8in]{../../FIGS/LSMR/SIMa/fig:LSRM11.png}
+			\caption{Simulated (shaded) and estimated predicted total catch.}
+			\label{fig:FIGS_LSMR_SIMa_fig:LSRM11}
+		\end{figure}
+	}
+	
+\end{frame}
+
+
+\begin{frame}{Simulation (Scenario 2)}
 	\begin{figure}[htbp]
 		\centering
 			\includegraphics[height=1.4in]{../../FIGS/LSMR/SIMb/fig:LSRM1.png}
@@ -293,28 +317,30 @@ University of British Columbia \\
 			\includegraphics[height=1.4in]{../../FIGS/LSMR/SIMb/fig:LSRM3.png}
 			\includegraphics[height=1.4in]{../../FIGS/LSMR/SIMb/fig:LSRM4.png}
 		\caption{MLE results with $\sigma_\delta = 0.2$.}
-		\label{fig:FIGS_LSMR_fig:LSRM1}
-	\end{figure}	
+		\label{fig:FIGS_LSMR_SIMb_fig:LSRM1}
+	\end{figure}
+	
+		
 \end{frame}
 
-\begin{frame}{Size composition (Tramel net)}
+\begin{frame}{Size composition (Tramel net, Scenario 2)}
 	\only<1>
 	{
 		\begin{figure}[htbp]
 			\centering
-				\includegraphics[height=2.8in]{../../FIGS/LSMR/SIMb/fig:LSRM6.png}
+				\includegraphics[height=2.8in]{../../FIGS/LSMR/SIMb/fig:LSRM8.png}
 			\caption{Simulated (shaded) and estimated predicted total catch.}
-			\label{fig:FIGS_LSMR_SIMb_fig:LSRM6}
+			\label{fig:FIGS_LSMR_SIMb_fig:LSRM8}
 		\end{figure}
 	}
 	\only<2>
 	{
-	\frametitle{Size composition (Hoop net)}
+	\frametitle{Size composition (Hoop net, Scenario 2)}
 		\begin{figure}[htbp]
 			\centering
-				\includegraphics[height=2.8in]{../../FIGS/LSMR/SIMb/fig:LSRM9.png}
+				\includegraphics[height=2.8in]{../../FIGS/LSMR/SIMb/fig:LSRM11.png}
 			\caption{Simulated (shaded) and estimated predicted total catch.}
-			\label{fig:FIGS_LSMR_SIMb_fig:LSRM9}
+			\label{fig:FIGS_LSMR_SIMb_fig:LSRM11}
 		\end{figure}
 	}
 	
@@ -322,6 +348,64 @@ University of British Columbia \\
 
 % section simulation_testing (end)
 
+\section[Grand Canyon]{Application to Grand Canyon HBC} % (fold)
+\label{sec:application_to_grand_canyon_hbc}
+\begin{frame}
+	\frametitle{Fitting LSMR to Grand Canyon data}
+	\begin{block}{Run Scenarios:}
+		\begin{enumerate}
+			\item Logistic selectivity for both gears.
+			\item Logistic for tramel nets, dome-shaped for hoop nets.
+			\item Selectivity coefficients for hoop nets, logistic tramel nets.
+		\end{enumerate}
+		
+	\end{block}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Run 1: Logistic selectivity}
+	\begin{figure}[htbp]
+		\centering
+			\includegraphics[height=1.4in]{../../FIGS/LSMR/RUN1/fig:LSRM1.png}
+			\includegraphics[height=1.4in]{../../FIGS/LSMR/RUN1/fig:LSRM2.png}\\
+			\includegraphics[height=1.4in]{../../FIGS/LSMR/RUN1/fig:LSRM3.png}
+			\includegraphics[height=1.4in]{../../FIGS/LSMR/RUN1/fig:LSRM5.png}
+		\caption{Abundance, recruitment, capture probability, and selectivity.}
+		\label{fig:FIGS_LSMR_RUN1_fig:LSRM1}
+	\end{figure}
+	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Run 2: Logistic \& dome-shaped selectivity}
+	\begin{figure}[htbp]
+		\centering
+			\includegraphics[height=1.4in]{../../FIGS/LSMR/RUN2/fig:LSRM1.png}
+			\includegraphics[height=1.4in]{../../FIGS/LSMR/RUN2/fig:LSRM2.png}\\
+			\includegraphics[height=1.4in]{../../FIGS/LSMR/RUN2/fig:LSRM3.png}
+			\includegraphics[height=1.4in]{../../FIGS/LSMR/RUN2/fig:LSRM5.png}
+		\caption{Abundance, recruitment, capture probability, and selectivity.}
+		\label{fig:FIGS_LSMR_RUN2_fig:LSRM1}
+	\end{figure}
+	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Run 3: Selectivity coefficients}
+	\begin{figure}[htbp]
+		\centering
+			\includegraphics[height=1.4in]{../../FIGS/LSMR/RUN3/fig:LSRM1.png}
+			\includegraphics[height=1.4in]{../../FIGS/LSMR/RUN3/fig:LSRM2.png}\\
+			\includegraphics[height=1.4in]{../../FIGS/LSMR/RUN3/fig:LSRM3.png}
+			\includegraphics[height=1.4in]{../../FIGS/LSMR/RUN3/fig:LSRM5.png}
+		\caption{Abundance, recruitment, capture probability, and selectivity.}
+		\label{fig:FIGS_LSMR_RUN3_fig:LSRM1}
+	\end{figure}
+	
+\end{frame}
+
+
+% section application_to_grand_canyon_hbc (end)
 
 
 % 
