@@ -196,11 +196,13 @@ dvar_vector Selex::linapprox(const dvector& x, const dvar_vector& y, const dvect
 	int i,j,k;
 	int n = xout.indexmax() - xout.indexmin() + 1;
 	double v;
+	RETURN_ARRAYS_INCREMENT();
 	dvar_vector yout(xout.indexmin(),xout.indexmax());
 	for(k = xout.indexmin(); k <= xout.indexmax(); k++)
 	{
 		v       = xout(k);
 		yout(k) = approx1(v,x,y);
 	}
+	RETURN_ARRAYS_DECREMENT();
 	return yout;
 }

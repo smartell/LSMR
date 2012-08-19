@@ -200,6 +200,9 @@ DATA_SECTION
 				case 3:  // linapprox
 					isel_npar(k) = x_nodes(k);
 				break;
+				case 4:  // cubic spline
+					isel_npar(k) = x_nodes(k);
+				break;
 			}
 		}
 	END_CALCS
@@ -309,7 +312,7 @@ PARAMETER_SECTION
 	
 	
 	//TODO Fix this so there is a dev vector for each gear, otherwise biased estimates of log_bar_f
-	init_bounded_matrix bar_f_devs(1,ngear,1,fi_count,-5.0,5.0,3);
+	init_bounded_matrix bar_f_devs(1,ngear,1,fi_count,-7.0,7.0,3);
 	
 	sdreport_number sd_l_infty;
 	
@@ -317,7 +320,7 @@ PARAMETER_SECTION
 	objective_function_value f;
 	
 
-	
+	number pen;
 	number m_linf;
 
 	vector tau(1,ngear);	// over-dispersion parameters >1.0
@@ -354,7 +357,7 @@ INITIALIZATION_SECTION
 
 RUNTIME_SECTION
     maximum_function_evaluations 500,1500,2500,25000,25000
-    convergence_criteria 0.01,1.e-4,1.e-5,1.e-5
+    convergence_criteria 0.01,1.e-4,1.e-5,1.e-5,1.e-5
 
 PRELIMINARY_CALCS_SECTION
 	if(SimFlag)
@@ -471,7 +474,7 @@ FUNCTION void runSimulationModel(const int& seed)
 	double sig_f = flag(7);
 	for(k=1;k<=ngear;k++)
 	{
-		bar_f_devs(k) = sig_f*tmp_bar_f_devs(k);
+		bar_f_devs(k) = sig_f*(tmp_bar_f_devs(k)-mean(tmp_bar_f_devs(k)));
 	}
 
 	initParameters(); 
@@ -545,6 +548,8 @@ FUNCTION initParameters
 	beta       = theta(6);
 	mu_r       = theta(7);
 	cv_r       = theta(8);
+	
+	pen = 0;
   }
 //
 FUNCTION calcSizeTransitionMatrix
@@ -649,15 +654,17 @@ FUNCTION calcCaptureProbability
 	ik = 1;
 	fi.initialize();
 	Farr.initialize();
+	dvar_matrix fdev(1,ngear,1,fi_count);
 	
 	for(k=1;k<=ngear;k++)
 	{
+		fdev(k) = dev_vector(bar_f_devs(k),pen);
 		for(i=1;i<=irow(k);i++)
 		{
 			jyr = iyr(k,i);
 			if( effort(k,i)>0 )
 			{
-				fi(k,i)      = qk(k)*effort(k,i)*mfexp(bar_f_devs(k)(ik(k)++));
+				fi(k,i)      = qk(k)*effort(k,i)*mfexp(fdev(k)(ik(k)++));
 				Farr(k)(jyr) = fi(k,i) * sx(k);
 			}
 		}
@@ -717,9 +724,14 @@ FUNCTION calcSelectivityAtLength
 	cout<<"Linear interpolation"<<endl;	
 	cout<<cSelex.linapprox(x,y,xmid)<<endl;
 	*/
-	
+	 
 	for(k=1;k<=ngear;k++)
 	{
+		dvector x(1,x_nodes(k));
+		dvector fx(1,nx);
+		x.fill_seqadd(0,1.0/(x_nodes(k)-1));
+		fx.fill_seqadd(0,1.0/(nx-1));
+		
 		switch(sel_type(k))
 		{
 			case 1:  //logistic
@@ -736,8 +748,13 @@ FUNCTION calcSelectivityAtLength
 			case 3: //linapprox
 				dx = (double(nbin)-1.)/(double(x_nodes(k)-1.));
 				xi(k).fill_seqadd( min(xmid),dx );
-				yi(k)= sel_par(k);
+				yi(k)= dev_vector(sel_par(k),pen);
 				sx(k) = cSelex.linapprox(xi(k),yi(k),xmid);
+			break;
+			case 4: //cubic spline
+				yi(k) = dev_vector(sel_par(k),pen);
+				vcubic_spline_function ffa(x,yi(k));
+				sx(k) = ffa(fx);
 			break;
 		}
 		sx(k) = mfexp( sx(k) - log( mean( mfexp(sx(k))+1.e-30 ) ) );
@@ -886,12 +903,12 @@ FUNCTION calc_objective_function;
 	
 	
 	/* PENALTIES TO INSURE DEV VECTORS HAVE A MEAN O */
-	dvar_vector dev_pen(1,ngear);
-	for(k=1;k<=ngear;k++)
-	{
-		dvariable s = mean(bar_f_devs(k)); 
-		dev_pen(k)  = 1.e5 * s*s;
-	}
+	//dvar_vector dev_pen(1,ngear);
+	//for(k=1;k<=ngear;k++)
+	//{
+	//	dvariable s = mean(bar_f_devs(k)); 
+	//	dev_pen(k)  = 1.e5 * s*s;
+	//}
 	
 	/* LIKELIHOODS */
 	/*
@@ -980,7 +997,7 @@ FUNCTION calc_objective_function;
 	sel_pen.initialize();
 	for(k=1;k<=ngear;k++)
 	{
-		if( sel_type(k)==3 )
+		if( sel_type(k)==3 || sel_type(k)==4 )
 		{
 			sel_pen(k) = sel_pen1(k)/nx * norm2(first_difference(first_difference(sx(k))));
 			for(j=1;j<nx;j++)
@@ -988,6 +1005,8 @@ FUNCTION calc_objective_function;
 				if(sx(k,j+1)<sx(k,j))
 					sel_pen(k) += sel_pen2(k) * square(sx(k,j+1)-sx(k,j));
 			}
+			//dvariable s = mean(sel_par(k));
+			//sel_pen(k) += 1.e9*s*s;
 		}
 	}
 	
@@ -996,8 +1015,9 @@ FUNCTION calc_objective_function;
 	f  = sum(fvec); 
 	f += sum(pvec); 
 	f += sum(priors); 
-	f += sum(dev_pen); 
+	//f += sum(dev_pen); 
 	f += sum(sel_pen); 
+	f += pen;
 	
   }
 //
@@ -1019,6 +1039,15 @@ FUNCTION dvariable dgamma(const prevariable& x, const double& a, const double& b
 	dvariable t2 = (a-1.)*log(x)-x/b;
 	RETURN_ARRAYS_DECREMENT();
 	return(t1*mfexp(t2));
+  }
+
+FUNCTION dvar_vector dev_vector(dvar_vector &x, dvariable &pen)
+  {
+	/*A little tweek to make a dvar_vector sum to 0.*/
+	dvariable s = mean(x);
+	pen += 10000.0*s*s;
+	x -=s;
+	return(x);
   }
 
 FUNCTION dvar_vector posfun(const dvar_vector& x, const double& eps, dvariable& pen)
@@ -1067,7 +1096,7 @@ FUNCTION dvar_matrix calcLTM(dvector& x, const dvariable &linf, const dvariable 
 	
 	- cumd_gamma(x,a) is the same as Igamma(a,x) in R.
 	- If length interval > linf, then assume now further growth.
-	- Note the use of posfun to ensure differentiable.
+
 	*/
 	RETURN_ARRAYS_INCREMENT();
 	int i,j;
@@ -1291,6 +1320,11 @@ GLOBALS_SECTION
 		RETURN_ARRAYS_DECREMENT();
 		return(-loglike);
 	}
+	
+	/*
+	Cubic spline function array class is in statsLib.h in Version 11
+	*/
+	
 	
 	
 FINAL_SECTION
