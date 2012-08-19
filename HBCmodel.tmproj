@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>ADMB/srcLSMR/LSMR.tpl</string>
+	<string>SCENARIOS/RUN3/RUN3.ctl</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -18,7 +18,7 @@
 		</dict>
 	</array>
 	<key>fileHierarchyDrawerWidth</key>
-	<integer>335</integer>
+	<integer>241</integer>
 	<key>metaData</key>
 	<dict>
 		<key>ADMB/srcGROWTH/GI.dat</key>
@@ -49,89 +49,19 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>ADMB/srcLSMR/HBC2011_ANNUAL.dat</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>38</integer>
-				<key>line</key>
-				<integer>80</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
-		</dict>
 		<key>ADMB/srcLSMR/LSMR.tpl</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>3</integer>
+				<integer>49</integer>
 				<key>line</key>
-				<integer>759</integer>
+				<integer>896</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>730</integer>
-		</dict>
-		<key>ADMB/srcLSMR/Makefile</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>64</integer>
-				<key>line</key>
-				<integer>16</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
-		</dict>
-		<key>ADMB/srcLSMR/Number.txt</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>10</integer>
-				<key>line</key>
-				<integer>0</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
-		</dict>
-		<key>ADMB/srcLSMR/simLSMR.ctl</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>59</integer>
-				<key>line</key>
-				<integer>48</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
-		</dict>
-		<key>ADMB/srcLSMR/simLSMR.dat</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>0</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>872</integer>
 		</dict>
 		<key>PRESENTATION/ASMR/ASMR.tex</key>
 		<dict>
@@ -168,28 +98,42 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>30</integer>
+				<integer>32</integer>
 				<key>line</key>
-				<integer>41</integer>
+				<integer>22</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>WRITEUP/HBCmain.tex</key>
+		<key>SCENARIOS/RUN3/RUN3.ctl</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>37</integer>
+				<integer>20</integer>
 				<key>line</key>
-				<integer>112</integer>
+				<integer>13</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>73</integer>
+			<integer>2</integer>
+		</dict>
+		<key>SCENARIOS/RUN3/lsmr.par</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>32</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
 		</dict>
 		<key>WRITEUP/Results/Results:EffortLengthComps.tex</key>
 		<dict>
@@ -225,17 +169,9 @@
 	<key>openDocuments</key>
 	<array>
 		<string>ADMB/srcLSMR/LSMR.tpl</string>
-		<string>ADMB/srcLSMR/simLSMR.dat</string>
-		<string>ADMB/srcLSMR/Makefile</string>
-		<string>ADMB/srcLSMR/Number.txt</string>
-		<string>ADMB/srcLSMR/HBC2011_ANNUAL.dat</string>
-		<string>ADMB/srcLSMR/simLSMR.ctl</string>
-		<string>PRESENTATION/ASMR/ASMR.tex</string>
-		<string>ADMB/srcGROWTH/GI.dat</string>
-		<string>ADMB/srcGROWTH/HBC_Annual_GI.dat</string>
-		<string>WRITEUP/HBCmain.tex</string>
-		<string>WRITEUP/Results/Results:EffortLengthComps.tex</string>
 		<string>R/LSMR.R</string>
+		<string>SCENARIOS/RUN3/RUN3.ctl</string>
+		<string>SCENARIOS/RUN3/lsmr.par</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<false/>
@@ -256,22 +192,14 @@
 					<key>subItems</key>
 					<dict/>
 				</dict>
-				<key>FIGS</key>
+				<key>R</key>
 				<dict>
 					<key>isExpanded</key>
 					<true/>
 					<key>subItems</key>
-					<dict>
-						<key>LSMR</key>
-						<dict>
-							<key>isExpanded</key>
-							<true/>
-							<key>subItems</key>
-							<dict/>
-						</dict>
-					</dict>
+					<dict/>
 				</dict>
-				<key>GROWTH</key>
+				<key>SCENARIOS</key>
 				<dict>
 					<key>isExpanded</key>
 					<true/>

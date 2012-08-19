@@ -184,11 +184,13 @@ DATA_SECTION
 	init_vector sel_pen2(1,ngear);
 	
 	ivector isel_npar(1,ngear);
+	ivector jsel_npar(1,ngear);	//number of rows
 	
 	LOC_CALCS
 		/* Determine the number of selectivity parameters to estimate */
 		for(k=1;k<=ngear;k++)
 		{
+			jsel_npar(k) = 1;
 			switch(sel_type(k))
 			{
 				case 1:  // logistic
@@ -202,6 +204,10 @@ DATA_SECTION
 				break;
 				case 4:  // cubic spline
 					isel_npar(k) = x_nodes(k);
+				break;
+				case 5:  // cubic spline array
+					isel_npar(k) = x_nodes(k);
+					jsel_npar(k) = (nyr-syr)+1;
 				break;
 			}
 		}
@@ -285,7 +291,7 @@ PARAMETER_SECTION
 	init_vector log_tau(1,ngear,tau_phz);
 	
 	//Selectivity parameters
-	init_bounded_vector_vector sel_par(1,ngear,1,isel_npar,-5.,5.,sel_phz);
+	init_bounded_vector_vector sel_par(1,ngear,1,isel_npar,-15.,15.,sel_phz);
 	LOC_CALCS
 		int k;
 		for(k=1;k<=ngear;k++)

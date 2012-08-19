@@ -28,7 +28,7 @@
 ##      wt =200. 50.0 22.2 12.5 5.56 3.12 2.00                               ##
 ## ------------------------------------------------------------------------- ##
 ## GILL           HOOP                                                       ##
-   1              3            ## sel_type(1=logistic,2=eplogis,3=linapprox) ##
+   1              4            ## sel_type(1=logistic,2=eplogis,3=linapprox) ##
    2              2            ## estimation phase                           ##
    15             10           ## length-at-50% vulnerability                ##
    3              30           ## std in length-at-50% vulnerabilty          ##
