@@ -17,36 +17,49 @@ source("plotMarginals.R", echo=FALSE)
 
 .SAVEFIGS		<- TRUE
 .PRESENTATION	<- FALSE
-.CEXLAB			<- 1.0
-.FILENAME		<- "../ADMB/srcLSMR/lsmr"
-.FIGDIR			<- "../FIGS/LSMR/SIMb/"
+.CEXLAB			<- 2.0
+#.FILENAME		<- "../ADMB/srcLSMR/lsmr"
+#.FILENAME		<- "../SCENARIOS/SIMb/lsmr"
+.FILENAME		<- "../SCENARIOS/RUN4/lsmr"
+
+.FIGDIR			<- "../FIGS/LSMR/RUN4/"
 
 
 
 getObj <- function(fn=.FILENAME)
 {
 	obj				<- read.admb(.FILENAME)
-	obj$mcmc		<- read.table(paste(.FILENAME, ".post", sep=""), header=TRUE)
+	mcfile          <- paste(.FILENAME, ".post", sep="")
+	if(file.exists(mcfile))
+	obj$mcmc		<- read.table(mcfile, header=TRUE)
 	class(obj)		<- c(class(obj), "lsmr")
 	return(obj)
 }
 
 obj <- getObj()
 
+
 main <- function()
 {
+	graphics.off()
 	obj <- getObj()
 	par(las = 1)
 	par(cex.lab = .CEXLAB)
 	plot(obj);
 	if(.SAVEFIGS) 
 	{
-		gfn <- paste(.FIGDIR, "fig:LSRM%d.png", sep="")
-		png(gfn, width=960, height=960, res=100)
-		par(cex.lab = .CEXLAB, cex.axis=0.9*.CEXLAB, mar=c(6.1, 5.1, 5.1, 3.1) )
-		plot(obj)
-		dev.off()
+		savefigs()
 	}
+}
+
+savefigs <- function()
+{
+	obj <- getObj()
+	gfn <- paste(.FIGDIR, "fig:LSRM%d.png", sep="")
+	png(gfn, width=960, height=960, res=100)
+	par(cex.lab = .CEXLAB, cex.axis=0.9*.CEXLAB, mar=c(6.1, 5.1, 5.1, 3.1) )
+	plot(obj)
+	dev.off()
 }
 
 # --------------------------------------------------------------------------- #
@@ -72,10 +85,14 @@ plot.lsmr <- function(obj, ...)
 		.plotMx(obj)
 		gletter(4)
 		
-		
 		.plotSelex(xmid, t(sx))
+		gletter(5)
 		
+		.plotN100(obj)
+		gletter(6)
 		
+		.plotN150(obj)
+		gletter(7)
 		
 		ir = 0
 		for(i in 1:ngear)
@@ -90,20 +107,15 @@ plot.lsmr <- function(obj, ...)
 		}
 		
 		# Posterior samples
-		.plotTrace(obj)
-		.plotMarginalPosteriors(obj)
+		if(exists("post.samp"))
+		{
+			.mcmcTrace(obj)
+			.plotMarginalPosteriors(obj)
+		}
+		
 		
 	})
 
-}
-
-.plotTrace <- function(obj, ...)
-{
-	with(obj, {
-		if(exists("post.samp"))
-		.mcmcTrace(obj)
-	})
-	
 }
 
 .plotMx <- function(obj, ...)
@@ -156,16 +168,17 @@ plot.lsmr <- function(obj, ...)
 	})	
 }
 
-.plotNt <- function(obj, ...)
+.plotNt <- function(obj,  ...)
 {
 	# plot Numbers greater than 50 mm 
 	with(obj, {
+		
 		yl <- c(0, max(Nt))
 		if(exists("true_Nt"))
 			yl <- c(0, max(Nt, true_Nt))
 		
 		plot(yr, Nt, type="l", ylim=yl
-		, xlab="Year", ylab="Abundance (> 50 mm)")
+		, xlab="Year", ylab="Abundance (> 50 mm)", ...)
 	
 		if(exists("true_Nt"))
 		{
@@ -176,6 +189,30 @@ plot.lsmr <- function(obj, ...)
 		 
 	})	
 }
+
+.plotN100 <- function(obj,  ...)
+{
+	# plot Numbers greater than 50 mm 
+	with(obj, {
+		
+		yl <- c(0, max(N100))
+		
+		plot(yr, N100, type="l", ylim=yl
+		, xlab="Year", ylab="Abundance (> 100 mm)", ...)		 
+	})	
+}
+.plotN150 <- function(obj,  ...)
+{
+	# plot Numbers greater than 50 mm 
+	with(obj, {
+		
+		yl <- c(0, max(N150))
+		
+		plot(yr, N150, type="l", ylim=yl
+		, xlab="Year", ylab="Abundance (> 150 mm)", ...)		 
+	})	
+}
+
 
 .plotSelex <- function(x, y, ...)
 {

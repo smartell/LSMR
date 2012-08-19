@@ -435,7 +435,7 @@ FUNCTION writePosteriorSamples
 	dvector Rt(syr,nyr);
 	for(i=syr;i<=nyr;i++)
 	{
-		if(i==syr) Rt(i) = value(mfexp(log_ddot_r+ddot_r_devs(nx)));
+		if(i==syr) Rt(i) = value(mfexp(log_ddot_r+ddot_r_devs(1)));
 		else       Rt(i) = value(mfexp(log_rt(i)));
 	}
 	
@@ -525,7 +525,7 @@ FUNCTION void runSimulationModel(const int& seed)
 	{
 		if(i==syr) 
 		{
-			true_Rt(i) = value(mfexp(log_ddot_r+ddot_r_devs(nx)));
+			true_Rt(i) = value(mfexp(log_ddot_r+ddot_r_devs(1)));
 		}
 		else
 		{
@@ -865,7 +865,7 @@ FUNCTION calc_objective_function;
 		{
 			dvariable mean_f = sum(fi(k))/fi_count(k);
 			pvec(3) += dnorm(mean_f,0.1,0.01);
-			pvec(4) += dnorm(bar_f_devs(k),0,1.0);
+			pvec(4) += dnorm(bar_f_devs(k),0,0.01);
 		}
 	}
 	else
@@ -877,7 +877,7 @@ FUNCTION calc_objective_function;
 		{
 			dvariable mean_f = sum(fi(k))/fi_count(k);
 			pvec(3) += dnorm(mean_f,0.1,2.5);
-			pvec(4) += dnorm(bar_f_devs(k),0,1.0);
+			pvec(4) += dnorm(bar_f_devs(k),0,flag(7)+1.e-10);
 		}
 		
 		//pvec(3) = dnorm(log_bar_f,log(0.1108032),2.5);
@@ -1137,8 +1137,14 @@ REPORT_SECTION
 	dvector Rt(syr,nyr);
 	for(i=syr;i<=nyr;i++)
 	{
-		if(i==syr) Rt(i) = value(mfexp(log_ddot_r+ddot_r_devs(nx)));
-		else       Rt(i) = value(mfexp(log_rt(i)));
+		if(i==syr)
+		{
+			Rt(i) = value(mfexp(log_ddot_r+ddot_r_devs(1)));
+		}
+		else
+		{
+			Rt(i) = value(mfexp(log_rt(i)));
+		}   
 	}
 	REPORT(Nt);
 	REPORT(Rt);
