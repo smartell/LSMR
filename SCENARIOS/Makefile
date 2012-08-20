@@ -3,7 +3,7 @@
 ## targets:
 
 ## Macros
-SUBDIR = RUN1 RUN2 RUN3 RUN4 RUN5  # SIMa SIMb
+SUBDIR = RUN1 RUN2 RUN3 RUN4 #RUN5  # SIMa SIMb
 ##SUBDIR = SOKeg
 TARGET = 
 

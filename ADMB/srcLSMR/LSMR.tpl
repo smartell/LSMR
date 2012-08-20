@@ -207,7 +207,7 @@ DATA_SECTION
 				break;
 				case 5:  // cubic spline array
 					isel_npar(k) = x_nodes(k);
-					jsel_npar(k) = (nyr-syr)+1;
+					jsel_npar(k) = (int)(nyr-syr+1)/2 + 1;
 				break;
 			}
 		}
@@ -293,7 +293,7 @@ PARAMETER_SECTION
 	
 	//Selectivity parameters
 	//init_bounded_vector_vector sel_par(1,ngear,1,isel_npar,-15.,15.,sel_phz);
-	init_bounded_matrix_vector sel_par(1,ngear,1,jsel_npar,1,isel_npar,-20.,20.,sel_phz);
+	init_bounded_matrix_vector sel_par(1,ngear,1,jsel_npar,1,isel_npar,-7.,7.,sel_phz);
 	LOC_CALCS
 		int k;
 		for(k=1;k<=ngear;k++)
@@ -385,8 +385,8 @@ PROCEDURE_SECTION
 	if( flag(1) ) cout<<"\n TOP OF PROCEDURE_SECTION "<<endl;
 	
 	initParameters(); 
-	calcSizeTransitionMatrix();  
-	calcSelectivityAtLength();
+	calcSizeTransitionMatrix(); 
+	calcSelectivityAtLength();  
 	calcCaptureProbability();
 	calcSurvivalAtLength(); 
 	initializeModel();	
@@ -725,7 +725,7 @@ FUNCTION calcSelectivityAtLength
 	dmatrix xi(1,ngear,1,x_nodes);
 	dvar_matrix yi(1,ngear,1,x_nodes);
 	int n = nyr-syr+1;
-	dvar_matrix tmp_sel(1,n,1,nx);
+	
 	/*
 	dvariable gamma = 0.1;
 	dvariable x1 = 30.0;
@@ -740,7 +740,9 @@ FUNCTION calcSelectivityAtLength
 	{
 		dvector x(1,x_nodes(k));
 		dvector fx(1,nx);
-		dvar_matrix selcoff(1,n,1,x_nodes(k));
+		dvar_matrix selcoff(1,jsel_npar(k),1,x_nodes(k));
+		dvar_matrix tmp_sel(1,jsel_npar(k),1,nx);
+		
 		x.fill_seqadd(0,1.0/(x_nodes(k)-1));
 		fx.fill_seqadd(0,1.0/(nx-1));
 		
@@ -765,6 +767,7 @@ FUNCTION calcSelectivityAtLength
 			break;
 			case 4: // cubic spline
 				yi(k) = dev_vector(sel_par(k)(1),pen);
+				//yi(k) = sel_par(k)(1);
 				vcubic_spline_function ffa(x,yi(k));
 				sx(k) = ffa(fx);
 			break;
@@ -778,21 +781,26 @@ FUNCTION calcSelectivityAtLength
 		
 		if(sel_type(k)==5)      // cubic spline array (must be outside of switch)
 		{
-			for(i=1;i<=n;i++)
+			for(i=1;i<=jsel_npar(k);i++)
 			{
-				selcoff(i) = dev_vector(sel_par(k)(i),pen);
+				//selcoff(i) = dev_vector(sel_par(k)(i),pen);
+				selcoff(i) = sel_par(k)(i); 
 			}
-			vcubic_spline_function_array fna(1,n,x,selcoff);
+			
+			vcubic_spline_function_array fna(1,jsel_npar(k),x,selcoff);
 			tmp_sel = fna(fx);
 			sx(k) = tmp_sel(1);
-			j=0;
+			j=1;
 			for(i=syr;i<=nyr;i++)
 			{
-				j++;
 				six(k)(i) = mfexp( tmp_sel(j) - log(mean(mfexp(tmp_sel(j)))+1.e-30) );
+				if( i%2 )
+				{
+					j++;
+				}
 			}
 		}
-		
+		sx(k) = six(k)(syr);
 		//sx(k) = mfexp( sx(k) - log( mean( mfexp(sx(k))+1.e-30 ) ) );
 		//sx(k) = mfexp( sx(k) - log( max( mfexp(sx(k))+1.e-30 ) ) );
 	}
@@ -929,7 +937,7 @@ FUNCTION calc_objective_function;
 		for(k=1;k<=ngear;k++)
 		{
 			dvariable mean_f = sum(fi(k))/fi_count(k);
-			pvec(3) += dnorm(mean_f,0.1,2.5);
+			pvec(3) += dnorm(mean_f,0.1,0.25);
 			pvec(4) += dnorm(bar_f_devs(k),0,flag(7)+1.e-3);
 		}
 		
@@ -1173,7 +1181,7 @@ FUNCTION dvar_matrix calcLTM(dvector& x, const dvariable &linf, const dvariable 
   }
 	
 REPORT_SECTION
-	int i,j,im;
+	int i,j,k,im;
 	REPORT(f          );
 	REPORT(log_ddot_r );
 	REPORT(log_bar_r  );
@@ -1239,6 +1247,38 @@ REPORT_SECTION
 	REPORT(Chat);
 	REPORT(Mhat);
 	REPORT(Rhat);
+	
+	/*Residuals for negative binomial*/
+	d3_array delta_C(1,ngear,1,irow,1,jcol);
+	d3_array delta_M(1,ngear,1,irow,1,jcol);
+	d3_array delta_R(1,ngear,1,irow,1,jcol);
+	
+	delta_C.initialize();
+	delta_M.initialize();
+	delta_R.initialize();
+	
+	for(k=1;k<=ngear;k++)
+	{
+		for(i=1;i<=irow(k);i++)
+		{
+			if(effort(k,i)>0)
+			{
+				dvector std_C = value(sqrt( 1+Chat(k)(i) + square(Chat(k)(i))/tau(k) ));
+				delta_C(k)(i) = value(elem_div(C(k)(i)-Chat(k)(i),std_C));
+				
+				dvector std_M = value(sqrt( 1+Mhat(k)(i) + square(Mhat(k)(i))/tau(k) ));
+				delta_M(k)(i) = value(elem_div(M(k)(i)-Mhat(k)(i),std_M));
+				
+				dvector std_R = value(sqrt( 1+Rhat(k)(i) + square(Rhat(k)(i))/tau(k) ));
+				delta_R(k)(i) = value(elem_div(R(k)(i)-Rhat(k)(i),std_R));
+			}
+		}
+	}
+	REPORT(delta_C);
+	REPORT(delta_M);
+	REPORT(delta_R);
+	
+	
 	REPORT(A);
 	
 	REPORT(npar);
@@ -1257,7 +1297,8 @@ REPORT_SECTION
 //
 TOP_OF_MAIN_SECTION
 	time(&start);
-	arrmblsize = 50000000;
+	//arrmblsize = 50000000;
+	arrmblsize = 1807940824;
 	gradient_structure::set_GRADSTACK_BUFFER_SIZE(1.e7);
 	gradient_structure::set_CMPDIF_BUFFER_SIZE(1.e7);
 	gradient_structure::set_MAX_NVAR_OFFSET(5000);

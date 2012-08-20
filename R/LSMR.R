@@ -11,17 +11,17 @@
 
 
 # --------------------------------------------------------------------------- #
+require(PBSmodelling)
 source("read.admb.R", echo=FALSE)
 source("plotTrace.R", echo=FALSE)
 source("plotMarginals.R", echo=FALSE)
 
 .SAVEFIGS		<- TRUE
 .PRESENTATION	<- FALSE
-.CEXLAB			<- 2.0
-#.FILENAME		<- "../ADMB/srcLSMR/lsmr"
-#.FILENAME		<- "../SCENARIOS/SIMb/lsmr"
-.FILENAME		<- "../SCENARIOS/RUN5/lsmr"
+.CEXLAB			<- 1.0
 
+.FILENAME		<- "../SCENARIOS/RUN5/lsmr"
+.FILEDIR		<- "../SCENARIOS/RUN5/"
 .FIGDIR			<- "../FIGS/LSMR/RUN5/"
 
 
@@ -31,7 +31,14 @@ getObj <- function(fn=.FILENAME)
 	obj				<- read.admb(.FILENAME)
 	mcfile          <- paste(.FILENAME, ".post", sep="")
 	if(file.exists(mcfile))
-	obj$mcmc		<- read.table(mcfile, header=TRUE)
+	{
+		obj$mcmc		<- read.table(mcfile, header=TRUE)
+		obj$Nt.ps		<- read.table(paste(.FILEDIR,"Nt.post", sep=""), header=FALSE)
+		obj$Rt.ps		<- read.table(paste(.FILEDIR,"Rt.post", sep=""), header=FALSE)
+		obj$N100.ps		<- read.table(paste(.FILEDIR,"N100.post", sep=""), header=FALSE)
+		obj$N150.ps		<- read.table(paste(.FILEDIR,"N150.post", sep=""), header=FALSE)
+	}
+	
 	class(obj)		<- c(class(obj), "lsmr")
 	return(obj)
 }
@@ -118,6 +125,29 @@ plot.lsmr <- function(obj, ...)
 
 }
 
+.plotResiduals <- function(obj, ...)
+{
+	with(obj, {
+		ir = 0
+		for(i in 1:ngear)
+		{
+			ir = 1:irow[i] + max(ir)
+			
+			plotBubbles(t(delta_C[ir, ]), xval=yr, yval=xmid, 
+				prettyaxis=TRUE, hide0=TRUE, frange=0.02, size=0.1, 
+				main="Catch residuals")
+			
+			plotBubbles(t(delta_M[ir, ]), xval=yr, yval=xmid, 
+				prettyaxis=TRUE, hide0=TRUE, frange=0.02, size=0.1, 
+				main="Residuals for new marks released")
+				
+			plotBubbles(t(delta_R[ir, ]), xval=yr, yval=xmid, 
+				prettyaxis=TRUE, hide0=TRUE, frange=0.02, size=0.1, 
+				main="Residuals for recaptured marks")
+		}
+	})
+}
+
 .plotMx <- function(obj, ...)
 {
 	with(obj, { 
@@ -173,9 +203,9 @@ plot.lsmr <- function(obj, ...)
 	# plot Numbers greater than 50 mm 
 	with(obj, {
 		
-		yl <- c(0, max(Nt))
+		yl <- c(0, 1.2*max(Nt))
 		if(exists("true_Nt"))
-			yl <- c(0, max(Nt, true_Nt))
+			yl <- c(0, 1.2*max(Nt, true_Nt))
 		
 		plot(yr, Nt, type="l", ylim=yl
 		, xlab="Year", ylab="Abundance (> 50 mm)", ...)
@@ -185,6 +215,16 @@ plot.lsmr <- function(obj, ...)
 			lines(yr, true_Nt, lwd=2, col=colr(2, 0.5))
 			legend("top", c("estimated","true"),lty=1, lwd=c(1, 2)
 			, col=c(1, colr(2, 0.5)), bty="n")
+		}
+		
+		# Add credible interval
+		if(exists("Nt.ps"))
+		{
+			ci <- apply(Nt.ps, 2, quantile, probs=c(0.025, 0.05, 0.25, 0.5, 0.75, 0.95, 0.975))
+			.polygon(yr, ci[c(1, 7), ])
+			.polygon(yr, ci[c(2, 6), ])
+			.polygon(yr, ci[c(3, 5), ])
+			
 		}
 		 
 	})	
@@ -198,7 +238,18 @@ plot.lsmr <- function(obj, ...)
 		yl <- c(0, max(N100))
 		
 		plot(yr, N100, type="l", ylim=yl
-		, xlab="Year", ylab="Abundance (> 100 mm)", ...)		 
+		, xlab="Year", ylab="Abundance (> 100 mm)", ...)
+		
+		# Add credible interval
+		if(exists("N100.ps"))
+		{
+			ci <- apply(N100.ps, 2, quantile, probs=c(0.025, 0.05, 0.25, 0.5, 0.75, 0.95, 0.975))
+			.polygon(yr, ci[c(1, 7), ])
+			.polygon(yr, ci[c(2, 6), ])
+			.polygon(yr, ci[c(3, 5), ])
+			
+		}
+		
 	})	
 }
 .plotN150 <- function(obj,  ...)
@@ -210,6 +261,16 @@ plot.lsmr <- function(obj, ...)
 		
 		plot(yr, N150, type="l", ylim=yl
 		, xlab="Year", ylab="Abundance (> 150 mm)", ...)		 
+		# Add credible interval
+		if(exists("N150.ps"))
+		{
+			ci <- apply(N150.ps, 2, quantile, probs=c(0.025, 0.05, 0.25, 0.5, 0.75, 0.95, 0.975))
+			.polygon(yr, ci[c(1, 7), ])
+			.polygon(yr, ci[c(2, 6), ])
+			.polygon(yr, ci[c(3, 5), ])
+			
+		}
+		
 	})	
 }
 
@@ -218,6 +279,14 @@ plot.lsmr <- function(obj, ...)
 {
 	#Plot seletivities
 	matplot(x, y, xlab="Length (cm)", ylab="Selectivity", type="l", col=1)
+}
+
+.polygon  <- function(x, y, ...)
+{
+	# Add a polygon to a plot,  where y is the ci
+	xp <- c(x, rev(x))
+	yp <- c(y[1,], rev(y[2, ]))
+	polygon(xp, yp, col=colr(1, 0.15), border=NA)
 }
 
 .staircase <- function(x, y, ...)
