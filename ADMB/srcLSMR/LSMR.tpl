@@ -184,11 +184,13 @@ DATA_SECTION
 	init_vector sel_pen2(1,ngear);
 	
 	ivector isel_npar(1,ngear);
+	ivector jsel_npar(1,ngear);	//number of rows
 	
 	LOC_CALCS
 		/* Determine the number of selectivity parameters to estimate */
 		for(k=1;k<=ngear;k++)
 		{
+			jsel_npar(k) = 1;
 			switch(sel_type(k))
 			{
 				case 1:  // logistic
@@ -200,8 +202,16 @@ DATA_SECTION
 				case 3:  // linapprox
 					isel_npar(k) = x_nodes(k);
 				break;
+				case 4:  // cubic spline
+					isel_npar(k) = x_nodes(k);
+				break;
+				case 5:  // cubic spline array
+					isel_npar(k) = x_nodes(k);
+					jsel_npar(k) = (int)(nyr-syr+1)/2 + 1;
+				break;
 			}
 		}
+		cout<<"OK after getting dimension of sel_par"<<endl;
 	END_CALCS
 	
 	init_int nflags;
@@ -282,21 +292,22 @@ PARAMETER_SECTION
 	init_vector log_tau(1,ngear,tau_phz);
 	
 	//Selectivity parameters
-	init_bounded_vector_vector sel_par(1,ngear,1,isel_npar,-5.,5.,sel_phz);
+	//init_bounded_vector_vector sel_par(1,ngear,1,isel_npar,-15.,15.,sel_phz);
+	init_bounded_matrix_vector sel_par(1,ngear,1,jsel_npar,1,isel_npar,-7.,7.,sel_phz);
 	LOC_CALCS
 		int k;
 		for(k=1;k<=ngear;k++)
 		{
 			if( sel_type(k)==1 )
 			{
-				sel_par(k,1) = log(lx_ival(k));
-				sel_par(k,2) = log(gx_ival(k));
+				sel_par(k,1,1) = log(lx_ival(k));
+				sel_par(k,1,2) = log(gx_ival(k));
 			}
 			if( sel_type(k)==2 )
 			{
-				sel_par(k,1) = log(lx_ival(k));
-				sel_par(k,2) = log(gx_ival(k));
-				sel_par(k,3) = -4.0;
+				sel_par(k,1,1) = log(lx_ival(k));
+				sel_par(k,1,2) = log(gx_ival(k));
+				sel_par(k,1,3) = -4.0;
 			}
 		}
 	END_CALCS
@@ -309,7 +320,7 @@ PARAMETER_SECTION
 	
 	
 	//TODO Fix this so there is a dev vector for each gear, otherwise biased estimates of log_bar_f
-	init_bounded_matrix bar_f_devs(1,ngear,1,fi_count,-5.0,5.0,3);
+	init_bounded_matrix bar_f_devs(1,ngear,1,fi_count,-7.0,7.0,3);
 	
 	sdreport_number sd_l_infty;
 	
@@ -317,7 +328,7 @@ PARAMETER_SECTION
 	objective_function_value f;
 	
 
-	
+	number pen;
 	number m_linf;
 
 	vector tau(1,ngear);	// over-dispersion parameters >1.0
@@ -329,6 +340,7 @@ PARAMETER_SECTION
 	vector log_rt(syr+1,nyr);
 	matrix fi(1,ngear,1,irow);  // capture probability in period i.
 	matrix sx(1,ngear,1,jcol);	// Selectivity at length xmid
+	3darray six(1,ngear,syr,nyr,1,jcol);  //time-varying selectivity.
 	matrix N(syr,nyr,1,nx);		// Numbers(time step, length bins)
 	matrix U(syr,nyr,1,nx);		// Un-marked number(time, length)
 	matrix T(syr,nyr,1,nx);		// Marks-at-large (time step, length bins)
@@ -354,7 +366,7 @@ INITIALIZATION_SECTION
 
 RUNTIME_SECTION
     maximum_function_evaluations 500,1500,2500,25000,25000
-    convergence_criteria 0.01,1.e-4,1.e-5,1.e-5
+    convergence_criteria 0.01,1.e-4,1.e-5,1.e-5,1.e-5
 
 PRELIMINARY_CALCS_SECTION
 	if(SimFlag)
@@ -373,8 +385,8 @@ PROCEDURE_SECTION
 	if( flag(1) ) cout<<"\n TOP OF PROCEDURE_SECTION "<<endl;
 	
 	initParameters(); 
-	calcSizeTransitionMatrix();
-	calcSelectivityAtLength();	
+	calcSizeTransitionMatrix(); 
+	calcSelectivityAtLength();  
 	calcCaptureProbability();
 	calcSurvivalAtLength(); 
 	initializeModel();	
@@ -471,7 +483,7 @@ FUNCTION void runSimulationModel(const int& seed)
 	double sig_f = flag(7);
 	for(k=1;k<=ngear;k++)
 	{
-		bar_f_devs(k) = sig_f*tmp_bar_f_devs(k);
+		bar_f_devs(k) = sig_f*(tmp_bar_f_devs(k)-mean(tmp_bar_f_devs(k)));
 	}
 
 	initParameters(); 
@@ -545,6 +557,8 @@ FUNCTION initParameters
 	beta       = theta(6);
 	mu_r       = theta(7);
 	cv_r       = theta(8);
+	
+	pen = 0;
   }
 //
 FUNCTION calcSizeTransitionMatrix
@@ -649,16 +663,19 @@ FUNCTION calcCaptureProbability
 	ik = 1;
 	fi.initialize();
 	Farr.initialize();
+	dvar_matrix fdev(1,ngear,1,fi_count);
 	
 	for(k=1;k<=ngear;k++)
 	{
+		fdev(k) = dev_vector(bar_f_devs(k),pen);
 		for(i=1;i<=irow(k);i++)
 		{
 			jyr = iyr(k,i);
 			if( effort(k,i)>0 )
 			{
-				fi(k,i)      = qk(k)*effort(k,i)*mfexp(bar_f_devs(k)(ik(k)++));
-				Farr(k)(jyr) = fi(k,i) * sx(k);
+				fi(k,i)      = qk(k)*effort(k,i)*mfexp(fdev(k)(ik(k)++));
+				//Farr(k)(jyr) = fi(k,i) * sx(k);
+				Farr(k)(jyr) = fi(k,i) * six(k)(jyr);
 			}
 		}
 	}
@@ -699,13 +716,15 @@ FUNCTION calcSelectivityAtLength
 	This function calculates the length-specific selectivity.
 	The parametric option is a logistic curve (plogis(x,lx,gx))
 	*/
-	int k;
+	int i,j,k;
 	double dx;
 	dvariable p1,p2,p3;
 	sx.initialize();
+	six.initialize();
 	Selex cSelex;
 	dmatrix xi(1,ngear,1,x_nodes);
 	dvar_matrix yi(1,ngear,1,x_nodes);
+	int n = nyr-syr+1;
 	
 	/*
 	dvariable gamma = 0.1;
@@ -717,30 +736,72 @@ FUNCTION calcSelectivityAtLength
 	cout<<"Linear interpolation"<<endl;	
 	cout<<cSelex.linapprox(x,y,xmid)<<endl;
 	*/
-	
 	for(k=1;k<=ngear;k++)
 	{
+		dvector x(1,x_nodes(k));
+		dvector fx(1,nx);
+		dvar_matrix selcoff(1,jsel_npar(k),1,x_nodes(k));
+		dvar_matrix tmp_sel(1,jsel_npar(k),1,nx);
+		
+		x.fill_seqadd(0,1.0/(x_nodes(k)-1));
+		fx.fill_seqadd(0,1.0/(nx-1));
+		
 		switch(sel_type(k))
 		{
-			case 1:  //logistic
-				p1 = mfexp(sel_par(k,1));
-				p2 = mfexp(sel_par(k,2));
+			case 1:  // logistic
+				p1 = mfexp(sel_par(k,1,1));
+				p2 = mfexp(sel_par(k,1,2));
 				sx(k) = log( cSelex.logistic(xmid,p1,p2) );
 			break;
-			case 2: //eplogis
-				p1 = mfexp(sel_par(k,1));
-				p2 = mfexp(sel_par(k,2));
-				p3 = mfexp(sel_par(k,3))/(1.+mfexp(sel_par(k,3)));
+			case 2: // eplogis
+				p1 = mfexp(sel_par(k,1,1));
+				p2 = mfexp(sel_par(k,1,2));
+				p3 = mfexp(sel_par(k,1,3))/(1.+mfexp(sel_par(k,1,3)));
 				sx(k) = log( cSelex.eplogis(xmid,p1,p2,p3) );
 			break;
-			case 3: //linapprox
+			case 3: // linapprox
 				dx = (double(nbin)-1.)/(double(x_nodes(k)-1.));
 				xi(k).fill_seqadd( min(xmid),dx );
-				yi(k)= sel_par(k);
+				yi(k)= dev_vector(sel_par(k)(1),pen);
 				sx(k) = cSelex.linapprox(xi(k),yi(k),xmid);
 			break;
+			case 4: // cubic spline
+				yi(k) = dev_vector(sel_par(k)(1),pen);
+				//yi(k) = sel_par(k)(1);
+				vcubic_spline_function ffa(x,yi(k));
+				sx(k) = ffa(fx);
+			break;
 		}
-		sx(k) = mfexp( sx(k) - log( mean( mfexp(sx(k))+1.e-30 ) ) );
+		for(i=syr;i<=nyr;i++)
+		{
+			six(k)(i) = mfexp( sx(k) - log( mean( mfexp(sx(k))+1.e-30 ) ) );
+		}
+		
+		
+		
+		if(sel_type(k)==5)      // cubic spline array (must be outside of switch)
+		{
+			for(i=1;i<=jsel_npar(k);i++)
+			{
+				//selcoff(i) = dev_vector(sel_par(k)(i),pen);
+				selcoff(i) = sel_par(k)(i); 
+			}
+			
+			vcubic_spline_function_array fna(1,jsel_npar(k),x,selcoff);
+			tmp_sel = fna(fx);
+			sx(k) = tmp_sel(1);
+			j=1;
+			for(i=syr;i<=nyr;i++)
+			{
+				six(k)(i) = mfexp( tmp_sel(j) - log(mean(mfexp(tmp_sel(j)))+1.e-30) );
+				if( i%2 )
+				{
+					j++;
+				}
+			}
+		}
+		sx(k) = six(k)(syr);
+		//sx(k) = mfexp( sx(k) - log( mean( mfexp(sx(k))+1.e-30 ) ) );
 		//sx(k) = mfexp( sx(k) - log( max( mfexp(sx(k))+1.e-30 ) ) );
 	}
   }
@@ -876,8 +937,8 @@ FUNCTION calc_objective_function;
 		for(k=1;k<=ngear;k++)
 		{
 			dvariable mean_f = sum(fi(k))/fi_count(k);
-			pvec(3) += dnorm(mean_f,0.1,2.5);
-			pvec(4) += dnorm(bar_f_devs(k),0,flag(7)+1.e-10);
+			pvec(3) += dnorm(mean_f,0.1,0.25);
+			pvec(4) += dnorm(bar_f_devs(k),0,flag(7)+1.e-3);
 		}
 		
 		//pvec(3) = dnorm(log_bar_f,log(0.1108032),2.5);
@@ -886,12 +947,12 @@ FUNCTION calc_objective_function;
 	
 	
 	/* PENALTIES TO INSURE DEV VECTORS HAVE A MEAN O */
-	dvar_vector dev_pen(1,ngear);
-	for(k=1;k<=ngear;k++)
-	{
-		dvariable s = mean(bar_f_devs(k)); 
-		dev_pen(k)  = 1.e5 * s*s;
-	}
+	//dvar_vector dev_pen(1,ngear);
+	//for(k=1;k<=ngear;k++)
+	//{
+	//	dvariable s = mean(bar_f_devs(k)); 
+	//	dev_pen(k)  = 1.e5 * s*s;
+	//}
 	
 	/* LIKELIHOODS */
 	/*
@@ -978,15 +1039,20 @@ FUNCTION calc_objective_function;
 	*/
 	dvar_vector sel_pen(1,ngear);
 	sel_pen.initialize();
+	int n=(nyr-syr)+1;
 	for(k=1;k<=ngear;k++)
 	{
-		if( sel_type(k)==3 )
+		if( sel_type(k)==3 || sel_type(k)==4 )
 		{
-			sel_pen(k) = sel_pen1(k)/nx * norm2(first_difference(first_difference(sx(k))));
-			for(j=1;j<nx;j++)
+			for(i=syr;i<=nyr;i++)
 			{
-				if(sx(k,j+1)<sx(k,j))
-					sel_pen(k) += sel_pen2(k) * square(sx(k,j+1)-sx(k,j));
+				sel_pen(k) += sel_pen1(k)/(nx+n) * norm2(first_difference(first_difference(six(k)(i))));
+				for(j=1;j<nx;j++)
+				{
+					if(six(k,i,j+1)<six(k,i,j))
+						sel_pen(k) += sel_pen2(k)/n * square(six(k,i,j+1)-six(k,i,j));
+				}
+				sel_pen(k) += 0.1*norm2(six(k)(i));
 			}
 		}
 	}
@@ -996,8 +1062,9 @@ FUNCTION calc_objective_function;
 	f  = sum(fvec); 
 	f += sum(pvec); 
 	f += sum(priors); 
-	f += sum(dev_pen); 
+	//f += sum(dev_pen); 
 	f += sum(sel_pen); 
+	f += pen;
 	
   }
 //
@@ -1019,6 +1086,15 @@ FUNCTION dvariable dgamma(const prevariable& x, const double& a, const double& b
 	dvariable t2 = (a-1.)*log(x)-x/b;
 	RETURN_ARRAYS_DECREMENT();
 	return(t1*mfexp(t2));
+  }
+
+FUNCTION dvar_vector dev_vector(dvar_vector &x, dvariable &pen)
+  {
+	/*A little tweek to make a dvar_vector sum to 0.*/
+	dvariable s = mean(x);
+	pen += 10000.0*s*s;
+	x -=s;
+	return(x);
   }
 
 FUNCTION dvar_vector posfun(const dvar_vector& x, const double& eps, dvariable& pen)
@@ -1067,7 +1143,7 @@ FUNCTION dvar_matrix calcLTM(dvector& x, const dvariable &linf, const dvariable 
 	
 	- cumd_gamma(x,a) is the same as Igamma(a,x) in R.
 	- If length interval > linf, then assume now further growth.
-	- Note the use of posfun to ensure differentiable.
+
 	*/
 	RETURN_ARRAYS_INCREMENT();
 	int i,j;
@@ -1105,7 +1181,7 @@ FUNCTION dvar_matrix calcLTM(dvector& x, const dvariable &linf, const dvariable 
   }
 	
 REPORT_SECTION
-	int i,j,im;
+	int i,j,k,im;
 	REPORT(f          );
 	REPORT(log_ddot_r );
 	REPORT(log_bar_r  );
@@ -1171,6 +1247,38 @@ REPORT_SECTION
 	REPORT(Chat);
 	REPORT(Mhat);
 	REPORT(Rhat);
+	
+	/*Residuals for negative binomial*/
+	d3_array delta_C(1,ngear,1,irow,1,jcol);
+	d3_array delta_M(1,ngear,1,irow,1,jcol);
+	d3_array delta_R(1,ngear,1,irow,1,jcol);
+	
+	delta_C.initialize();
+	delta_M.initialize();
+	delta_R.initialize();
+	
+	for(k=1;k<=ngear;k++)
+	{
+		for(i=1;i<=irow(k);i++)
+		{
+			if(effort(k,i)>0)
+			{
+				dvector std_C = value(sqrt( 1+Chat(k)(i) + square(Chat(k)(i))/tau(k) ));
+				delta_C(k)(i) = value(elem_div(C(k)(i)-Chat(k)(i),std_C));
+				
+				dvector std_M = value(sqrt( 1+Mhat(k)(i) + square(Mhat(k)(i))/tau(k) ));
+				delta_M(k)(i) = value(elem_div(M(k)(i)-Mhat(k)(i),std_M));
+				
+				dvector std_R = value(sqrt( 1+Rhat(k)(i) + square(Rhat(k)(i))/tau(k) ));
+				delta_R(k)(i) = value(elem_div(R(k)(i)-Rhat(k)(i),std_R));
+			}
+		}
+	}
+	REPORT(delta_C);
+	REPORT(delta_M);
+	REPORT(delta_R);
+	
+	
 	REPORT(A);
 	
 	REPORT(npar);
@@ -1189,7 +1297,8 @@ REPORT_SECTION
 //
 TOP_OF_MAIN_SECTION
 	time(&start);
-	arrmblsize = 50000000;
+	//arrmblsize = 50000000;
+	arrmblsize = 1807940824;
 	gradient_structure::set_GRADSTACK_BUFFER_SIZE(1.e7);
 	gradient_structure::set_CMPDIF_BUFFER_SIZE(1.e7);
 	gradient_structure::set_MAX_NVAR_OFFSET(5000);
@@ -1291,6 +1400,11 @@ GLOBALS_SECTION
 		RETURN_ARRAYS_DECREMENT();
 		return(-loglike);
 	}
+	
+	/*
+	Cubic spline function array class is in statsLib.h in Version 11
+	*/
+	
 	
 	
 FINAL_SECTION
