@@ -1,0 +1,50 @@
+## ------------------------------------------------------------------------- ##
+window name=hcamView title="iSCAM Viewer"
+
+menu nitems=1 label="File"
+  menuitem label="Exit" font="Courier 10" function=closeWin
+## ------------------------------------------------------------------------- ##
+
+## ------------------------------------------------------------------------- ##
+## TOP OF WINDOW                                                             ##
+## ------------------------------------------------------------------------- ##
+grid 1 1 toptitle="List of Model runs to view"
+object name=ifiles pady=5 padx=5 rowshow=5 rowlabels=FALSE width="5 8 25 30"
+
+
+notebook tabs="Figures Tables Tools" name=nbtab width=520 height=600
+## ------------------------------------------------------------------------- ##
+## FIGURES TAB                                                               ##
+## ------------------------------------------------------------------------- ##
+	## Grid of controls
+	grid 2 1	
+		## RADIO BUTTONS FOR PLOTTING DATA
+		grid 4 3 toptitle="Graphical output" relief="sunken" pady=5
+		radio name=plotType mode=character function=.viewPlot  sticky=W  value=abun50   text="Abundance (>  50 mm)"                    
+		radio name=plotType mode=character function=.viewPlot  sticky=W  value=abun100  text="Abundance (> 100 mm)"                    
+		radio name=plotType mode=character function=.viewPlot  sticky=W  value=abun150  text="Abundance (> 150 mm)"        
+		radio name=plotType mode=character function=.viewPlot  sticky=W  value=abunRt   text="Recruitment"    
+		radio name=plotType mode=character function=.viewPlot  sticky=W  value=capProb  text="Capture probability"         
+		radio name=plotType mode=character function=.viewPlot  sticky=W  value=selex    text="Size selectivity"         
+		radio name=plotType mode=character function=.viewPlot  sticky=W  value=mort     text="Natural mortality"         
+		null
+		null
+		null
+		null
+		type=check name=overLay mode="logical" checked=FALSE text="Overlay" font="" edit=TRUE
+		
+		## RADIO BUTTONS FOR PLOTTING MLE RESULTS
+		grid 1 1 toptitle="Maximum Likelihood Estimates (MLE)" relief="sunken" pady=5
+		null
+
+## ------------------------------------------------------------------------- ##
+## TABLES TAB                                                                ##
+## ------------------------------------------------------------------------- ##
+	label text="TABLES TAB"
+
+## ------------------------------------------------------------------------- ##
+## TOOLS TAB                                                                 ##
+## ------------------------------------------------------------------------- ##
+	label text="TOOLS TAB"
+
+	

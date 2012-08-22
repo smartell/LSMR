@@ -17,8 +17,8 @@ require(Hmisc)
 #require(reshape)
 require(grid)
 
-source("./RGui/Gui.R", echo=FALSE)
-source("./RGui/lsmrPlots.R", echo=FALSE)
+source("./Gui.R", echo=FALSE)
+source("./lsmrPlots.R", echo=FALSE)
 source("read.admb.R", echo=FALSE)
 source("plotTrace.R", echo=FALSE)
 source("plotMarginals.R", echo=FALSE)
@@ -28,9 +28,9 @@ source("plotMarginals.R", echo=FALSE)
 .PRESENTATION	<- FALSE
 .CEXLAB			<- 1.0
 
-.FILENAME		<- "../SCENARIOS/RUN5/lsmr"
-.FILEDIR		<- "../SCENARIOS/RUN5/"
-.FIGDIR			<- "../FIGS/LSMR/RUN5/"
+.FILENAME		<- "../../SCENARIOS/RUN5/lsmr"
+.FILEDIR		<- "../../SCENARIOS/RUN5/"
+.FIGDIR			<- "../../FIGS/LSMR/RUN5/"
 
 
 
