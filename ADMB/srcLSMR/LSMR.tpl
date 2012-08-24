@@ -1420,3 +1420,10 @@ FINAL_SECTION
 	cout<<hour<<" hours, "<<minute<<" minutes, "<<second<<" seconds"<<endl;
 	cout<<"*******************************************"<<endl;
 
+	if(last_phase())
+	{
+		//uostream ofs((char*)(ad_comm::adprogram_name + adstring(".ecm")));
+		cout<<ad_comm::adprogram_name<<endl;
+	}
+
+

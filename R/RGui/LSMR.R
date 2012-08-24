@@ -13,8 +13,8 @@
 # --------------------------------------------------------------------------- #
 require(PBSmodelling)
 require(Hmisc)
-#require(ggplot2)
-#require(reshape)
+require(ggplot2)
+require(reshape)
 require(grid)
 
 source("./Gui.R", echo=FALSE)
@@ -29,7 +29,7 @@ source("plotMarginals.R", echo=FALSE)
 .CEXLAB			<- 1.0
 
 .FILENAME		<- "../../SCENARIOS/RUN5/lsmr"
-.FILEDIR		<- "../../SCENARIOS/RUN5/"
+.FILEDIR		<- "../../SCENARIOS/RUN2/"
 .FIGDIR			<- "../../FIGS/LSMR/RUN5/"
 
 
