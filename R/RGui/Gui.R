@@ -50,6 +50,7 @@ function()
 	# and read files and store into model object (M)
 	hdr	<- ifiles[ ifiles$Select, ]
 	fn	<- hdr$Control.File
+	print(fn)
 	#M	<- lapply(fn, read.admb)
 	M   <- lapply(fn, getObj)
 	names(M) <- hdr$Model
@@ -64,6 +65,11 @@ function()
 		M[[idx]]$Nt   = M[[idx]]$nt2
 		M[[idx]]$N100 = M[[idx]]$nt3
 		M[[idx]]$N150 = M[[idx]]$nt4
+		M[[idx]]$N220 = M[[idx]]$nt4
+		M[[idx]]$Rt   = M[[idx]]$nt2 -M[[idx]]$nt3
+		# Get ASMR posterior samples
+		M[[idx]]$N150.ps = read.table("./../../ADMB/srcASMR/nt4.mcmc", header=FALSE)
+		M[[idx]]$N220.ps = read.table("./../../ADMB/srcASMR/nt4.mcmc", header=FALSE)
 	}
 	
 	
@@ -91,6 +97,10 @@ function()
 			ylbl <- "Abundance (> 150 mm)"
 			.lsmrPlotNt(M, what="N150", ylbl=ylbl)
 		},
+		abun220={
+			ylbl <- "Mature abundance (> 220 mm)"
+			.lsmrPlotNt(M, what="N220", ylbl=ylbl)
+		},
 		abun50.ps={
 			cat("Entering abun50.ps \n")
 			ylbl <- "Abundance (> 50 mm)"
@@ -104,13 +114,17 @@ function()
 			ylbl <- "Abundance (> 150 mm)"
 			.lsmrPlotViolin(M, what="N150.ps", ylbl=ylbl)
 		}, 
-		agecomp={
-			print("agecomp")
-			.plotAgeComps(M)
+		abun220.ps={
+			ylbl <- "Mature abundance (> 220 mm)"
+			.lsmrPlotViolin(M, what="N220.ps", ylbl=ylbl)
+		}, 
+		abunRt={
+			ylbl <- "Recruitment"
+			.lsmrPlotNt(M, what="Rt", ylbl=ylbl)
 		},
-		agehist={
-			print("agehist")
-			.plotAgeHist(M)
+		mort={
+			print("Natural Mortality")
+			.lsmrPlotMortality(M)
 		},  
 		meanwt={
 			print("meanwt")

@@ -3,10 +3,10 @@
 "Select","Model","Description","Control File"
 #The following line is for the Demo example
 #TRUE,HG,"2010data_final",~/Documents/CURRENT PROJECTS/iSCAM/srcWorkingCopy/Examples/qciHerring/qciHerring2010
-TRUE,RUN1, "Fixed logistic selectivity"   ,./../../SCENARIOS/RUN1/lsmr
-TRUE,RUN2, "Exponential Logistic      "   ,./../../SCENARIOS/RUN2/lsmr
-TRUE,RUN3, "Hoop Selectivity coeffs   "   ,./../../SCENARIOS/RUN3/lsmr
-TRUE,RUN4, "Spline Selectivity coeffs "   ,./../../SCENARIOS/RUN4/lsmr
+TRUE,RUN1, "Fixed logistic selectivity"   ,./../../SCENARIOS/RUN1/RUN1
+TRUE,RUN2, "Exponential Logistic      "   ,./../../SCENARIOS/RUN2/RUN2
+TRUE,RUN3, "Hoop Selectivity coeffs   "   ,./../../SCENARIOS/RUN3/RUN3
+TRUE,RUN4, "Spline Selectivity coeffs "   ,./../../SCENARIOS/RUN4/RUN4
 TRUE,ASMR, "ASMR Run                  "   ,./../../ADMB/srcASMR/asmr
 FALSE,SIMa, "Perfect information (Sim)"   ,./../../SCENARIOS/SIMa/lsmr
 FALSE,SIMb, "Mixed error model (Sim)  "   ,./../../SCENARIOS/SIMb/lsmr

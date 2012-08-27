@@ -22,7 +22,8 @@ notebook tabs="Figures Tables Tools" name=nbtab width=520 height=600
 		grid 4 3 toptitle="Maximum likelihood estimates" relief="sunken" pady=5
 		radio name=plotType mode=character function=.viewPlot  sticky=W  value=abun50   text="Abundance (>  50 mm)"                    
 		radio name=plotType mode=character function=.viewPlot  sticky=W  value=abun100  text="Abundance (> 100 mm)"                    
-		radio name=plotType mode=character function=.viewPlot  sticky=W  value=abun150  text="Abundance (> 150 mm)"        
+		radio name=plotType mode=character function=.viewPlot  sticky=W  value=abun150  text="Abundance (> 150 mm)"
+		radio name=plotType mode=character function=.viewPlot  sticky=W  value=abun220  text="Abundance (> 220 mm)"        
 		radio name=plotType mode=character function=.viewPlot  sticky=W  value=abunRt   text="Recruitment"    
 		radio name=plotType mode=character function=.viewPlot  sticky=W  value=capProb  text="Capture probability"         
 		radio name=plotType mode=character function=.viewPlot  sticky=W  value=selex    text="Size selectivity"         
@@ -30,14 +31,16 @@ notebook tabs="Figures Tables Tools" name=nbtab width=520 height=600
 		null
 		null
 		null
-		null
 		type=check name=overLay mode="logical" checked=FALSE text="Overlay" font="" edit=TRUE
 		
 		## RADIO BUTTONS FOR PLOTTING MLE RESULTS
-		grid 1 3 toptitle="Marginal posterior distributions" relief="sunken" pady=5
+		grid 2 3 toptitle="Marginal posterior distributions" relief="sunken" pady=5
 		radio name=plotType mode=character function=.viewPlot  sticky=W  value=abun50.ps  text="Abundance (>  50 mm)"
 		radio name=plotType mode=character function=.viewPlot  sticky=W  value=abun100.ps text="Abundance (> 100 mm)"                    
-		radio name=plotType mode=character function=.viewPlot  sticky=W  value=abun150.ps text="Abundance (> 150 mm)"                    
+		radio name=plotType mode=character function=.viewPlot  sticky=W  value=abun150.ps text="Abundance (> 150 mm)"
+		radio name=plotType mode=character function=.viewPlot  sticky=W  value=abun220.ps text="Abundance (> 220 mm)"
+		null
+		null
 
 ## ------------------------------------------------------------------------- ##
 ## TABLES TAB                                                                ##

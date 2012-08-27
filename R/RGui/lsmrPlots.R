@@ -49,15 +49,16 @@
 	# construct data.frame
 	mdf <- NULL
 	n   <- length(M)
-	print(n)
 	for(i in 1:n)
 	{
 		idx <- match(what, names(M[[i]]))
-		N   <- t(data.frame(M[[i]][idx]))
-		print(N)
-		df  <- data.frame(Year=M[[i]]$yr, Model=names(M)[i], Nt=N )
-		mdf <- rbind(mdf, melt(df, id.vars=c("Model", "Year")))
-		print(mdf)
+		if(!is.na(idx))
+		{
+			N   <- t(data.frame(M[[i]][idx]))
+			print(N)
+			df  <- data.frame(Year=M[[i]]$yr, Model=names(M)[i], Nt=N )
+			mdf <- rbind(mdf, melt(df, id.vars=c("Model", "Year")))
+		}
 	}
 	names(mdf) <- c("Model", "Year", "Variable", "Abundance")
 	
@@ -66,12 +67,17 @@
 		ylbl="Value"
 	}
 	
-	p <- ggplot(mdf, aes(factor(Year), Abundance, col=Model))
+	p <- ggplot(mdf, aes(factor(Year), Abundance, fill=Model, col=Model))
 	p <- p + geom_violin()
 	if( ! .OVERLAY )
 	{
 		p <- p + facet_wrap(~ Model, scales="free")
 	}
 	print(p)
+	
+}
+
+.lsmrPlotMortality <- function(M, ...)
+{
 	
 }

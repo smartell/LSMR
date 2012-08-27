@@ -396,8 +396,14 @@ PROCEDURE_SECTION
 	calc_objective_function();
 	sd_l_infty = l_infty;
 	
+	if(mc_phase())
+	{
+		mcmcPhase=1;
+	}
+	
 	if( mceval_phase() )
 	{
+		mcmcEvalPhase=1;
 		writePosteriorSamples();
 	}
 	
@@ -412,11 +418,12 @@ FUNCTION writePosteriorSamples
 	nf++;
 	if(nf==1)
 	{
-		ofstream ofs0("LSMR.post");
-		ofstream ofs1("Nt.post"  );
-		ofstream ofs2("N100.post");
-		ofstream ofs3("N150.post");
-		ofstream ofs4("Rt.post"  );
+		ofstream ofs0("lsmr.post");
+		ofstream ofs1("lsmr.n1ps"  );
+		ofstream ofs2("lsmr.n2ps");
+		ofstream ofs3("lsmr.n3ps");
+		ofstream ofs4("lsmr.n4ps");
+		ofstream ofs5("lsmr.rtps"  );
 		ofs0<<"log_ddot_r       ";
 		ofs0<<" log_bar_r       ";
 		ofs0<<" m_infty         ";
@@ -431,11 +438,12 @@ FUNCTION writePosteriorSamples
 		
 		
 	}
-	ofstream ofs0("LSMR.post",ios::app);
-	ofstream ofs1("Nt.post"  ,ios::app);
-	ofstream ofs2("N100.post",ios::app);
-	ofstream ofs3("N150.post",ios::app);
-	ofstream ofs4("Rt.post"  ,ios::app);
+	ofstream ofs0("lsmr.post",ios::app);
+	ofstream ofs1("lsmr.n1ps",ios::app);
+	ofstream ofs2("lsmr.n2ps",ios::app);
+	ofstream ofs3("lsmr.n3ps",ios::app);
+	ofstream ofs4("lsmr.n4ps",ios::app);
+	ofstream ofs5("lsmr.rtps",ios::app);
 	
 	
 	
@@ -443,6 +451,7 @@ FUNCTION writePosteriorSamples
 	dvector Nt = value(rowsum(N));
 	dvector N100 = value( rowsum(trans(trans(N).sub(6,nbin))) );
 	dvector N150 = value( rowsum(trans(trans(N).sub(11,nbin))) );
+	dvector N220 = value( rowsum(trans(trans(N).sub(18,nbin))) );
 	
 	dvector Rt(syr,nyr);
 	for(i=syr;i<=nyr;i++)
@@ -457,7 +466,8 @@ FUNCTION writePosteriorSamples
 	ofs1<< Nt    <<endl;
 	ofs2<< N100  <<endl;
 	ofs3<< N150  <<endl;
-	ofs4<< Rt    <<endl;
+	ofs4<< N220  <<endl;
+	ofs5<< Rt    <<endl;
 	
   }
 
@@ -1228,10 +1238,13 @@ REPORT_SECTION
 	/*Abundance of other size classes*/
 	dvector N100(syr,nyr);
 	dvector N150(syr,nyr);
+	dvector N220(syr,nyr);
 	N100 = value( rowsum(trans(trans(N).sub(6,nbin))) );
 	N150 = value( rowsum(trans(trans(N).sub(11,nbin))) );
+	N220 = value( rowsum(trans(trans(N).sub(18,nbin))) );
 	REPORT(N100);
 	REPORT(N150);
+	REPORT(N220);
 	
 	
 	REPORT(log_rt);
@@ -1317,6 +1330,9 @@ GLOBALS_SECTION
 	#include <time.h>
 	#include <contrib.h>
 	#include <selex.cpp>
+	bool mcmcPhase = 0;
+	bool mcmcEvalPhase = 0;
+	
 
 	time_t start,finish;
 	long hour,minute,second;
@@ -1405,6 +1421,26 @@ GLOBALS_SECTION
 	Cubic spline function array class is in statsLib.h in Version 11
 	*/
 	
+	/*
+	Remove extension from file name
+	*/
+	adstring remove_ext(adstring fileName)
+	{
+		/*
+		This function strips the file extension
+		from the fileName argument and returns
+		the file name without the extension.
+		*/
+		const int length = fileName.size();
+		for (int i=length; i>=0; --i)
+		{
+			if (fileName(i)=='.')
+			{
+				return fileName(1,i-1);
+			}
+		}
+		return fileName;
+	}
 	
 	
 FINAL_SECTION
@@ -1422,8 +1458,53 @@ FINAL_SECTION
 
 	if(last_phase())
 	{
-		//uostream ofs((char*)(ad_comm::adprogram_name + adstring(".ecm")));
-		cout<<ad_comm::adprogram_name<<endl;
+		adstring file1 = ad_comm::adprogram_name;
+		adstring file2= remove_ext(control_file);
+		
+		adstring cmd = "cp "+file1+".rep "+file2+".rep";
+		system(cmd);
+		
+		cmd = "cp "+file1+".par "+file2+".par";
+		system(cmd);
+		
+		cmd = "cp "+file1+".std "+file2+".std";
+		system(cmd);
+		
+		cmd = "cp "+file1+".cor "+file2+".cor";
+		system(cmd);
+		
+		if(mcmcPhase)
+		{
+			cmd = "cp "+file1+".psv "+file2+".psv";
+			system(cmd);
+			
+		}
+		
+		if(mcmcEvalPhase)
+		{
+			cmd = "cp "+file1+".post "+file2+".post";
+			system(cmd);
+			
+			cmd = "cp "+file1+".n1ps "+file2+".n1ps";
+			system(cmd);
+			
+			cmd = "cp "+file1+".n2ps "+file2+".n2ps";
+			system(cmd);
+			
+			cmd = "cp "+file1+".n3ps "+file2+".n3ps";
+			system(cmd);
+			
+			cmd = "cp "+file1+".n4ps "+file2+".n4ps";
+			system(cmd);
+			
+			cmd = "cp "+file1+".rtps "+file2+".rtps";
+			system(cmd);
+			
+		}
+		
+		
+		
+		
 	}
 
 

@@ -36,15 +36,17 @@ source("plotMarginals.R", echo=FALSE)
 
 getObj <- function(fn=.FILENAME)
 {
-	obj				<- read.admb(.FILENAME)
-	mcfile          <- paste(.FILENAME, ".post", sep="")
+	print(fn)
+	obj				<- read.admb(fn)
+	mcfile          <- paste(fn, ".post", sep="")
 	if(file.exists(mcfile))
 	{
 		obj$mcmc		<- read.table(mcfile, header=TRUE)
-		obj$Nt.ps		<- read.table(paste(.FILEDIR,"Nt.post", sep=""), header=FALSE)
-		obj$Rt.ps		<- read.table(paste(.FILEDIR,"Rt.post", sep=""), header=FALSE)
-		obj$N100.ps		<- read.table(paste(.FILEDIR,"N100.post", sep=""), header=FALSE)
-		obj$N150.ps		<- read.table(paste(.FILEDIR,"N150.post", sep=""), header=FALSE)
+		obj$Nt.ps		<- read.table(paste(fn,".n1ps", sep=""), header=FALSE)
+		obj$Rt.ps		<- read.table(paste(fn,".rtps", sep=""), header=FALSE)
+		obj$N100.ps		<- read.table(paste(fn,".n2ps", sep=""), header=FALSE)
+		obj$N150.ps		<- read.table(paste(fn,".n3ps", sep=""), header=FALSE)
+		obj$N220.ps		<- read.table(paste(fn,".n4ps", sep=""), header=FALSE)
 	}
 	
 	class(obj)		<- c(class(obj), "lsmr")
