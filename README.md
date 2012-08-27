@@ -14,17 +14,17 @@ Obtaining a copy of ILSMR:
 ==========================
 
 This software is maintained using a Distributed Version Control System (DVCS)
-called Git.  The Git repository can be cloned from google at the following URL
+called Git.  The Git repository can be cloned from google at the following link:
 
-# Deprecated https://code.google.com/p/lsmr-project/
-https://github.com/smartell/LSMR
+* [GitHub](https://github.com/smartell/LSMR)
 
 To obtain a clone of the repository use:
+
 git clone git://github.com/smartell/LSMR.git
 
 To gain write access to the repository contact martell.steve@gmail.com
 
-THE FOLLOWING IS A LIST OF USEFUL GIT COMMANDS TO USE AT THE COMMAND LINE$:
+THE FOLLOWING IS A LIST OF USEFUL GIT COMMANDS TO USE AT THE COMMAND LINE:
   git help                      <list git commands>
   git clone url ILSMR/          <clone repository>
   git add filename              <add new file>
